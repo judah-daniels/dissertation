@@ -10,7 +10,26 @@
 \usepackage{changepage}
 \usepackage{url}
 \usepackage{blindtext}
+\usepackage{tabularx,booktabs}
+\usepackage{dirtree}
+\usepackage{cite}
+\usepackage{float} % Prevent Latex from repositioning tables
+\usepackage{amsmath}
+\usepackage{graphicx}
 
+%----------------------------------------------------------------------------------------
+
+% Formatting Commands
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\tabhead}[1]{\textbf{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\file}[1]{\texttt{\bfseries#1}}
+\newcommand{\option}[1]{\texttt{\itshape#1}}
+
+%----------------------------------------------------------------------------------------
+
+% Language setting
+\usepackage[english]{babel}
 %\raggedbottom                           % try to avoid widows and orphans
 \sloppy
 \clubpenalty1000%
@@ -25,10 +44,9 @@
 
 \bibliographystyle{plain}
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Title
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \thispagestyle{empty}
 
@@ -45,6 +63,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Proforma, table of contents and list of figures
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \pagestyle{plain}
 
@@ -72,6 +91,7 @@ Project Originator: & \bf \moriginator                  \\
 Supervisor:         & \bf \msupervisor                  \\ 
 \end{tabular}
 }
+
 \footnotetext[1]{This word count was computed
 by \texttt{detex diss.tex | tr -cd '0-9A-Za-z $\tt\backslash$n' | wc -w}
 }
@@ -81,17 +101,6 @@ by \texttt{detex diss.tex | tr -cd '0-9A-Za-z $\tt\backslash$n' | wc -w}
 \section*{Original Aims of the Project}
 % At most 100 words
 
-To write a demonstration dissertation\footnote{A normal footnote without the
-complication of being in a table.} using \LaTeX\ to save
-student's time when writing their own dissertations. The dissertation
-should illustrate how to use the more common \LaTeX\ constructs. It
-should include pictures and diagrams to show how these can be
-incorporated into the dissertation.  It should contain the entire
-\LaTeX\ source of the dissertation and the makefile.  It should
-explain how to construct an MSDOS disk of the dissertation in
-Postscript format that can be used by the book shop for printing, and,
-finally, it should have the prescribed layout and format of a diploma
-dissertation.
 
 
 \section*{Work Completed}
@@ -102,8 +111,7 @@ All that has been completed appears in this dissertation.
 \section*{Special Difficulties}
 % At most 100 words
 
-Learning how to incorporate encapulated postscript into a \LaTeX\
-document on both Ubuntu Linux and OS X.
+None
 
 \newpage
 
@@ -125,276 +133,164 @@ appreciated.
 
 \chapter{Introduction}
 
-\section{Overview of the files}
+\section{Motivation}
+The introduction should explain the principal motivation for the project and show how the work fits into the broad area of surrounding computer science and give a brief survey of previous related work. \\
+Clear motivation, justifying potential benefits of success.
+\section{Related Work}
+It should generally be unnecessary to quote at length from technical papers or textbooks.
+If a simple bibliographic reference is insufficient, consign any lengthy quotation to an appendix.
+\section{Aims}
 
-This document consists of the following files:
-
-\begin{itemize}
-\item \texttt{makefile} --- The makefile for the dissertation and
-                         Project Proposal
-\item \texttt{main.tex} --- The dissertation
-\item \texttt{proposal.tex}  --- The project proposal 
-\item \texttt{figs} -- A directory containing diagrams and pictures
-\item \texttt{refs.bib} --- The bibliography database
-\end{itemize}
-
-\section{Building the document}
-
-This document was produced using \LaTeXe which is based upon
-\LaTeX\cite{Lamport86}.  To build the document you first need to
-generate \texttt{diss.aux} which, amongst other things, contains the
-references used.  This if done by executing the command:
-
-\texttt{pdflatex main}
-
-\noindent
-Then the bibliography can be generated from \texttt{refs.bib} using:
-
-\texttt{bibtex main}
-
-\noindent
-Finally, to ensure all the page numbering is correct run \texttt{pdflatex}
-on \texttt{diss.tex} until the \texttt{.aux} files do not change.  This
-usually takes 2 more runs.
-
-\subsection{The makefile}
-
-To simplify the calls to \texttt{pdflatex} and \texttt{bibtex}, 
-a makefile has been provided, see Appendix~\ref{makefile}. 
-It provides the following facilities:
-
-\begin{description}
-
-\item\texttt{make} \\
- Display help information.
-
-\item\texttt{make proposal.pdf} \\
- Format the proposal document as a PDF.
-
-\item\texttt{make view-proposal} \\
- Run \texttt{make proposal.pdf} and then display it with a Linux PDF viewer
- (preferably ``okular'', if that is not available fall back to ``evince'').
-
-\item\texttt{make main.pdf} \\
- Format the dissertation document as a PDF.
-
-\item\texttt{make count} \\
-Display an estimate of the word count.
-
-\item\texttt{make all} \\
-Construct \texttt{proposal.pdf} and \texttt{diss.pdf}.
-
-\item\texttt{make pub} \\ Make \texttt{diss.pdf}
-and place it in my \texttt{public\_html} directory.
-
-\item\texttt{make clean} \\ Delete all intermediate files except the
-source files and the resulting PDFs. All these deleted files can
-be reconstructed by typing \texttt{make all}.
-
-\end{description}
-
-
-\section{Counting words}
-
-An approximate word count of the body of the dissertation may be
-obtained using:
-
-\texttt{wc main.tex}
-
-\noindent
-Alternatively, try something like:
-
-\verb/detex main.tex | tr -cd '0-9A-Z a-z\n' | wc -w/
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Preparation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Preparation}
+\paragraph{Description: }
+Principally, this chapter should describe the work which was undertaken before code was written, hardware built or theories worked on. 
+It should show how the project proposal was further refined and clarified, so that the implementation stage could go smoothly rather than by trial and error.
+\par
+Throughout this chapter and indeed the whole dissertation, it is essential to demonstrate that a proper professional approach was employed.
+\par
 
-This chapter is empty!
+\section{Starting Point}
+It is essential to declare the starting point. 
+This states any existing codebase or materials that your project builds on. 
+The text here can commonly be identical to the text in your proposal, but it may enlarge on it or report variations.
+For instance, the true starting point may have turned out to be different from that declared in the proposal and such discrepancies must be explained.
 
+\subsection{Relevant courses and experience}
+
+\subsection{Existing codebase}
+
+\section{The Protovoice Model}
+Mention complicated theories or algorithms which required understanding. \\ 
+Clear presentation of challenging background material covering a range of computer science topics beyond Part IB.
+
+\section{Heuristic Search Algorithms}
+
+\section{Data Processing}
+
+\section{Requirements Analysis}
+Underlining the professional approach, this chapter will very likely include a section headed "Requirements Analysis" and refer to appropriate software engineering techniques used in the dissertation. \\
+Good or excellent requirements analysis; 
+\par 
+Main deliverables with a risk analysis. 
+Implementation modules with a dependency analysis.
+
+\section{Software Engineering Techniques}
+justified and documented selection of suitable tools; good engineering approach.
+
+\subsection{Development model}
+Include Gantt chart.
+\subsection{Languages, libraries, tools}
+The chapter will also cite any new programming languages and systems which had to be learnt \\
+Table: 
+\par 
+stack  \\
+haskell \\ 
+python \\
+numpy \\ 
+pandas \\ 
+ms3 \\
+Haskell-Musicology \\ 
+protovoice annotation tool \\
+memory management - ghc profiling \\
+\par
+The introduction should explain the principal motivation for the project and show how the work fits into the broad area of surrounding computer science and give a brief survey of previous related work.
+It should generally be unnecessary to quote at length from technical papers or textbooks.
+If a simple bibliographic reference is insufficient, consign any lengthy quotation to an appendix.
+
+\paragraph{Mark Scheme: }
+Good or excellent requirements analysis; justified and documented selection of suitable tools; good engineering approach.
+Clear presentation of challenging background material covering a range of computer science topics beyond Part IB.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Implementation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Implementation}
 
-\section{Verbatim text}
+\paragraph{Description: }
+This chapter should describe what was actually produced: the programs which were written, the hardware which was built or the theory which was developed. Any design strategies that looked ahead to the testing stage should be described in order to demonstrate a professional approach was taken.
+\par
+Descriptions of programs may include fragments of high-level code but large chunks of code are usually best left to appendices or omitted altogether. Analogous advice applies to circuit diagrams or detailed steps in a machine-checked proof.
+\par
+The implementation chapter should include a section labelled "Repository Overview". The repository overview should be around one page in length and should describe the high-level structure of the source code found in your source code repository. It should describe whether the code was written from scratch or if it built on an existing project or tutorial. Making effective use of powerful tools and pre-existing code is often laudable, and will count to your credit if properly reported. Nevertheless, as in the rest of the dissertation, it is essential to draw attention to the parts of the work which are not your own. 
+\par
+It should not be necessary to give a day-by-day account of the progress of the work but major milestones may sometimes be highlighted with advantage.
 
-Verbatim text can be included using \verb|\begin{verbatim}| and
-\verb|\end{verbatim}|. I normally use a slightly smaller font and
-often squeeze the lines a little closer together, as in:
+\paragraph{Mark Scheme: }
+Contribution to the field.
+Application of extra-curricular reading and original interpretation of previous work from academia or industry.
+Challenging goals and substantial deliverables with excellent selection and application of appropriate mathematical, scientific and/or engineering techniques.
+Clear and justified repository overview.
+At most minor faults in execution or understanding.
 
-{\renewcommand{\baselinestretch}{0.8}\small
-\begin{verbatim}
-GET "libhdr"
- 
-GLOBAL { count:200; all  }
- 
-LET try(ld, row, rd) BE TEST row=all
-                        THEN count := count + 1
-                        ELSE { LET poss = all & ~(ld | row | rd)
-                               UNTIL poss=0 DO
-                               { LET p = poss & -poss
-                                 poss := poss - p
-                                 try(ld+p << 1, row+p, rd+p >> 1)
-                               }
-                             }
-LET start() = VALOF
-{ all := 1
-  FOR i = 1 TO 12 DO
-  { count := 0
-    try(0, 0, 0)
-    writef("Number of solutions to %i2-queens is %i5*n", i, count)
-    all := 2*all + 1
-  }
-  RESULTIS 0
+\section{Repository Overview:}
+The following describes the protovoices-haskell repository, and where my code contribution will lie:
+\par
+\medskip
+\dirtree{%
+.1 protovoices-haskell.
+.2 app.
+.3 MainHeuristicSearch.hs <- My code.
+.3 ....
+.2 src.
+.3 \textbf{Heuristics} <- My code.  
+.4 …  <- My code.
+.3 ....
+.2 test.
+.2 testdata.
+.2 ....
 }
-\end{verbatim}
-}
-
-\section{Tables}
-
-\begin{samepage}
-Here is a simple example\footnote{A footnote} of a table.
-
-\begin{center}
-\begin{tabular}{l|c|r}
-Left      & Centred & Right \\
-Justified &         & Justified \\[3mm]
-%\hline\\%[-2mm]
-First     & A       & XXX \\
-Second    & AA      & XX  \\
-Last      & AAA     & X   \\
-\end{tabular}
-\end{center}
-
-\noindent
-There is another example table in the proforma.
-\end{samepage}
-
-\section{Simple diagrams}
-
-Simple diagrams can be written directly in \LaTeX.  For example, see
-figure~\ref{latexpic1} on page~\pageref{latexpic1} and see
-figure~\ref{latexpic2} on page~\pageref{latexpic2}.
-
-\begin{figure}
-\setlength{\unitlength}{1mm}
-\begin{center}
-\begin{picture}(125,100)
-\put(0,80){\framebox(50,10){AAA}}
-\put(0,60){\framebox(50,10){BBB}}
-\put(0,40){\framebox(50,10){CCC}}
-\put(0,20){\framebox(50,10){DDD}}
-\put(0,00){\framebox(50,10){EEE}}
-
-\put(75,80){\framebox(50,10){XXX}}
-\put(75,60){\framebox(50,10){YYY}}
-\put(75,40){\framebox(50,10){ZZZ}}
-
-\put(25,80){\vector(0,-1){10}}
-\put(25,60){\vector(0,-1){10}}
-\put(25,50){\vector(0,1){10}}
-\put(25,40){\vector(0,-1){10}}
-\put(25,20){\vector(0,-1){10}}
-
-\put(100,80){\vector(0,-1){10}}
-\put(100,70){\vector(0,1){10}}
-\put(100,60){\vector(0,-1){10}}
-\put(100,50){\vector(0,1){10}}
-
-\put(50,65){\vector(1,0){25}}
-\put(75,65){\vector(-1,0){25}}
-\end{picture}
-\end{center}
-\caption{A picture composed of boxes and vectors.}
-\label{latexpic1}
-\end{figure}
-
-\begin{figure}
-\setlength{\unitlength}{1mm}
-\begin{center}
-
-\begin{picture}(100,70)
-\put(47,65){\circle{10}}
-\put(45,64){abc}
-
-\put(37,45){\circle{10}}
-\put(37,51){\line(1,1){7}}
-\put(35,44){def}
-
-\put(57,25){\circle{10}}
-\put(57,31){\line(-1,3){9}}
-\put(57,31){\line(-3,2){15}}
-\put(55,24){ghi}
-
-\put(32,0){\framebox(10,10){A}}
-\put(52,0){\framebox(10,10){B}}
-\put(37,12){\line(0,1){26}}
-\put(37,12){\line(2,1){15}}
-\put(57,12){\line(0,2){6}}
-\end{picture}
-
-\end{center}
-\caption{A diagram composed of circles, lines and boxes.}
-\label{latexpic2}
-\end{figure}
-
-
-
-\section{Adding more complicated graphics}
-
-The use of \LaTeX\ format can be tedious and it is often better to use
-encapsulated postscript (EPS) or PDF to represent complicated graphics.
-Figure~\ref{epsfig} and~\ref{xfig} on page \pageref{xfig} are
-examples. The second figure was drawn using \texttt{xfig} and exported in
-{\tt.eps} format. This is my recommended way of drawing all diagrams.
-
-
-\begin{figure}[tbh]
-\centerline{\includegraphics{figs/cuarms.pdf}}
-\caption{Example figure using encapsulated postscript}
-\label{epsfig}
-\end{figure}
-
-\begin{figure}[tbh]
-\vspace{4in}
-\caption{Example figure where a picture can be pasted in}
-\label{pastedfig}
-\end{figure}
-
-
-\begin{figure}[tbh]
-\centerline{\includegraphics{figs/diagram.pdf}}
-\caption{Example diagram drawn using \texttt{xfig}}
-\label{xfig}
-\end{figure}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Evaluation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Evaluation}
 
-\section{Printing and binding}
+\paragraph{Description:}
+This is where Assessors will be looking for signs of success and for evidence of thorough and systematic evaluation.
+Sample output, tables of timings and photographs of workstation screens, oscilloscope traces or circuit boards may be included.
+Care should be employed to take a professional approach throughout.
+For example, a graph that does not indicate confidence intervals will generally leave a professional scientist with a negative impression. 
+As with code, voluminous examples of sample output are usually best left to appendices or omitted altogether.
+\par
+There are some obvious questions which this chapter will address. How many of the original goals were achieved? Were they proved to have been achieved? Did the program, hardware, or theory really work?
+\par
+Assessors are well aware that large programs will very likely include some residual bugs. It should always be possible to demonstrate that a program works in simple cases and it is instructive to demonstrate how close it is to working in a really ambitious case.
 
-Use a ``duplex'' laser printer that can print on both sides to print
-two copies of your dissertation. Then bind them, for example using the
-comb binder in the Computer Laboratory Library.
+\paragraph{Mark Scheme (Evaluation and Conclusions): }
+Conclusions provide an effective summary of work completed along with good future work.
+Clearly presented argument demonstrating success criteria met.
+Good or excellent evidence of critical thought and interpretation of the results which substantiate any claims of success, improvements or novelty.
 
-\section{Further information}
-
-See the Unix Tools notes at
-
-\url{http://www.cl.cam.ac.uk/teaching/current-1/UnixTools/materials.html}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Conclusions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Conclusions}
+This chapter is likely to be very short and it may well refer back to the Introduction. 
+\section{Achievements}
 
-I hope that this rough guide to writing a dissertation is \LaTeX\ has
-been helpful and saved you time.
+\section{Future Work}
 
+\section{Lessons learned}
+Personal reflection on the lessons learned.
+It might offer a reflection on the lessons learned and explain how you would have planned the project if starting again with the benefit of hindsight.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % the bibliography
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \addcontentsline{toc}{chapter}{Bibliography}
 \bibliography{refs}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % the appendices
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \appendix
 
 \chapter{Latex source}
