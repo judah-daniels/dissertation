@@ -1,9 +1,10 @@
 % Template for a Computer Science Tripos Part II project dissertation
 \documentclass[12pt,a4paper,twoside,openright]{report}
 \usepackage[pdfborder={0 0 0}]{hyperref}    % turns references into hyperlinks
-\usepackage[margin=25mm]{geometry}  % adjusts page layout
+\usepackage[left=25mm, right=25mm, bottom=25mm, top=20mm]{geometry}  % adjusts page layout
 \usepackage{graphicx}  % allows inclusion of PDF, PNG and JPG images
 \usepackage{verbatim}
+\usepackage{tabu}
 \usepackage{docmute}   % only needed to allow inclusion of proposal.tex
 \usepackage[utf8]{inputenc}
 \usepackage{mathtools}
@@ -17,6 +18,8 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 
+%--- Remove hbox warning
+\hfuzz=5000.002pt 
 %----------------------------------------------------------------------------------------
 
 % Formatting Commands
@@ -71,7 +74,7 @@
 
 \include{metadata}
 
-\bibliographystyle{plain}
+\bibliographystyle{acm}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Title
@@ -152,9 +155,7 @@ None
 \newpage
 \section*{Acknowledgements}
 
-This document owes much to an earlier version written by Simon Moore
-\cite{Moore95}.  His help, encouragement and advice was greatly 
-appreciated.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % now for the chapters
@@ -186,6 +187,8 @@ appreciated.
 \section{The Protovoice Model}
 
 \section{Probabilistic Programming}
+\subsection{Bayesian Inference}
+\subsection{Probabilistic Model of Harmony}
 
 \section{Heuristic Search Algorithms}
 
@@ -219,6 +222,8 @@ The chapter will also cite any new programming languages and systems which had t
       \midrule
       Haskell-Musicology & ... & ... \\
       \midrule
+      Dimcat & ... & ... \\
+      \midrule
       Python & ... & ... \\
       \midrule
       Numpy & ... & ... \\
@@ -246,75 +251,86 @@ The chapter will also cite any new programming languages and systems which had t
 
 \section{Repository Overview:}
 
-\DTsetlength{1em}{1em}{0em}{0.4pt}{0.4pt}       
+\DTsetlength{0em}{1.3em}{0em}{0.7pt}{3pt}       
+\setlength{\DTbaselineskip}{15pt}  %minimum size for \normalsize
+\renewcommand{\DTstyle}{\ttfamily}
 
-\setlength{\DTbaselineskip}{18pt} %minimum size for  \large
-\renewcommand{\DTstyle}{\rmfamily\large}    %
-
-The following describes the protovoices-haskell repository, and where my code contribution will lie:
+The following describes an overview of the project repository:
 \medskip
-\begin{table}
-  \centering
+\begin{table}[h]
+  % \centering
   \caption{Repository Overview}
+  \vspace{\baselineskip}
   \label{jeff}
-  \begin{tabularx}{\textwidth}{XXX}
-    File/Folder & Description & Lines of Code \\
+  \begin{tabularx}{\textwidth}{l X c}
+    File/Folder & Description & LOC \\
     \toprule
     \toprule
-  \begin{minipage}[t]{4cm}
+  \begin{minipage}[t]{5.3cm}
     \dirtree{%
-    .1 protovoices-haskell.
-    .2 app\vspace{\baselineskip}. 
-    .2 src.
-    .3 HeuristicParser.hs.
-    .3 HeuristicSearch.hs.
-    .3 Heuristics.hs.
-    .3 RandomChoiceSearch.hs.
-    .3 RandomSampleParser.hs.
-    .3 FileHandling.hs.
-    .3 PBHModel.hs.
-    .3 \dots \vspace{\}.
-    .2 harmonic-inference \vspace{\baselineskip}.
-    .2 experiments.
+    .1 protovoices-haskell/.
+    .2 src/.
+    .3 HeuristicParser.hs,~HeuristicSearch.hs \vspace{\DTbaselineskip}.
+    .3 RandomChoiceSearch.hs,~RandomSampleParser.hs\vspace{2\DTbaselineskip}.
+    .3 Heuristics.hs,~PBHModel.hs \vspace{2\DTbaselineskip}.
+    .3 FileHandling.hs\vspace{2\DTbaselineskip}.
+    .3 \dots \vspace{\DTbaselineskip}.
+    .2 app/.
+    .3 MainFullParse.hs\vspace{\DTbaselineskip}. 
+    .2 harmonic-inference \vspace{\DTbaselineskip}.
+    .2 experiments/.
     .3 preprocess.ipynb.
     .3 dcml\_params.json.
-    .3 inputs \vspace{\baselineskip}.
-    .2 test \vspace{\baselineskip}.
+    .3 inputs/ \vspace{\DTbaselineskip}.
+    .2 test/ \vspace{\DTbaselineskip}.
     }
+  \end{minipage} &
+  \begin{minipage}[t]{8cm}
+Root directory
+\vspace{2\baselineskip}\\
+Core Implementation (Section x)
+\vspace{2\baselineskip}\\
+Baseline Implemetation (Section x)
+\vspace{2\DTbaselineskip}\\
+Extension Implementation (Section x) 
+\vspace{2\DTbaselineskip}\\
+Utilities
+\vspace{5\DTbaselineskip}\\
+Entry Point
+\vspace{8.2\DTbaselineskip}\\
+Unit Tests (Section x)
+
   \end{minipage} & 
-  \begin{minipage}[t]{4cm}
-    Root directory  \\
-    minipage \\
-    minipage \\
-    minipage \\
-    minipage \\
-
+  \begin{minipage}[t]{0.5cm}
+    1972
+    \vspace{0.1\DTbaselineskip}\\
+    470\\
+    \vspace{\DTbaselineskip}
+    121\\
+    \vspace{\DTbaselineskip}
+    383\\
+    \vspace{1.8\DTbaselineskip}
+    188\\
+    \vspace{3.7\DTbaselineskip}
+    121\\
+    \vspace{3\DTbaselineskip}
+    115\\
+    \vspace{2.5\DTbaselineskip}
+    611\\
   \end{minipage}
-  & 
-  2323  
-
-% &  Director A  \\
-%    Director B \\
-%    Director C\\
-%    Director D\\
 \end{tabularx}
 \end{table}
 
-% \par
-% \medskip
-% \dirtree{%
-% .1 protovoices-haskell.
-% .2 app.
-% .3 MainHeuristicSearch.hs <- My code.
-% .3 ....
-% .2 src.
-% .3 \textbf{Heuristics} <- My code.  
-% .4 …  <- My code.
-% .3 ....
-% .2 test.
-% .2 testdata.
-% .2 ....
-% }
+\section{Core Implementation}
+\section{Baseline implementation}
+\section{Random Sample Parser}
+\section{Random Choice Search}
+\section{Extension Implementation}
+\subsection{Probabilistic Model of Harmony}
+\subsection{Heuristic Design}
+\subsection{Heuristic Search}
+\section{Testing}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Evaluation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -352,14 +368,17 @@ The following describes the protovoices-haskell repository, and where my code co
 
 \section{Future Work}
 
+\cite{finkensiep_modeling_2021}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % the bibliography
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \addcontentsline{toc}{chapter}{Bibliography}
-\bibliography{refs}
+\nocite{*}
+% \addbibresource{Disseration.bib}
+\bibliography{Dissertation}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % the appendices
@@ -367,24 +386,24 @@ The following describes the protovoices-haskell repository, and where my code co
 
 \appendix
 
-\chapter{Latex source}
+\chapter{Additional Information}
 
-\section{metadata.tex}
-{\scriptsize\verbatiminput{metadata.tex}}
-
-\section{main.tex}
-{\scriptsize\verbatiminput{main.tex}}
-
-\section{proposal.tex}
-{\scriptsize\verbatiminput{proposal.tex}}
-
-\chapter{Makefile}
-
-\section{makefile}\label{makefile}
-{\scriptsize\verbatiminput{makefile.txt}}
-
-\section{refs.bib}
-{\scriptsize\verbatiminput{refs.bib}}
+% \section{metadata.tex}
+% {\scriptsize\verbatiminput{metadata.tex}}
+%
+% \section{main.tex}
+% {\scriptsize\verbatiminput{main.tex}}
+%
+% \section{proposal.tex}
+% {\scriptsize\verbatiminput{proposal.tex}}
+%
+% \chapter{Makefile}
+%
+% \section{makefile}\label{makefile}
+% {\scriptsize\verbatiminput{makefile.txt}}
+%
+% \section{refs.bib}
+% {\scriptsize\verbatiminput{refs.bib}}
 
 
 \chapter{Project Proposal}

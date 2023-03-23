@@ -1,0 +1,419 @@
+@misc{chenFunctionalHarmonyRecognition2018a,
+  title = {Functional {{Harmony Recognition}} of {{Symbolic Music Data}} with {{Multi-task Recurrent Neural Networks}}},
+  author = {Chen, Tsung-Ping and Su, Li},
+  year = {2018},
+  month = sep,
+  journal = {Proceedings of the 19th International Society for Music Information Retrieval Conference},
+  pages = {90--97},
+  publisher = {{ISMIR}},
+  address = {{Paris, France}},
+  doi = {10.5281/zenodo.1492351},
+  urldate = {2023-02-18},
+  abstract = {Previous works on chord recognition mainly focus on chord symbols but overlook other essential features that matter in musical harmony. To tackle the functional harmony recognition problem, we compile a new professionally annotated dataset of symbolic music encompassing not only chord symbols, but also various interrelated chord functions such as key modulation, chord inversion, secondary chords, and chord quality. We further present a novel holistic system in functional harmony recognition; a multi-task learning (MTL) architecture is implemented with the recurrent neural network (RNN) to jointly model chord functions in an end-to-end scenario. Experimental results highlight the capability of the proposed recognition system, and a promising improvement of the system by employing multi-task learning instead of single-task learning. This is one attempt to challenge the end-to-end chord recognition task from the perspective of functional harmony so as to uncover the grand structure ruling the flow of musical sound. The dataset and the source code of the proposed system is announced at https://github.com/ Tsung-Ping/functional-harmony.},
+  file = {/Users/judah/Zotero/storage/286LWJ7I/Chen and Su - 2018 - Functional Harmony Recognition of Symbolic Music D.pdf}
+}
+
+@inproceedings{chenHarmonyTransformerIncorporating2019,
+  title = {Harmony {{Transformer}}: {{Incorporating Chord Segmentation}} into {{Harmony Recognition}}},
+  shorttitle = {Harmony {{Transformer}}},
+  booktitle = {International {{Society}} for {{Music Information Retrieval Conference}}},
+  author = {Chen, Tsung-Ping and Su, Li},
+  year = {2019},
+  urldate = {2023-02-18},
+  abstract = {Musical harmony analysis is usually a process of unfolding and interpreting the hierarchical structure of music. Computational approaches to such structural analysis are still challenging, owing to the fact that the boundary between different harmonic states (such as chord functions) is not explicitly defined in the audio or symbolic music data. It is a novel approach to improve chord recognition by jointly identifying chord change using end-to-end sequence learning. In this paper, we propose the Harmony Transformer, a multi-task music harmony analysis model aiming to improve chord recognition through incorporating chord segmentation into the recognition process. The integration of chord segmentation and chord recognition is implemented with the Transformer, a deep sequential learning model yielding fruitful results in the field of natural language processing. A non-autoregressive decoding framework is also adopted here in aid of concatenating the two highly correlated tasks. Experiments of both chord symbol recognition and functional harmony recognition on audio and symbolic datasets demonstrate that explicitly learning the hierarchical structural information of musical data can facilitate and improve the harmony recognition.},
+  file = {/Users/judah/Zotero/storage/ZWN3VCR2/Chen and Su - 2019 - Harmony Transformer Incorporating Chord Segmentat.pdf}
+}
+
+@article{cohenImperfectSeeksIts2001,
+  title = {``{{The Imperfect Seeks Its Perfection}}'': {{Harmonic Progression}}, {{Directed Motion}}, and {{Aristotelian Physics}}},
+  shorttitle = {``{{The Imperfect Seeks Its Perfection}}''},
+  author = {Cohen, David E.},
+  year = {2001},
+  month = oct,
+  journal = {Music Theory Spectrum},
+  volume = {23},
+  number = {2},
+  pages = {139--169},
+  issn = {0195-6167},
+  doi = {10.1525/mts.2001.23.2.139},
+  urldate = {2023-02-18},
+  abstract = {The modern theoretical concept of harmonic progression was first clearly articulated by Rameau. Yet in his Trait\'e, this concept is still demonstrably linked (via Zarlino) with an older notion of harmonic progression: the late-medieval contrapuntal doctrine that ``imperfect'' dyadic sonorities ``seek'' or ``require'' resolution to specific ``perfect'' dyads. This doctrine first appears in Marchetto of Padua's Lucidarium (1317/18). Its explanation, the general principle that ``the imperfect seeks its perfection,'' is a scholastic formulation of a basic principle of Aristotelian physics: natural motions are directed toward a predetermined goal or ``end'' (telos), which is the ``perfection'' of the moved thing. The late-medieval application of this principle to counterpoint thus emerges as the probable origin of the concept of harmonic progression and, more broadly, of the widely accepted view of music as embodying ``directed motion.''},
+  file = {/Users/judah/Zotero/storage/ZCLWJ977/Cohen - 2001 - “The Imperfect Seeks Its Perfection” Harmonic Pro.pdf;/Users/judah/Zotero/storage/WVEDHS7J/1005818.html}
+}
+
+@inproceedings{feisthauerEstimatingKeysModulations2020,
+  title = {Estimating Keys and Modulations in Musical Pieces},
+  booktitle = {Sound and {{Music Computing Conference}} ({{SMC}} 2020)},
+  author = {Feisthauer, Laurent and Bigo, Louis and Giraud, Mathieu and Lev{\'e}, Florence},
+  year = {2020},
+  month = jun,
+  urldate = {2023-02-18},
+  abstract = {Modulations, the moments where key change, are structurally important in tonal music. Analyzing music, especially studying large-scale music structure of a piece, often implies to look for modulations. State-of-the-art key-finding algorithms generally aim at identifying keys rather than studying the way they change. Here, we introduce new ways to model modulations with the help of features based on musicological knowledge, as well as an algorithm estimating the tonal plan of a piece. We study the concept of current diatonic pitch set and introduce a heuristic to detect dominant-to-tonic progressions. We design three proximity measures to assess how close the music is from each key. These measures are then combined by an algorithm that identifies an optimal tonal plan. We report results on a corpus including 38 movements from Mozart's string quartets, obtaining a 84.8\% prediction of correct keys with insight on where the modulations occur.},
+  langid = {english},
+  file = {/Users/judah/Zotero/storage/BP7X4D37/Feisthauer et al. - 2020 - Estimating keys and modulations in musical pieces.pdf}
+}
+
+@article{finkensiepMODELINGINFERRINGPROTOVOICE2021,
+  title = {{{MODELING AND INFERRING PROTO-VOICE STRUCTURE IN FREE POLYPHONY}}},
+  author = {Finkensiep, Christoph and Rohrmeier, Martin},
+  year = {2021},
+  abstract = {Voice leading is considered to play an important role in the structure of Western tonal music. However, the explicit voice assignment of a piece (if present at all) generally does not reflect all phenomena related to voice leading. Instead, voice-leading phenomena can occur in free textures (e.g., in most keyboard music), or cut across the explicitly notated voices (e.g., through implicit polyphony within a single voice). This paper presents a model of proto-voices, voice-like structures that encode sequential and vertical relations between notes without the need to assume explicit voices. Proto-voices are constructed by recursive combination of primitive structural operations, such as insertion of neighbor or passing notes, or horizontalization of simultaneous notes. Together, these operations give rise to a grammar-like hierarchical system that can be used to infer the structural fabric of a piece using a chart parsing algorithm. Such a model can serve as a foundation for defining higher-level latent entities (such as harmonies or voice-leading schemata), explicitly linking them to their realizations on the musical surface.},
+  langid = {english},
+  file = {/Users/judah/Zotero/storage/RQYKS2LS/Finkensiep and Rohrmeier - 2021 - MODELING AND INFERRING PROTO-VOICE STRUCTURE IN FR.pdf}
+}
+
+@phdthesis{finkensiepStructureFreePolyphony2023,
+  title = {The {{Structure}} of {{Free Polyphony}}},
+  author = {Finkensiep, Christoph},
+  year = {2023},
+  address = {{Lausanne}},
+  doi = {10.5075/epfl-thesis-9403},
+  abstract = {The human ability to perceive and understand music is remarkable. From an unstructured stream of acoustic input it creates a wide range of experiences, from psycho-acoustic effects to emotional and aesthetic responses. One such set of phenomena is the experience of structure, the perception of notes standing in musically meaningful relationships to each other and to abstract entities such as chords, voices, schemata, formal segments, motives, or themes, which are not directly represented in the stream of notes and thus must be inferred.This dissertation argues that the perception of musical structure from notes is an instance of the general principle of Bayesian perception, which states that perception is probabilistic inference to the latent causes that produce the sensory input. It first explores the fundamental relations between notes and latent entities in three case studies on modal melodies, recognition of voice-leading schemata, and harmonic ornamentation. Subsequently, it proposes a unified generative model of the note-level structure underlying Western tonal music and potentially other styles. This model is based on the elaboration of simple latent note configurations into the musical surface, maintaining vertical, horizontal, and hierarchical relations in the process.On the music-theoretical side, this model provides a language to formally express analytical intuitions and a foundation for precise definitions of traditional concepts and clarification of their relation to the musical surface. On the computational side, the model demonstrates how complex musical structures can be inferred and how the structural properties of a style can be learned using parsing and probabilistic inference. On the cognitive side, the model shows that the perception of tonal structure can linked to general Bayesian perception through a generative process. This thesis therefore constitutes a bridge between different perspectives and disciplines, and thus contributes to a unified understanding of the human capacity for music},
+  langid = {english},
+  school = {EPFL},
+  keywords = {bayesian inference,cognition,computational modeling,computational musicology,harmony,music,music theory,structure,voice leading}
+}
+
+@article{gjerdingenCognitiveFoundationsMusical1992,
+  title = {Cognitive {{Foundations}} of {{Musical Pitch Carol L}}. {{Krumhansl}}},
+  author = {Gjerdingen, Robert},
+  year = {1992},
+  month = jul,
+  journal = {Music Perception: An Interdisciplinary Journal},
+  volume = {9},
+  pages = {476--492},
+  doi = {10.2307/40285567},
+  file = {/Users/judah/Zotero/storage/D9IW47J2/Gjerdingen - 1992 - Cognitive Foundations of Musical Pitch Carol L. Kr.pdf}
+}
+
+@article{goodmanSemiringParsing1999,
+  title = {Semiring {{Parsing}}},
+  author = {Goodman, Joshua},
+  year = {1999},
+  journal = {Computational Linguistics},
+  volume = {25},
+  number = {4},
+  pages = {573--606},
+  publisher = {{MIT Press}},
+  address = {{Cambridge, MA}},
+  urldate = {2022-08-01},
+  file = {/Users/judah/Zotero/storage/VIIER4EP/Goodman - 1999 - Semiring Parsing.pdf}
+}
+
+@inproceedings{gothamWhatIfWhen2021,
+  title = {What If the '{{When}}' {{Implies}} the '{{What}}'?: {{Human}} Harmonic Analysis Datasets Clarify the Relative Role of the Separate Steps in Automatic Tonal Analysis},
+  shorttitle = {What If the '{{When}}' {{Implies}} the '{{What}}'?},
+  booktitle = {Proceedings of the 22nd {{International Society}} for {{Music Information Retrieval Conference}}, {{ISMIR}} 2021, {{Online}}, {{November}} 7-12, 2021},
+  author = {Gotham, Mark and Kleinertz, Rainer and Weiss, Christof and M{\"u}ller, Meinard and Klauk, Stephanie},
+  editor = {Lee, Jin Ha and Lerch, Alexander and Duan, Zhiyao and Nam, Juhan and Rao, Preeti and van Kranenburg, Peter and Srinivasamurthy, Ajay},
+  year = {2021},
+  pages = {229--236},
+  urldate = {2023-02-18},
+  file = {/Users/judah/Zotero/storage/4K2H2CIH/Gotham et al. - 2021 - What if the 'When' Implies the 'What' Human harm.pdf}
+}
+
+@article{granroth-wildingHarmonicAnalysisMusic2013,
+  title = {Harmonic {{Analysis}} of {{Music Using Combinatory Categorial Grammar}}},
+  author = {{Granroth-Wilding}, Mark},
+  year = {2013},
+  journal = {The University Of Edinburgh},
+  abstract = {arious patterns of the organization of Western tonal music exhibit hierarchical structure, among them the harmonic progressions underlying melodies and the metre underlying rhythmic patterns. Recognizing these structures is an important part of unconscious human cognitive processing of music. Since the prosody and syntax of natural languages are commonly analysed with similar hierarchical structures, it is reasonable to expect that the techniques used to identify these structures automatically in natural language might also be applied to the automatic interpretation of music. In natural language processing (NLP), analysing the syntactic structure of a sentence is prerequisite to semantic interpretation. The analysis is made difficult by the high degree of ambiguity in even moderately long sentences. In music, a similar sort of structural analysis, with a similar degree of ambiguity, is fundamental to tasks such as key identification and score transcription. These and other tasks depend on harmonic and rhythmic analyses. There is a long history of applying linguistic analysis techniques to musical analysis. In recent years, statistical modelling, in particular in the form of probabilistic models, has become ubiquitous in NLP for large-scale practical analysis of language. The focus of the present work is the application of statistical parsing to automatic harmonic analysis of music. This thesis demonstrates that statistical parsing techniques, adapted from NLP with little modification, can be successfully applied to recovering the harmonic structure underlying music. It shows first how a type of formal grammar based on one used for linguistic syntactic \ldots},
+  langid = {english},
+  file = {/Users/judah/Zotero/storage/8IHKSHMY/Granroth-Wilding - Harmonic Analysis of Music Using Combinatory Categ.pdf}
+}
+
+@article{harasimHarmonicSyntaxTime2019,
+  title = {Harmonic {{Syntax}} in {{Time}}: {{Rhythm Improves Grammatical Models}} of {{Harmony}}},
+  shorttitle = {Harmonic {{Syntax}} in {{Time}}},
+  editor = {Harasim, Daniel and O'Donnell, Timothy J. and Rohrmeier, Martin Alois},
+  year = {2019},
+  journal = {Proceedings of the 20th ISMIR Conference},
+  publisher = {{ISMIR}},
+  doi = {10.5281/zenodo.3527812},
+  abstract = {Music is hierarchically structured, both in how it is perceived by listeners and how it is composed. Such structure can be elegantly captured using probabilistic grammatical models similar to those used to study natural language. They address the complexity of the structure using abstract categories in a recursive formalism. Most existing grammatical models of musical structure focus on one single dimension of music\textendash such as melody, harmony, or rhythm. While these grammar models often work well on short musical excerpts, accurate analysis of longer pieces requires taking into account the constraints from multiple domains of structure. The present paper proposes abstract product grammars\textendash a formalism which integrates multiple dimensions of musical structure into a single grammatical model\textendash along with efficient parsing and inference algorithms for this formalism. We use this model to study the combination of hierarchically-structured harmonic syntax and hierarchically-structured rhythmic information. The latter is modeled by a novel grammar of rhythm that is capable of expressing temporal regularities in musical phrases. It integrates grouping structure and meter. The combined model of harmony and rhythm outperforms both single-dimension models in computational experiments. All models are trained and evaluated on a treebank of hand-annotated Jazz standards}
+}
+
+@article{humphreyFourTimelyInsights2015,
+  title = {Four {{Timely Insights}} on {{Automatic Chord Estimation}}},
+  author = {Humphrey, Eric J and Bello, Juan P},
+  year = {2015},
+  abstract = {Automatic chord estimation (ACE) is a hallmark research topic in content-based music informatics, but like many other tasks, system performance appears to be converging to yet another glass ceiling. Looking toward trends in other machine perception domains, one might conclude that complex, data-driven methods have the potential to significantly advance the state of the art. Two recent efforts did exactly this for large-vocabulary ACE, but despite arguably achieving some of the highest results to date, both approaches plateau well short of having solved the problem. Therefore, this work explores the behavior of these two high performing, systems as a means of understanding obstacles and limitations in chord estimation, arriving at four critical observations: one, music recordings that invalidate tacit assumptions about harmony and tonality result in erroneous and even misleading performance; two, standard lexicons and comparison methods struggle to reflect the natural relationships between chords; three, conventional approaches conflate the competing goals of recognition and transcription to some undefined degree; and four, the perception of chords in real music can be highly subjective, making the very notion of ``ground truth'' annotations tenuous. Synthesizing these observations, this paper offers possible remedies going forward, and concludes with some perspectives on the future of both ACE research and the field at large.},
+  langid = {english},
+  file = {/Users/judah/Zotero/storage/M5JDW97U/Humphrey and Bello - 2015 - FOUR TIMELY INSIGHTS ON AUTOMATIC CHORD ESTIMATION.pdf}
+}
+
+@misc{johannesMs3ParsingMuseScore2021,
+  title = {Ms3 - {{Parsing MuseScore}} 3},
+  shorttitle = {Ms3},
+  author = {Johannes, Hentschel},
+  year = {2021},
+  abstract = {A parser for annotated MuseScore 3 files.},
+  howpublished = {https://github.com/johentsch/ms3}
+}
+
+@article{kidneyAlgebrasWeightedSearch2021,
+  title = {Algebras for Weighted Search},
+  author = {Kidney, Donnacha Ois{\'i}n and Wu, Nicolas},
+  year = {2021},
+  month = aug,
+  journal = {Proceedings of the ACM on Programming Languages},
+  volume = {5},
+  number = {ICFP},
+  pages = {1--30},
+  issn = {2475-1421},
+  doi = {10.1145/3473577},
+  urldate = {2022-11-27},
+  abstract = {DONNACHA OIS\'IN KIDNEY, Imperial College London, United Kingdom NICOLAS WU, Imperial College London, United Kingdom Weighted search is an essential component of many fundamental and useful algorithms. Despite this, it is relatively under explored as a computational effect, receiving not nearly as much attention as either depth- or breadth-first search. This paper explores the algebraic underpinning of weighted search, and demonstrates how to implement it as a monad transformer. The development first explores breadth-first search, which can be expressed as a polynomial over semirings. These polynomials are generalised to the free semimodule monad to capture a wide range of applications, including probability monads, polynomial monads, and monads for weighted search. Finally, a monad transformer based on the free semimodule monad is introduced. Applying optimisations to this type yields an implementation of pairing heaps, which is then used to implement Dijkstra's algorithm and efficient probabilistic sampling. The construction is formalised in Cubical Agda and implemented in Haskell. CCS Concepts: \textbullet{} Theory of computation \textrightarrow{} Shortest paths; Backtracking; Proof theory; Constructive mathematics; Type theory; Logic and verification; Algebraic semantics; \textbullet{} Software and its engineering \textrightarrow{} Functional languages; Data types and structures.},
+  langid = {english},
+  file = {/Users/judah/Zotero/storage/PNPGP9YX/Kidney and Wu - 2021 - Algebras for weighted search.pdf}
+}
+
+@article{koopsAnnotatorSubjectivityHarmony2019,
+  title = {Annotator Subjectivity in Harmony Annotations of Popular Music},
+  author = {Koops, Hendrik Vincent and {de Haas}, W. Bas and Burgoyne, John Ashley and Bransen, Jeroen and {Kent-Muller}, Anna and Volk, Anja},
+  year = {2019},
+  month = may,
+  journal = {Journal of New Music Research},
+  volume = {48},
+  number = {3},
+  pages = {232--252},
+  issn = {0929-8215, 1744-5027},
+  doi = {10.1080/09298215.2019.1613436},
+  urldate = {2023-02-12},
+  abstract = {Reference annotation datasets containing harmony annotations are at the core of a wide range of studies in music information retrieval (MIR) and related fields. The majority of these datasets contain single reference annotations describing the harmony of each piece. Nevertheless, studies showing differences among annotators in many other MIR tasks make the notion of a single `ground-truth' reference annotation a tenuous one. In this paper, we introduce and analyse the Chordify Annotator Subjectivity Dataset (CASD) containing chord labels for 50 songs from 4 expert annotators in order to gain a better understanding of the differences between annotators in their chord label choice. Our analysis reveals that annotators use distinct chord-label vocabularies, with low chord-label overlap across all annotators. Between annotators, we find only 73 percent overlap on average for the traditional major\textendash minor vocabulary and 54 percent overlap for the most complex chord labels. A factor analysis reveals the relative importance of triads, sevenths, inversions and other musical factors for each annotator on their choice of chord labels and reported difficulty of the songs. Our results further substantiate the existence of a harmonic `subjectivity ceiling': an upper bound for evaluations in computational harmony research. Current state-of-the-art chord-estimation systems perform beyond this subjectivity ceiling by about 10 percent. This suggests that current ACE algorithms are powerful enough to tune themselves to particular annotators' idiosyncrasies. Overall, our results show that annotator subjectivity is an important factor in harmonic transcriptions, which should inform future studies into harmony perception and computational models of harmony.},
+  langid = {english},
+  file = {/Users/judah/Zotero/storage/5JRW7B22/Koops et al. - 2019 - Annotator subjectivity in harmony annotations of p.pdf}
+}
+
+@misc{korzeniowskiImprovedChordRecognition2018,
+  title = {Improved {{Chord Recognition}} by {{Combining Duration}} and {{Harmonic Language Models}}},
+  author = {Korzeniowski, Filip and Widmer, Gerhard},
+  year = {2018},
+  month = aug,
+  number = {arXiv:1808.05335},
+  eprint = {arXiv:1808.05335},
+  publisher = {{arXiv}},
+  doi = {10.48550/arXiv.1808.05335},
+  urldate = {2023-03-21},
+  abstract = {Chord recognition systems typically comprise an acoustic model that predicts chords for each audio frame, and a temporal model that casts these predictions into labelled chord segments. However, temporal models have been shown to only smooth predictions, without being able to incorporate musical information about chord progressions. Recent research discovered that it might be the low hierarchical level such models have been applied to (directly on audio frames) which prevents learning musical relationships, even for expressive models such as recurrent neural networks (RNNs). However, if applied on the level of chord sequences, RNNs indeed can become powerful chord predictors. In this paper, we disentangle temporal models into a harmonic language model---to be applied on chord sequences---and a chord duration model that connects the chord-level predictions of the language model to the frame-level predictions of the acoustic model. In our experiments, we explore the impact of each model on the chord recognition score, and show that using harmonic language and duration models improves the results.},
+  archiveprefix = {arxiv},
+  keywords = {Computer Science - Machine Learning,Computer Science - Sound,Electrical Engineering and Systems Science - Audio and Speech Processing},
+  file = {/Users/judah/Zotero/storage/GTU8TI4D/Korzeniowski and Widmer - 2018 - Improved Chord Recognition by Combining Duration a.pdf;/Users/judah/Zotero/storage/4QT36HLM/1808.html}
+}
+
+@article{krumhanslTracingDynamicChanges1982,
+  title = {Tracing the Dynamic Changes in Perceived Tonal Organization in a Spatial Representation of Musical Keys},
+  author = {Krumhansl, Carol L. and Kessler, Edward J.},
+  year = {1982},
+  journal = {Psychological Review},
+  volume = {89},
+  pages = {334--368},
+  publisher = {{American Psychological Association}},
+  address = {{US}},
+  issn = {1939-1471},
+  doi = {10.1037/0033-295X.89.4.334},
+  abstract = {Investigated the cognitive representation of harmonic and tonal structure in Western music using a tone-profile technique in 2 experiments with 24 undergraduates and community adults. Listeners rated how well single tones (any one of the 12 tones of the chromatic scale) followed a musical element such as a scale, chord, or cadence. Stable rating profiles reflecting the tonal hierarchies in major and minor keys were obtained, which, when intercorrelated and analyzed using multidimensional scaling, produced a 4-dimensional spatial map of the distances between keys. Listeners integrated harmonic functions over multiple chords, developing a sense of key that needed to be re-evaluated as additional chords were sounded. It is suggested that the perceived relations between chords and keys and between different keys are mediated through an internal representation of the hierarchy of tonal functions of single tones in music. (56 ref) (PsycINFO Database Record (c) 2016 APA, all rights reserved)},
+  keywords = {Auditory Perception,Cognitive Maps,Music,Pitch Perception},
+  file = {/Users/judah/Zotero/storage/UHEIYLPF/1982-27246-001.html}
+}
+
+@book{lerdahlGenerativeTheoryTonal2010,
+  title = {A Generative Theory of Tonal Music},
+  author = {Lerdahl, Fred and Jackendoff, Ray},
+  year = {2010},
+  edition = {Repr.},
+  publisher = {{MIT Press}},
+  address = {{Cambridge, Mass.}},
+  isbn = {978-0-262-62107-6},
+  langid = {english},
+  file = {/Users/judah/Zotero/storage/YX5TQ8JQ/Lerdahl and Jackendoff - 2010 - A generative theory of tonal music.pdf}
+}
+
+@article{marsdenSchenkerianAnalysisComputer2010,
+  title = {Schenkerian {{Analysis}} by {{Computer}}: {{A Proof}} of {{Concept}}},
+  shorttitle = {Schenkerian {{Analysis}} by {{Computer}}},
+  author = {Marsden, Alan},
+  year = {2010},
+  month = sep,
+  journal = {Journal of New Music Research},
+  volume = {39},
+  number = {3},
+  pages = {269--289},
+  issn = {0929-8215, 1744-5027},
+  doi = {10.1080/09298215.2010.503898},
+  urldate = {2022-11-14},
+  abstract = {A system for automatically deriving a Schenkerian reduction of an extract of tonal music is described. Schenkerian theory is formalized in a quasi-grammatical manner, expressing a reduction as a binary-tree structure. Computer software which operates in the manner of a chart parser using this grammar has been implemented, capable of deriving a matrix of reduction possibilities, in polynomial time, from a representation of the score. A full reduction of the extract can be discovered by selecting a tree from this matrix. The number of possible valid reductions for even short extracts is found to be extremely large, so criteria are required to distinguish good reductions from bad ones. To find such criteria, themes from five Mozart piano sonatas are analysed and samples of `good' reductions (defined by reference to preexisting analyses of these themes) are compared with randomly sampled reductions. Nine criteria are thereby derived, which can be applied in the process of parsing and selecting a reduction. The results are promising, but the process is still too computationally expensive\textemdash only extracts of a few bars in length can be reduced\textemdash and more extensive testing is required before the system can be properly claimed to perform automatic Schenkerian analysis.},
+  langid = {english},
+  file = {/Users/judah/Zotero/storage/2CJAF2LK/Marsden - 2010 - Schenkerian Analysis by Computer A Proof of Conce.pdf}
+}
+
+@article{mauchCanStatisticalLanguage,
+  title = {Can {{Statistical Language Models}} Be Used for the {{Analysis}} of {{Harmonic Progressions}}?},
+  author = {Mauch, Matthias and Mullensiefen, Daniel and Dixon, Simon and Wiggins, Geraint},
+  abstract = {The availability of large, electronically encoded text corpora and the use of computers in recent decades have made Natural Language Processing (NLP) a flourishing research area. A wealth of standard techniques has been developed to serve use cases like document retrieval, identification of a finite vocabulary and synonyms, and the collocation of terms. Similarly, social networking among musicians in internet forums and the advent of automatic chord extraction have led to the establishment of chord databases, if on a smaller scale. Comparatively little research has been carried out on these growing corpora of chords. We suspect that one reason for this lack of research lies in the difficulty to decide if chords or other harmonic elements can be treated like lexemes in a text corpus. More simply, the question is: What is a word in terms of harmony? In this paper we propose a bottom-up approach. In order to find harmonic units whose distributions resemble distributions of words we consider chord elements differing in (a) length of chord sequence (counted in chord symbols), and (b) chord alphabet. Using lengths from 1 to 4 and two different chord alphabets we obtain a parameter space of size 8. For each of the parameter settings we compute statistical summaries of the resulting frequency distribution of the harmonic unit. As results, we report the parameter settings for two different chord corpora (2500+ songs each) that generate a frequency model corresponding most closely to the Brown Corpus, a general text corpus of American English.},
+  langid = {english},
+  file = {/Users/judah/Zotero/storage/K3EBWSSP/Mauch et al. - Can Statistical Language Models be used for the An.pdf}
+}
+
+@inproceedings{mcleodModularSystemHarmonic2021,
+  title = {A {{Modular System}} for the {{Harmonic Analysis}} of {{Musical Scores}} Using a {{Large Vocabulary}}},
+  booktitle = {Proceedings of the 22nd {{International Society}} for {{Music Information Retrieval Conference}}, {{ISMIR}} 2021, {{Online}}, {{November}} 7-12, 2021},
+  author = {McLeod, Andrew and Rohrmeier, Martin},
+  editor = {Lee, Jin Ha and Lerch, Alexander and Duan, Zhiyao and Nam, Juhan and Rao, Preeti and van Kranenburg, Peter and Srinivasamurthy, Ajay},
+  year = {2021},
+  pages = {435--442},
+  urldate = {2023-02-28}
+}
+
+@article{neuwirthAnnotatedBeethovenCorpus2018,
+  title = {The {{Annotated Beethoven Corpus}} ({{ABC}}): {{A Dataset}} of {{Harmonic Analyses}} of {{All Beethoven String Quartets}}},
+  shorttitle = {The {{Annotated Beethoven Corpus}} ({{ABC}})},
+  author = {Neuwirth, Markus and Harasim, Daniel and Moss, Fabian C. and Rohrmeier, Martin},
+  year = {2018},
+  month = jul,
+  journal = {Frontiers in Digital Humanities},
+  volume = {5},
+  pages = {16},
+  issn = {2297-2668},
+  doi = {10.3389/fdigh.2018.00016},
+  urldate = {2022-10-11},
+  abstract = {STATISTICS The ABC contains expert harmonic annotations of all sixteen string quartets (70 movements) by Beethoven: quartets nos. 1\textendash 6 (op. 18), nos. 7\textendash 9 (op. 59), no. 10 (op. 74), no. 11 (op. 95), no. 12 (op. 127) (four movements each quartet), no. 13 (op. 130; six movements), no. 14 (op. 131; seven movements), no. 15 (op. 132; five movements), and no. 16 (op. 135; four movements). In total, the ABC consists of 15,806 measures (240,462 notes) of music, which were annotated with 27,962 chord labels (1,753 unique). Table 1 describes our dataset in comparison to other corpora of symbolic harmonic labels with respect to style, structural features, and size (number of items, measures, and chord symbols) in the first six rows. The last three rows give more detailed information about the distribution of chord symbols in our string quartet corpus.},
+  langid = {english},
+  file = {/Users/judah/Zotero/storage/CGR7ITXM/Neuwirth et al. - 2018 - The Annotated Beethoven Corpus (ABC) A Dataset of.pdf}
+}
+
+@misc{niEndtoendMachineLearning2011,
+  title = {An End-to-End Machine Learning System for Harmonic Analysis of Music},
+  author = {Ni, Yizhao and Mcvicar, Matt and {Santos-Rodriguez}, Raul and De Bie, Tijl},
+  year = {2011},
+  month = jul,
+  number = {arXiv:1107.4969},
+  eprint = {arXiv:1107.4969},
+  publisher = {{arXiv}},
+  doi = {10.48550/arXiv.1107.4969},
+  urldate = {2023-03-21},
+  abstract = {We present a new system for simultaneous estimation of keys, chords, and bass notes from music audio. It makes use of a novel chromagram representation of audio that takes perception of loudness into account. Furthermore, it is fully based on machine learning (instead of expert knowledge), such that it is potentially applicable to a wider range of genres as long as training data is available. As compared to other models, the proposed system is fast and memory efficient, while achieving state-of-the-art performance.},
+  archiveprefix = {arxiv},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Multimedia,Computer Science - Sound},
+  file = {/Users/judah/Zotero/storage/W39G3WSR/Ni et al. - 2011 - An end-to-end machine learning system for harmonic.pdf;/Users/judah/Zotero/storage/AZZ37J43/1107.html}
+}
+
+@article{pardoAlgorithmsChordalAnalysis2002,
+  title = {Algorithms for {{Chordal Analysis}}},
+  author = {Pardo, Bryan and Birmingham, William P.},
+  year = {2002},
+  month = jun,
+  journal = {Computer Music Journal},
+  volume = {26},
+  number = {2},
+  pages = {27--49},
+  issn = {0148-9267, 1531-5169},
+  doi = {10.1162/014892602760137167},
+  urldate = {2023-02-13},
+  langid = {english},
+  file = {/Users/judah/Zotero/storage/6XBHDVMS/Pardo and Birmingham - 2002 - Algorithms for Chordal Analysis.pdf}
+}
+
+@phdthesis{pickensHarmonyModelingPolyphonic2004,
+  title = {Harmony {{Modeling}} for {{Polyphonic Music Retrieval}}},
+  author = {Pickens, Jeremy},
+  year = {2004},
+  langid = {english},
+  school = {University of Massachusetts},
+  file = {/Users/judah/Zotero/storage/N452QVS6/Pickens - HARMONIC MODELING FOR POLYPHONIC MUSIC RETRIEVAL.pdf}
+}
+
+@article{quinnArePitchClassProfiles2010,
+  title = {Are {{Pitch-Class Profiles Really}} ``{{Key}} for {{Key}}''?},
+  author = {Quinn, Ian},
+  year = {2010},
+  month = jan,
+  journal = {Zeitschrift der Gesellschaft f\"ur Musiktheorie [Journal of the German-Speaking Society of Music Theory]},
+  volume = {7},
+  doi = {10.31751/513},
+  abstract = {Most current approaches to key-finding, either from symbolic data such as MIDI or from digital audio data, rely on pitch-class profiles. Our alternative approach is based on two ideas: first, that chord progressions, understood rather loosely as pairs of neighboring harmonic states demarcated by note onsets, are sufficient as windows for key-finding, at least in the chorale context; and second, that the encapsulated identity of a chord progression (modulo pitch-class transposition and revoicing) is sufficient \textendash{} that is, that reduction of progressions to pitch-class distributions is not necessary for key-finding. The system has no access to explicit information about a chord progression other than its transpositional distribution in the training corpus, yet it is able to reach an almost stunning degree of subtlety in its harmonic analysis of chorales it's never heard before. This suggests that reductionist approaches to tonality may be off the mark, or at least that pitch-class reductionism might not be necessary for a principled account of key.},
+  file = {/Users/judah/Zotero/storage/7AM6FIBP/Quinn - 2010 - Are Pitch-Class Profiles Really “Key for Key”.pdf}
+}
+
+@article{rocherDynamicChordAnalysis2009,
+  title = {Dynamic {{Chord Analysis}} for {{Symbolic Music}}},
+  author = {Rocher, Thomas and Robine, Matthias and Hanna, Pierre and Strandh, Robert},
+  year = {2009},
+  month = jan,
+  abstract = {In this paper, we present a new method for chord recognition from symbolic music. This method builds a graph of all possible chords and selects the best path in this graph. A rulebased approach is adopted to enumerate chord candidates from groups of notes by considering compatible chords and compatible keys. The distance proposed by Lerdahl is then used to compute costs between different chord candidates. Dynamic programming is also involved to select the best path among chord candidates. Experiments are performed on a MIDI song database, divided in different music styles. Then the proposed system is compared to the Melisma Music Analyzer software proposed by Temperley. Results show that our method has a comparable efficiency and provides not only the root of the chord, but also its mode (major or minor). The proposed system is still open and is able to support more chord types if correct rules to handle them are specified. \textcopyright{} July 2009- All}
+}
+
+@article{sappVisualHierarchicalKey2005,
+  title = {Visual Hierarchical Key Analysis},
+  author = {Sapp, Craig},
+  year = {2005},
+  month = oct,
+  journal = {Computers in Entertainment},
+  volume = {3},
+  pages = {1--19},
+  doi = {10.1145/1095534.1095544},
+  abstract = {Tonal music is often conceived of as progressing through a sequence of key regions, usually starting and ending in the tonic key, with a journey away from the tonic key somewhere in the middle of the piece. This article presents a visual method of displaying the musical key structure of a composition in a single picture. The hierarchical plots can also show the relative strength of these key regions and how they develop out of the chordal substrate of the music.},
+  file = {/Users/judah/Zotero/storage/BTLM2L2D/Sapp - 2005 - Visual hierarchical key analysis.pdf}
+}
+
+@article{sidorovMUSICANALYSISSMALLEST2014,
+  title = {{{MUSIC ANALYSIS AS A SMALLEST GRAMMAR PROBLEM}}},
+  author = {Sidorov, Kirill and Jones, Andrew and Marshall, David},
+  year = {2014},
+  abstract = {In this paper we present a novel approach to music analysis, in which a grammar is automatically generated explaining a musical work's structure. The proposed method is predicated on the hypothesis that the shortest possible grammar provides a model of the musical structure which is a good representation of the composer's intent. The effectiveness of our approach is demonstrated by comparison of the results with previously-published expert analysis; our automated approach produces results comparable to human annotation. We also illustrate the power of our approach by showing that it is able to locate errors in scores, such as introduced by OMR or human transcription. Further, our approach provides a novel mechanism for intuitive high-level editing and creative transformation of music. A wide range of other possible applications exists, including automatic summarization and simplification; estimation of musical complexity and similarity, and plagiarism detection.},
+  langid = {english},
+  file = {/Users/judah/Zotero/storage/YUECVKI8/Sidorov et al. - 2014 - MUSIC ANALYSIS AS A SMALLEST GRAMMAR PROBLEM.pdf}
+}
+
+@incollection{temperleyBayesianApproachKeyFinding2002,
+  title = {A {{Bayesian Approach}} to {{Key-Finding}}},
+  booktitle = {Music and {{Artificial Intelligence}}},
+  author = {Temperley, David},
+  editor = {Goos, Gerhard and Hartmanis, Juris and {van Leeuwen}, Jan and Anagnostopoulou, Christina and Ferrand, Miguel and Smaill, Alan},
+  year = {2002},
+  volume = {2445},
+  pages = {195--206},
+  publisher = {{Springer Berlin Heidelberg}},
+  address = {{Berlin, Heidelberg}},
+  doi = {10.1007/3-540-45722-4_18},
+  urldate = {2023-01-21},
+  abstract = {The key-profile model (originally proposed by Krumhansl and Schmuckler, and modified by Temperley) has proven to be a highly successful approach to key-finding. It appears that the key-profile model can be reinterpreted, with a few small modifications, as a Bayesian probabilistic model. This move sheds interesting light on a number of issues, including the psychological motivation for the key-profile model, other aspects of musical cognition such as metrical analysis, and issues such as ambiguity and expectation.},
+  isbn = {978-3-540-44145-8 978-3-540-45722-0},
+  langid = {english},
+  file = {/Users/judah/Zotero/storage/25784P4S/Temperley - 2002 - A Bayesian Approach to Key-Finding.pdf}
+}
+
+@inproceedings{temperleyBayesianApproachKeyFinding2002a,
+  title = {A {{Bayesian Approach}} to {{Key-Finding}}},
+  booktitle = {Music and {{Artificial Intelligence}}},
+  author = {Temperley, David},
+  editor = {Anagnostopoulou, Christina and Ferrand, Miguel and Smaill, Alan},
+  year = {2002},
+  series = {Lecture {{Notes}} in {{Computer Science}}},
+  pages = {195--206},
+  publisher = {{Springer}},
+  address = {{Berlin, Heidelberg}},
+  doi = {10.1007/3-540-45722-4_18},
+  abstract = {The key-profile model (originally proposed by Krumhansl and Schmuckler, and modified by Temperley) has proven to be a highly successful approach to key-finding. It appears that the key-profile model can be reinterpreted, with a few small modifications, as a Bayesian probabilistic model. This move sheds interesting light on a number of issues, including the psychological motivation for the key-profile model, other aspects of musical cognition such as metrical analysis, and issues such as ambiguity and expectation.},
+  isbn = {978-3-540-45722-0},
+  langid = {english},
+  keywords = {Bayesian Approach,Bayesian Model,Modulation Score,Music Perception,Stream Segregation},
+  file = {/Users/judah/Zotero/storage/RWDJFYGY/Temperley - 2002 - A Bayesian Approach to Key-Finding.pdf}
+}
+
+@article{temperleyUnifiedProbabilisticModel2009,
+  title = {A {{Unified Probabilistic Model}} for {{Polyphonic Music Analysis}}},
+  author = {Temperley, David},
+  year = {2009},
+  month = mar,
+  journal = {Journal of New Music Research},
+  volume = {38},
+  number = {1},
+  pages = {3--18},
+  publisher = {{Routledge}},
+  issn = {0929-8215},
+  doi = {10.1080/09298210902928495},
+  urldate = {2023-03-08},
+  abstract = {This article presents a probabilistic model of polyphonic music analysis. Taking a note pattern as input, the model combines three aspects of symbolic music analysis\textemdash metrical analysis, harmonic analysis, and stream segregation\textemdash into a single process, allowing it to capture the complex interactions between these structures. The model also yields an estimate of the probability of the note pattern itself; this has implications for the modelling of music transcription. I begin by describing the generative process that is assumed and the analytical process that is used to infer metrical, harmonic, and stream structures from a note pattern. I then present some tests of the model on metrical analysis and harmonic analysis, and discuss ongoing work to integrate the model into a transcription system.},
+  file = {/Users/judah/Zotero/storage/XNKLU6VF/Temperley - 2009 - A Unified Probabilistic Model for Polyphonic Music.pdf}
+}
