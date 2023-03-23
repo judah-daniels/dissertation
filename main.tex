@@ -27,7 +27,36 @@
 \newcommand{\option}[1]{\texttt{\itshape#1}}
 
 %----------------------------------------------------------------------------------------
+%% *****************************************************************
+\newlength{\upBranch} % shift up the text  lines <<<<
+\setlength{\upBranch}{0.7ex} % 
 
+\newlength{\tolineSpace} % blank space bellow text  lines  <<<
+\setlength{\tolineSpace}{1mm}% 
+
+\usepackage{xpatch} % needed <<<<<<<<
+\makeatletter
+
+\xpatchcmd{\dirtree} % root
+{\vbox{\@nameuse{DT@body@1}}}
+{\raisebox{-\tolineSpace}{\vbox{\@nameuse{DT@body@1}}}}
+{}{}    
+
+\xpatchcmd{\dirtree} % below space
+{\advance\dimen\z@ by-\@nameuse{DT@lastlevel@\the\DT@countiv}\relax}
+{\advance\dimen\z@ by-\tolineSpace \advance\dimen\z@ by-\@nameuse{DT@lastlevel@\the\DT@countiv}\relax}
+{}{}
+    
+\xpatchcmd{\dirtree}% shift up the text  lines
+{\kern\DT@sep\box\z@\endgraf}
+{\kern\DT@sep\raisebox{-\upBranch}{\box\z@}\endgraf}
+{}{}    
+
+\makeatother
+%% *****************************************************************
+
+
+%-----
 % Language setting
 \usepackage[english]{babel}
 %\raggedbottom                           % try to avoid widows and orphans
@@ -79,6 +108,7 @@ I, \mfullname{} of \mcollege, being a candidate for Part II of the Computer Scie
 \leftline{Date \today}
 
 \chapter*{Proforma}
+
 
 {\large
 \begin{tabular}{ll}
@@ -132,13 +162,12 @@ appreciated.
 \pagestyle{headings}
 
 \chapter{Introduction}
+\textit{This dissertation explores ... We present .. which extends a recent model, addressing problems of intractability by using Heuristic search methods. We show that our novel heuristic search method ... }
 
 \section{Motivation}
-The introduction should explain the principal motivation for the project and show how the work fits into the broad area of surrounding computer science and give a brief survey of previous related work. \\
-Clear motivation, justifying potential benefits of success.
+
 \section{Related Work}
-It should generally be unnecessary to quote at length from technical papers or textbooks.
-If a simple bibliographic reference is insufficient, consign any lengthy quotation to an appendix.
+
 \section{Aims}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -146,39 +175,25 @@ If a simple bibliographic reference is insufficient, consign any lengthy quotati
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Preparation}
-\paragraph{Description: }
-Principally, this chapter should describe the work which was undertaken before code was written, hardware built or theories worked on. 
-It should show how the project proposal was further refined and clarified, so that the implementation stage could go smoothly rather than by trial and error.
-\par
-Throughout this chapter and indeed the whole dissertation, it is essential to demonstrate that a proper professional approach was employed.
-\par
+\textit{In this chapter, I present the work which was undertaken before the code was written. After a brief description of my starting point, I provide an exposition of the Proto-voice Model which forms the foundation of this project. Subsequently, I discuss probabilistic programming and Bayesian inference, including a probabilistic model of harmony. Finally, I describe the software engineering techniques and principles used throughout the project. }
 
 \section{Starting Point}
-It is essential to declare the starting point. 
-This states any existing codebase or materials that your project builds on. 
-The text here can commonly be identical to the text in your proposal, but it may enlarge on it or report variations.
-For instance, the true starting point may have turned out to be different from that declared in the proposal and such discrepancies must be explained.
 
 \subsection{Relevant courses and experience}
 
 \subsection{Existing codebase}
 
 \section{The Protovoice Model}
-Mention complicated theories or algorithms which required understanding. \\ 
-Clear presentation of challenging background material covering a range of computer science topics beyond Part IB.
+
+\section{Probabilistic Programming}
 
 \section{Heuristic Search Algorithms}
 
-\section{Data Processing}
-
 \section{Requirements Analysis}
-Underlining the professional approach, this chapter will very likely include a section headed "Requirements Analysis" and refer to appropriate software engineering techniques used in the dissertation. \\
-Good or excellent requirements analysis; 
-\par 
+
 \subsection{Main deliverables}
-Main deliverables with a risk analysis. 
+
 \subsection{Dependency Analysis}
-Implementation modules with a dependency analysis.
 
 \section{Software Engineering Techniques}
 Justified and documented selection of suitable tools; good engineering approach.
@@ -229,77 +244,115 @@ The chapter will also cite any new programming languages and systems which had t
 
 \chapter{Implementation}
 
-\paragraph{Description: }
-This chapter should describe what was actually produced: the programs which were written, the hardware which was built or the theory which was developed. Any design strategies that looked ahead to the testing stage should be described in order to demonstrate a professional approach was taken.
-\par
-Descriptions of programs may include fragments of high-level code but large chunks of code are usually best left to appendices or omitted altogether. Analogous advice applies to circuit diagrams or detailed steps in a machine-checked proof.
-\par
-The implementation chapter should include a section labelled "Repository Overview". The repository overview should be around one page in length and should describe the high-level structure of the source code found in your source code repository. It should describe whether the code was written from scratch or if it built on an existing project or tutorial. Making effective use of powerful tools and pre-existing code is often laudable, and will count to your credit if properly reported. Nevertheless, as in the rest of the dissertation, it is essential to draw attention to the parts of the work which are not your own. 
-\par
-It should not be necessary to give a day-by-day account of the progress of the work but major milestones may sometimes be highlighted with advantage.
-
-\paragraph{Mark Scheme: }
-Contribution to the field.
-Application of extra-curricular reading and original interpretation of previous work from academia or industry.
-Challenging goals and substantial deliverables with excellent selection and application of appropriate mathematical, scientific and/or engineering techniques.
-Clear and justified repository overview.
-At most minor faults in execution or understanding.
-
 \section{Repository Overview:}
+
+\DTsetlength{1em}{1em}{0em}{0.4pt}{0.4pt}       
+
+\setlength{\DTbaselineskip}{18pt} %minimum size for  \large
+\renewcommand{\DTstyle}{\rmfamily\large}    %
+
 The following describes the protovoices-haskell repository, and where my code contribution will lie:
-\par
 \medskip
-\dirtree{%
-.1 protovoices-haskell.
-.2 app.
-.3 MainHeuristicSearch.hs <- My code.
-.3 ....
-.2 src.
-.3 \textbf{Heuristics} <- My code.  
-.4 …  <- My code.
-.3 ....
-.2 test.
-.2 testdata.
-.2 ....
-}
+\begin{table}
+  \centering
+  \caption{Repository Overview}
+  \label{jeff}
+  \begin{tabularx}{\textwidth}{XXX}
+    File/Folder & Description & Lines of Code \\
+    \toprule
+    \toprule
+  \begin{minipage}[t]{4cm}
+    \dirtree{%
+    .1 protovoices-haskell.
+    .2 app\vspace{\baselineskip}. 
+    .2 src.
+    .3 HeuristicParser.hs.
+    .3 HeuristicSearch.hs.
+    .3 Heuristics.hs.
+    .3 RandomChoiceSearch.hs.
+    .3 RandomSampleParser.hs.
+    .3 FileHandling.hs.
+    .3 PBHModel.hs.
+    .3 \dots \vspace{\}.
+    .2 harmonic-inference \vspace{\baselineskip}.
+    .2 experiments.
+    .3 preprocess.ipynb.
+    .3 dcml\_params.json.
+    .3 inputs \vspace{\baselineskip}.
+    .2 test \vspace{\baselineskip}.
+    }
+  \end{minipage} & 
+  \begin{minipage}[t]{4cm}
+    Root directory  \\
+    minipage \\
+    minipage \\
+    minipage \\
+    minipage \\
+
+  \end{minipage}
+  & 
+  2323  
+
+% &  Director A  \\
+%    Director B \\
+%    Director C\\
+%    Director D\\
+\end{tabularx}
+\end{table}
+
+% \par
+% \medskip
+% \dirtree{%
+% .1 protovoices-haskell.
+% .2 app.
+% .3 MainHeuristicSearch.hs <- My code.
+% .3 ....
+% .2 src.
+% .3 \textbf{Heuristics} <- My code.  
+% .4 …  <- My code.
+% .3 ....
+% .2 test.
+% .2 testdata.
+% .2 ....
+% }
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Evaluation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Evaluation}
+\textit{In this chapter, I provide qualitative and quantitative evaluations of the work completed. I then provide and interpret evidence to show that the success criteria were met.}
 
-\paragraph{Description:}
-This is where Assessors will be looking for signs of success and for evidence of thorough and systematic evaluation.
-Sample output, tables of timings and photographs of workstation screens, oscilloscope traces or circuit boards may be included.
-Care should be employed to take a professional approach throughout.
-For example, a graph that does not indicate confidence intervals will generally leave a professional scientist with a negative impression. 
-As with code, voluminous examples of sample output are usually best left to appendices or omitted altogether.
-\par
-There are some obvious questions which this chapter will address. How many of the original goals were achieved? Were they proved to have been achieved? Did the program, hardware, or theory really work?
-\par
-Assessors are well aware that large programs will very likely include some residual bugs. It should always be possible to demonstrate that a program works in simple cases and it is instructive to demonstrate how close it is to working in a really ambitious case.
+\textit{The main questions to answer are as follows:}
+\begin{itemize}
+  \item \textit{Can the proto-voice model be used to accurately infer chord labels?}
+  \item \textit{Can the proto-voice model be used to practically infer chord labels?}
+  \item \textit{How well my heuristic search algorithms infer chord labels?}
+\end{itemize}
 
-\paragraph{Mark Scheme (Evaluation and Conclusions): }
-Conclusions provide an effective summary of work completed along with good future work.
-Clearly presented argument demonstrating success criteria met.
-Good or excellent evidence of critical thought and interpretation of the results which substantiate any claims of success, improvements or novelty.
+\section{Accuracy}
 
-\paragraph{My thoughts}
-No terminal output, just diagrams and tables?
+\section{Performance}
+
+\section{Heuristic Search (Extension)}
+
+\section{Success Criteria}
+
+\section{Limitations}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Conclusions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Conclusions}
-This chapter is likely to be very short and it may well refer back to the Introduction. 
+\textit{In this chapter, I first discuss the success achieved by the project then offer a reflection on lessons learned. Finally, I consider the directions in which there is potential for future work.}
 \section{Achievements}
+
+\section{Lessons learned}
 
 \section{Future Work}
 
-\section{Lessons learned}
-Personal reflection on the lessons learned.
-It might offer a reflection on the lessons learned and explain how you would have planned the project if starting again with the benefit of hindsight.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % the bibliography
