@@ -4,6 +4,7 @@
 \usepackage[left=25mm, right=25mm, bottom=25mm, top=20mm]{geometry}  % adjusts page layout
 \usepackage{graphicx}  % allows inclusion of PDF, PNG and JPG images
 \usepackage{verbatim}
+\usepackage{amsfonts}
 \usepackage{tabu}
 \usepackage{docmute}   % only needed to allow inclusion of proposal.tex
 \usepackage[utf8]{inputenc}
@@ -163,11 +164,11 @@ None
 \pagestyle{headings}
 
 \chapter{Introduction}
-\textit{This dissertation explores efficient search strategies for parsing a symbolic music data using a musical grammar. We present ... which extends a recent model, addressing problems of intractability by using Heuristic search methods. We will see that that my novel heuristic search method . }
+\textit{This dissertation explores efficient search strategies for parsing a symbolic music data using a musical grammar. We present ... which extends a recent model, addressing problems of intractability by using Heuristic search methods. We will see that that my novel heuristic search algorithm achieves .... }
 
 \section{Motivation}
 
-A piece of music can be described using a sequence of chords, representing a higher level harmonic structure of a piece. There is a small, finite set of chord types, but each chord can be realised on the musical surface in a practically infinite number of ways. Given a score, we wish to infer the underlying chord types.
+A piece of music can be described using a sequence of chords, representing a higher level harmonic structure of a piece. There is a small, finite set of chord types, but each chord can be realised on the musical surface in a practically infinite number of ways. Given a score, we wish to infer the underlying chord types. This is often a time consuming and cognitively demanding expert task \cite{masadaChordRecognitionSymbolic2018}, hence its utility.
 
 \par
 The paper \textit{Modeling and Inferring Proto-voice Structure in Free Polyphony} describes a generative model that encodes the recursive and hierarchical dependencies between notes, giving rise to a grammar-like hierarchical system \cite{finkensiepMODELINGINFERRINGPROTOVOICE2021}. This proto-voice model can be used to reduce a piece into a hierarchical structure which encodes an understanding of the tonal/harmonic relations.
@@ -181,9 +182,12 @@ Christoph Finkensiep suggests in his thesis that the proto-voice model may be an
 While the original model could in theory be used to generate harmonic annotations, its exhaustive search strategy would be prohibitively time-consuming in practice for any but the shortest musical extracts; one half measure can have over 100,000 valid derivations \cite{finkensiepStructureFreePolyphony2023}. My approach will be to explore the use of heuristic search algorithms to solve this problem.
 
 \section{Related Work}
+First grammar/rule-based systems \cite{maxwellExpertSystemHarmonizing1992} \cite{winogradLinguisticsComputerAnalysis1968}, optimisation algorithms \cite{pardoAlgorithmsChordalAnalysis2002} and supervised learning approaches making use of large datasets \cite{niEndtoendMachineLearning2011} \cite{mcleodModularSystemHarmonic2021} \cite{masadaChordRecognitionSymbolic2018}.
+\par
+Distinction to be drawn between approaches that take segmented or non-segmented pieces. Some models make use of a joint segmentation and labelling approach \cite{masadaChordRecognitionSymbolic2018}... 
 
-
-\section{Aims}
+\par
+More general heuristic search techniques for huge search spaces.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Preparation
@@ -192,16 +196,10 @@ While the original model could in theory be used to generate harmonic annotation
 \chapter{Preparation}
 \textit{In this chapter, I present the work which was undertaken before the code was written. After a brief description of my starting point, I provide an exposition of the Proto-voice Model which forms the foundation of this project. Subsequently, I discuss probabilistic programming and Bayesian inference, including a probabilistic model of harmony. Finally, I describe the software engineering techniques and principles used throughout the project. }
 
-\section{Starting Point}
+\section{Background Material}
 
-\subsection{Relevant courses and experience}
-
-\subsection{Existing codebase}
-
-\section{The Proto-voice Model}
-
-\subsection{Proto-voices}
-TODO: Brief description of what notes are, what is a piece of music, introduce relevant musical terminology (Score, note, protovoice, repetition, neighbor/ ornament(choose one?)). Conflict of meaning with root-note (generative operation) and root note (musical terminology). What are the main assumptions/ infortion we need to know in order to understand the proto-voice model?
+\subsection{Proto-voice Model}
+TODO: Brief description of what notes are, what is a piece of music, introduce relevant musical terminology (Score, note, protovoice, repetition, neighbor/ ornament(choose one?)). Conflict of meaning with root-note (generative operation) and root note (musical terminology). What are the main assumptions/ information we need to know in order to understand the proto-voice model?
 
 \par
 TODO: Motivation of the model as a generative model on the note level, describing the piece as a DAG (Directed Acyclic Graph). What is a proto-voice exactly? 
@@ -219,7 +217,7 @@ The proto-voice model is characterised by 3 primitive generative operations on n
 Operations with two notes are represented by edge replacement. 
 \[p_1 \to p_2 ~~~\implies~~ p_1 \to c \to p_2 \label{edge replacement}\]
 
-\subsection{Proto-voice Operations}
+\subsubsection{Proto-voice Operations}
 
 To model simulataneity of notes we introduce slices, which are multisets of pitches, representing segments of a piece where a group of notes are heard. 
 \par 
@@ -235,19 +233,106 @@ Split: \[t \to t'_l s' t'_r\]
 Spread: \[t_l~s~t_r \to t'_l~s'_l~t'_m~s'_r~t'_r\]
 Freeze: \[t \to t \]
 
-\subsection{Proto-voice harmony}
+\subsubsection{Proto-voice harmony}
 How do we get from a proto-voice (partial)derivation to a harmonic inference?
 \par
-Explain what harmony is, and how the proto-voice model allows us to capture harmony. 
+Explain what harmony is, and how the proto-voice model allows us to capture harmony. Elaboration of the introduction.
+\par
+What assumptions are needed for a protovoice derivation to be able to describe harmonic entities? These shape heuristic design.
+\par
 
 
-\section{Probabilistic Programming}
+\subsection{Probabilistic Programming}
+Provide an explanation of all the concepts I learned and used in this project. 
+Techniques such as marginalisation, joint distributions, bayes rule etc. 
+Probabilistic programming is the combination model definitions and statistical inference algorithms for computing the conditional distribution of inputs (chords) that could have given rise to the observed output (score). We are making the assumption that the score is a realisation of the latent harmonic entities. 
 
-\subsection{Bayesian Inference}
+Dirchelet distributions
+Beta distribution  
+Multinomiall distribution 
+Normal Distribution 
+
+\par 
+Inference as model $\to$ data $\to$ prob distribution $\to$ chord guess
 
 \subsection{Probabilistic Model of Harmony}
 
-\section{Heuristic Search Algorithms}
+Outline of the probabilistic model of harmony, describing the parts that are relevant for harmonic annotations. This section allows the reader to understand the evaluation and heuristic modules.
+
+\par
+Describe how the parameters were attained
+\par
+Then describe how to go from the parameters to chord, chordtone and ornamentation distributions
+\par
+
+Parameters:
+\par
+pHarmonies: $\mathbb{N}^{n_c}$\\
+pChordtones: $\mathbb{N}^{n_c}$\\
+pOrnaments: $\mathbb{N}^{n_c}$
+\par
+Chordtypes, $C = \{\text{M,~m, Mm7, om, o7, mm7, \%7, MM7, +, Ger, It, Fr, mM7, +7}\}$
+
+\[\vec{\chi}' \sim \text{Dirchlet} (\text{pHarmonies}, n_c) \]
+
+\[\vec{\chi} = \mathbb{E} (\vec{X}_i) = \frac{\alpha_i}{\sum\limits_j \alpha_j} \]
+
+Chord: \[c \sim \text{Categorical}(\vec{\chi})\]
+
+Single chordtone distribution. We want to find $P(p|c, ct)$ probability of the pitch given the chord, and that the note is a chordtone:
+\[\vec{\phi}_{ct}' \sim \text{Dirchlet}(pChordtones, n_p) \implies \vec{\phi}\]
+
+For each of these parameters we use the MLE to get our probability distribution. 
+\[\vec{\phi}_{ct} = \text{MLE} (\vec{\phi}_{ct}')\]
+\[\vec{\phi}_{or} = \text{MLE} (\vec{\phi}_{or}')\]
+\[\vec{\chi}= \text{MLE} (\vec{\chi}') \]
+Then for each chord tone,
+\[p_{ct} \sim \text{Categorical}(\vec{\phi}_{ct})\]
+\[p_{or} \sim \text{Categorical}(\vec{\phi}_{or})\]
+We get the distribution of likelihoods for each pitch.
+
+
+
+
+
+
+\subsection{Heuristic Search Algorithms}
+
+Provide an outline of the heuristic search paradigm with a formalisation.
+\par
+Provide a brief overview of different techniques that are used to prune the search space that might be relevant.
+
+\section{Starting Point}
+
+\subsection{Relevant courses and experience}
+
+\paragraph{Haskell}{I was introduced to Haskell during an internship during the summer before starting this project (July to August 2022). This project is an excuse to learn the language.}
+\paragraph{Python}{I have experience coding in Python.}
+
+\paragraph{IB}{ Formal Models of Language, Artificial Intelligence.}
+
+\subsection{Existing codebase}
+NOTE: I need to restructure the codebase to reflect the different modules more clearly, to help with the flow to the dissertation.
+
+The following describes the protovoices-haskell repository, and where my code contribution will lie:
+\par
+\medskip
+\dirtree{%
+.1 protovoices-haskell.
+.2 app.
+.3 MainExamples.hs.
+.3 MainISMIR.hs.
+% .3 MainLearning.hs.
+% .3 MainHeuristicSearch.hs <- My code.
+.3 ....
+.2 src.
+.3 \textbf{Heuristics} <- My code.  
+% .4 …  <- My code.
+.3 ....
+.2 test.
+% .2 testdata.
+.2 ....
+}
 
 \section{Requirements Analysis}
 
@@ -379,12 +464,22 @@ Unit Tests (Section x)
 \end{table}
 
 \section{Core Implementation}
+
 \subsection{Heuristic Parser}
+
+\subsection{Evaluation Module}
+We need to know exactly what we are trying to achieve before we can understand the baseline and extention implementations.
+
+\subsubsection{Probabilistic Model of Harmony}
+
 \section{Baseline implementation}
-\section{Random Sample Parser}
-\section{Random Choice Search}
+\subsection{Random Sample Parser}
+As a crude baseline we develop two algorithms based on randomly sampling notes for each segment to infer the chord label. 
+\par
+The pure random sample algorithm simply samples random notes for each segment, and uses those to guess the chord label. This doesn't even consider the notes of the piece, so it's really bad, but provides a useful reference.
+
+\subsection{Random Choice Search}
 \section{Extension Implementation}
-\subsection{Probabilistic Model of Harmony}
 \subsection{Heuristic Design}
 \subsection{Heuristic Search}
 \section{Testing}
@@ -411,6 +506,7 @@ Things to note
   \item Then we want a heuristic search algorithm that considers each option exhaustively and finds the best local option. This is too computationally expensive to be used for whole pieces. 
   \item Given there can be millions of possible next states in the search, we need to look at different strategies to avoid searching through them all. E.g just sample states. 
   \item Sensitivity Analysis for the heuristic search is useful for the evaluation. Explore how robust it is to handcrafted attacks/ different types of passages.
+  \item Could evaluate by segments instead of pieces. 
 \end{itemize}
 
 \section{Performance}
