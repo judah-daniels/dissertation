@@ -163,11 +163,25 @@ None
 \pagestyle{headings}
 
 \chapter{Introduction}
-\textit{This dissertation explores ... We present .. which extends a recent model, addressing problems of intractability by using Heuristic search methods. We show that our novel heuristic search method ... }
+\textit{This dissertation explores efficient search strategies for parsing a symbolic music data using a musical grammar. We present ... which extends a recent model, addressing problems of intractability by using Heuristic search methods. We will see that that my novel heuristic search method . }
 
 \section{Motivation}
 
+A piece of music can be described using a sequence of chords, representing a higher level harmonic structure of a piece. There is a small, finite set of chord types, but each chord can be realised on the musical surface in a practically infinite number of ways. Given a score, we wish to infer the underlying chord types.
+
+\par
+The paper \textit{Modeling and Inferring Proto-voice Structure in Free Polyphony} describes a generative model that encodes the recursive and hierarchical dependencies between notes, giving rise to a grammar-like hierarchical system \cite{finkensiepMODELINGINFERRINGPROTOVOICE2021}. This proto-voice model can be used to reduce a piece into a hierarchical structure which encodes an understanding of the tonal/harmonic relations.
+\par
+Christoph Finkensiep suggests in his thesis that the proto-voice model may be an effective way to infer higher level latent entities, such as harmonies or voice leading schemata. Thus in this project I will ask the question: is this parsing model an effective way to annotate harmonies? By ‘effective’ we are referring to two things:
+\begin{itemize}
+  \item Accuracy: can the model successfully emulate how experts annotate harmonic progressions in musical passages? 
+  \item Practicality: can the model be used to do this within a reasonable time frame?
+\end{itemize}
+
+While the original model could in theory be used to generate harmonic annotations, its exhaustive search strategy would be prohibitively time-consuming in practice for any but the shortest musical extracts; one half measure can have over 100,000 valid derivations \cite{finkensiepStructureFreePolyphony2023}. My approach will be to explore the use of heuristic search algorithms to solve this problem.
+
 \section{Related Work}
+
 
 \section{Aims}
 
@@ -184,10 +198,53 @@ None
 
 \subsection{Existing codebase}
 
-\section{The Protovoice Model}
+\section{The Proto-voice Model}
+
+\subsection{Proto-voices}
+TODO: Brief description of what notes are, what is a piece of music, introduce relevant musical terminology (Score, note, protovoice, repetition, neighbor/ ornament(choose one?)). Conflict of meaning with root-note (generative operation) and root note (musical terminology). What are the main assumptions/ infortion we need to know in order to understand the proto-voice model?
+
+\par
+TODO: Motivation of the model as a generative model on the note level, describing the piece as a DAG (Directed Acyclic Graph). What is a proto-voice exactly? 
+\par 
+
+The proto-voice model is characterised by 3 primitive generative operations on notes.
+
+\begin{itemize}
+  % \setlength\itemsep{1em}
+ \item Repetitions 
+  \item Neighbor notes 
+  \item Passing notes
+\end{itemize}
+
+Operations with two notes are represented by edge replacement. 
+\[p_1 \to p_2 ~~~\implies~~ p_1 \to c \to p_2 \label{edge replacement}\]
+
+\subsection{Proto-voice Operations}
+
+To model simulataneity of notes we introduce slices, which are multisets of pitches, representing segments of a piece where a group of notes are heard. 
+\par 
+Diagram showing a slice + a diagram showing a higher level slices, grouping an arpegiation.
+\par 
+A slice $m$ is defined as a multiset of pitches.
+\par 
+A transition $t = (s_l, e, s_r)$  relates two slices with a configuration of edges $e=(e_{reg}, e_{pass})$, a set of regular edges (repetition or neighbor), and a set of passing edges.
+\par
+Outer operations (Diagram of all three operations): 
+\par
+Split: \[t \to t'_l s' t'_r\]
+Spread: \[t_l~s~t_r \to t'_l~s'_l~t'_m~s'_r~t'_r\]
+Freeze: \[t \to t \]
+
+\subsection{Proto-voice harmony}
+How do we get from a proto-voice (partial)derivation to a harmonic inference?
+\par
+Explain what harmony is, and how the proto-voice model allows us to capture harmony. 
+
 
 \section{Probabilistic Programming}
+
 \subsection{Bayesian Inference}
+
 \subsection{Probabilistic Model of Harmony}
 
 \section{Heuristic Search Algorithms}
@@ -302,7 +359,7 @@ Unit Tests (Section x)
 
   \end{minipage} & 
   \begin{minipage}[t]{0.5cm}
-    1972
+    2272
     \vspace{0.1\DTbaselineskip}\\
     470\\
     \vspace{\DTbaselineskip}
@@ -312,7 +369,7 @@ Unit Tests (Section x)
     \vspace{1.8\DTbaselineskip}
     188\\
     \vspace{3.7\DTbaselineskip}
-    121\\
+    431\\
     \vspace{3\DTbaselineskip}
     115\\
     \vspace{2.5\DTbaselineskip}
@@ -322,6 +379,7 @@ Unit Tests (Section x)
 \end{table}
 
 \section{Core Implementation}
+\subsection{Heuristic Parser}
 \section{Baseline implementation}
 \section{Random Sample Parser}
 \section{Random Choice Search}
@@ -346,6 +404,14 @@ Unit Tests (Section x)
 \end{itemize}
 
 \section{Accuracy}
+Things to note
+\begin{itemize}
+  \item The fact that segmentation is known ahead of time provides a great deal of information \cite{gothamWhatIfWhen2021}
+  \item So we can use comparisons between the random sample from each segment algorithm and the random parse algorithm to see if the use of the grammar provides an advantage over just sampling the notes directly, without looking at relations between notes.
+  \item Then we want a heuristic search algorithm that considers each option exhaustively and finds the best local option. This is too computationally expensive to be used for whole pieces. 
+  \item Given there can be millions of possible next states in the search, we need to look at different strategies to avoid searching through them all. E.g just sample states. 
+  \item Sensitivity Analysis for the heuristic search is useful for the evaluation. Explore how robust it is to handcrafted attacks/ different types of passages.
+\end{itemize}
 
 \section{Performance}
 
