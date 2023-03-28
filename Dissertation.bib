@@ -64,10 +64,13 @@
   file = {/Users/judah/Zotero/storage/BP7X4D37/Feisthauer et al. - 2020 - Estimating keys and modulations in musical pieces.pdf}
 }
 
-@article{finkensiepMODELINGINFERRINGPROTOVOICE2021,
-  title = {{{MODELING AND INFERRING PROTO-VOICE STRUCTURE IN FREE POLYPHONY}}},
+@inproceedings{finkensiepModelingInferringProtovoice2021,
+  title = {Modeling and {{Inferring Proto-voice Structure}} in {{Free Polyphony}}},
+  booktitle = {Proceedings of the 22nd {{ISMIR Conference}}},
   author = {Finkensiep, Christoph and Rohrmeier, Martin},
   year = {2021},
+  month = nov,
+  address = {{Online}},
   abstract = {Voice leading is considered to play an important role in the structure of Western tonal music. However, the explicit voice assignment of a piece (if present at all) generally does not reflect all phenomena related to voice leading. Instead, voice-leading phenomena can occur in free textures (e.g., in most keyboard music), or cut across the explicitly notated voices (e.g., through implicit polyphony within a single voice). This paper presents a model of proto-voices, voice-like structures that encode sequential and vertical relations between notes without the need to assume explicit voices. Proto-voices are constructed by recursive combination of primitive structural operations, such as insertion of neighbor or passing notes, or horizontalization of simultaneous notes. Together, these operations give rise to a grammar-like hierarchical system that can be used to infer the structural fabric of a piece using a chart parsing algorithm. Such a model can serve as a foundation for defining higher-level latent entities (such as harmonies or voice-leading schemata), explicitly linking them to their realizations on the musical surface.},
   langid = {english},
   file = {/Users/judah/Zotero/storage/RQYKS2LS/Finkensiep and Rohrmeier - 2021 - MODELING AND INFERRING PROTO-VOICE STRUCTURE IN FR.pdf}
@@ -134,12 +137,13 @@
   file = {/Users/judah/Zotero/storage/8IHKSHMY/Granroth-Wilding - Harmonic Analysis of Music Using Combinatory Categ.pdf}
 }
 
-@article{harasimHarmonicSyntaxTime2019,
+@inproceedings{harasimHarmonicSyntaxTime2019,
   title = {Harmonic {{Syntax}} in {{Time}}: {{Rhythm Improves Grammatical Models}} of {{Harmony}}},
   shorttitle = {Harmonic {{Syntax}} in {{Time}}},
-  editor = {Harasim, Daniel and O'Donnell, Timothy J. and Rohrmeier, Martin Alois},
+  booktitle = {Proceedings of the 20th {{ISMIR Conference}}},
+  author = {Harasim, Daniel},
+  editor = {O'Donnell, Timothy J. and Rohrmeier, Martin Alois},
   year = {2019},
-  journal = {Proceedings of the 20th ISMIR Conference},
   publisher = {{ISMIR}},
   doi = {10.5281/zenodo.3527812},
   abstract = {Music is hierarchically structured, both in how it is perceived by listeners and how it is composed. Such structure can be elegantly captured using probabilistic grammatical models similar to those used to study natural language. They address the complexity of the structure using abstract categories in a recursive formalism. Most existing grammatical models of musical structure focus on one single dimension of music\textendash such as melody, harmony, or rhythm. While these grammar models often work well on short musical excerpts, accurate analysis of longer pieces requires taking into account the constraints from multiple domains of structure. The present paper proposes abstract product grammars\textendash a formalism which integrates multiple dimensions of musical structure into a single grammatical model\textendash along with efficient parsing and inference algorithms for this formalism. We use this model to study the combination of hierarchically-structured harmonic syntax and hierarchically-structured rhythmic information. The latter is modeled by a novel grammar of rhythm that is capable of expressing temporal regularities in musical phrases. It integrates grouping structure and meter. The combined model of harmony and rhythm outperforms both single-dimension models in computational experiments. All models are trained and evaluated on a treebank of hand-annotated Jazz standards}
@@ -375,6 +379,16 @@
   doi = {10.31751/513},
   abstract = {Most current approaches to key-finding, either from symbolic data such as MIDI or from digital audio data, rely on pitch-class profiles. Our alternative approach is based on two ideas: first, that chord progressions, understood rather loosely as pairs of neighboring harmonic states demarcated by note onsets, are sufficient as windows for key-finding, at least in the chorale context; and second, that the encapsulated identity of a chord progression (modulo pitch-class transposition and revoicing) is sufficient \textendash{} that is, that reduction of progressions to pitch-class distributions is not necessary for key-finding. The system has no access to explicit information about a chord progression other than its transpositional distribution in the training corpus, yet it is able to reach an almost stunning degree of subtlety in its harmonic analysis of chorales it's never heard before. This suggests that reductionist approaches to tonality may be off the mark, or at least that pitch-class reductionism might not be necessary for a principled account of key.},
   file = {/Users/judah/Zotero/storage/7AM6FIBP/Quinn - 2010 - Are Pitch-Class Profiles Really “Key for Key”.pdf}
+}
+
+@inproceedings{raffelMirEvalTransparent2014,
+  title = {Mir\_eval: {{A Transparent Implementation}} of {{Common MIR Metrics}}},
+  booktitle = {Proceedings of the 15th {{International Conference}} on {{Music Information Retrieval}}},
+  author = {Raffel, Colin and McFee, Brian and Humphrey, Eric J and Salamon, Justin and Nieto, Oriol and Liang, Dawen and Ellis, Daniel P W},
+  year = {2014},
+  abstract = {Central to the field of MIR research is the evaluation of algorithms used to extract information from music data. We present mir\_eval, an open source software library which provides a transparent and easy-to-use implementation of the most common metrics used to measure the performance of MIR algorithms. In this paper, we enumerate the metrics implemented by mir\_eval and quantitatively compare each to existing implementations. When the scores reported by mir\_eval differ substantially from the reference, we detail the differences in implementation. We also provide a brief overview of mir\_eval's architecture, design, and intended use.},
+  langid = {english},
+  file = {/Users/judah/Zotero/storage/ZPEYFSUK/Raffel et al. - A TRANSPARENT IMPLEMENTATION OF COMMON MIR METRICS.pdf}
 }
 
 @article{rocherDynamicChordAnalysis2009,

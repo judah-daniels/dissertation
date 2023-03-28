@@ -312,7 +312,7 @@ Provide a brief overview of different techniques that are used to prune the sear
 \paragraph{IB}{ Formal Models of Language, Artificial Intelligence.}
 
 \subsection{Existing codebase}
-NOTE: I need to restructure the codebase to reflect the different modules more clearly, to help with the flow to the dissertation.
+NOTE: I need to restructure the codebase to reflect the different modules more clearly. This will help with the flow to the dissertation.
 
 The following describes the protovoices-haskell repository, and where my code contribution will lie:
 \par
@@ -336,14 +336,37 @@ The following describes the protovoices-haskell repository, and where my code co
 
 \section{Requirements Analysis}
 
-\subsection{Main deliverables}
+Table of main components with a dependency and risk analysis 
 
-\subsection{Dependency Analysis}
+\begin{table}[ht]
+  \caption{Overview of main deliverables along with a risk analysis}
+  \label{requirements}
+  \begin{tabularx}{\textwidth}{cXcc}
+    ID & Delieverable & Priority & Risk \\
+    \toprule
+    \texttt{core1} & Evaluation Module & High & Low \\
+    \texttt{core2} & End to End Pipeline  & High & Medium \\
+    \texttt{core3} & Parser  & High & Medium \\
+    \texttt{base1} & Random Choice search & High & Low \\
+    \texttt{base2} & Random Sample & High & Low \\
+    \texttt{ext1} & Heuristic Search 1 & Medium & High \\
+    \texttt{ext2} & Heuristic Search 2 & Medium & High \\
+  \end{tabularx}
+\end{table}
+\par
+Short description of where the risk lies. 
+\par
+Pertt chart showing the dependencies between different modules
+
 
 \section{Software Engineering Techniques}
 Justified and documented selection of suitable tools; good engineering approach.
 
+
 \subsection{Development model}
+
+Usig the dependency and risk analysis above, I created this gantt chart, and totally stuck to it(100\% didn't wait until now to get the end-to-end pipeline fully running, and spend most of the time in an extension rabbit hole.. We live and we learn).
+
 Include Gantt chart.
 
 \subsection{Languages, libraries and tools}
@@ -393,13 +416,15 @@ The chapter will also cite any new programming languages and systems which had t
 
 \section{Repository Overview:}
 
+Insert block diagram of components here.
+
+\vspace{50\baselineskip}
+
 \DTsetlength{0em}{1.3em}{0em}{0.7pt}{3pt}       
 \setlength{\DTbaselineskip}{15pt}  %minimum size for \normalsize
 \renewcommand{\DTstyle}{\ttfamily}
 
-The following describes an overview of the project repository:
-\medskip
-\begin{table}[h]
+\begin{table}[!t]
   % \centering
   \caption{Repository Overview}
   \vspace{\baselineskip}
@@ -463,26 +488,63 @@ Unit Tests (Section x)
 \end{tabularx}
 \end{table}
 
+The following describes an overview of the project repository:
+
 \section{Core Implementation}
 
 \subsection{Heuristic Parser}
+This is not a descriptive name. Think of a new name to describe the implementation of the search space of partial reductions.
 
 \subsection{Evaluation Module}
 We need to know exactly what we are trying to achieve before we can understand the baseline and extention implementations.
 
 \subsubsection{Probabilistic Model of Harmony}
+When evaluating using the protovoice model: we assume that we result in only chord tones for each segment. Thus we can use the chord tone probabilities to evaluate the prediction. 
+\par
+When just using a random sample, we have to assume that there is a mixture model of chord tones and ornaments. We can use the learnt parameters to determine the distribution.
+\par
+These two measures of likelihoods are comparable as they are drawn from the same distributions.
+\par
+We also need to infer chord labels. We can simply choose the chord that is most likely according to our model.
+\par 
+This gives us two key metrics, likelihood and accuracy.
+\par
+Could also use a more sophisticated notion of accuracy, using a chord similarity function \cite{humphreyFourTimelyInsights2015}. The {\texttt {mir\_eval}} package provides a plethora of metrics to compare chord label predictions \cite{raffelMirEvalTransparent2014}. 
 
 \section{Baseline implementation}
+
 \subsection{Random Sample Parser}
 As a crude baseline we develop two algorithms based on randomly sampling notes for each segment to infer the chord label. 
 \par
 The pure random sample algorithm simply samples random notes for each segment, and uses those to guess the chord label. This doesn't even consider the notes of the piece, so it's really bad, but provides a useful reference.
+\par 
+The per segment sample algorithm samples notes from each segment. Could just sample a random number of notes from each segment, or just use all the notes in the segment to predict the most likely chord label. This is reminiscent of using a key-profile model \cite{temperleyBayesianApproachKeyFinding2002} to find local keys.
 
 \subsection{Random Choice Search}
+Now we use our implementation of the protovoice parser, but just do a random walk in the tree of partial reductions. By comparing this against the random ample parser, we can get an idea of the utility of the model. We show that this works surprisingly well.
+
 \section{Extension Implementation}
+
 \subsection{Heuristic Design}
+Step 1: Design heuristic to be as accurate as possible. I.e the extreme is to consider every possible parse, but for a single piece there can be over $10^{10^{10^{10^{10^{10}}}}}$ different parses. We consider 1 step at a time at first - this still results in needing to choose an operation out of upwards of 30,000,000 options for just a single step.     
+\par
+First the full piece heuristic parse 
+\par
+Problem of very large slices.\\ 
+Segment by segment heuristic parse - avoids the problem, but is slightly hacky. Can we incorprate our knowledge regarding the relative proportion of chord tones and ornaments. Should we allow duplicates of notes in slices? Perhaps we should favour spreads more. 
+\par
+Always consider a certain number of slices and spreads.
+\par
+
 \subsection{Heuristic Search}
+Step 2: Relax the heuristic search in order to reduce runtime/ lower complexity.
+\par 
+In the case that there are 85,000,000 options, perhaps we should sample the options rather than evaluating all of them. 
+\par 
+This version of heuristic search should be able to parse full pieces (hopefully), so can be used to compare with the baselines on an entire corpus.
+
 \section{Testing}
+Show unit tests, and examples of the test/development cycle for the heuristic search development
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Evaluation
