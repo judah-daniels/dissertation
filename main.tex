@@ -5,6 +5,9 @@
 \usepackage{graphicx}  % allows inclusion of PDF, PNG and JPG images
 \usepackage{verbatim}
 \usepackage{amsfonts}
+\usepackage{placeins}
+\usepackage{amsthm}
+\usepackage{amsmath}
 \usepackage{tabu}
 \usepackage{docmute}   % only needed to allow inclusion of proposal.tex
 \usepackage[utf8]{inputenc}
@@ -16,7 +19,6 @@
 \usepackage{dirtree}
 \usepackage{cite}
 \usepackage{float} % Prevent Latex from repositioning tables
-\usepackage{amsmath}
 \usepackage{graphicx}
 
 %--- Remove hbox warning
@@ -70,6 +72,11 @@
 
 \renewcommand{\baselinestretch}{1.1}    % adjust line spacing to make
                                         % more readable
+
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\graphicspath { {figs/}}
 
 \begin{document}
 
@@ -173,7 +180,7 @@ A piece of music can be described using a sequence of chords, representing a hig
 \par
 The paper \textit{Modeling and Inferring Proto-voice Structure in Free Polyphony} describes a generative model that encodes the recursive and hierarchical dependencies between notes, giving rise to a grammar-like hierarchical system \cite{finkensiepMODELINGINFERRINGPROTOVOICE2021}. This proto-voice model can be used to reduce a piece into a hierarchical structure which encodes an understanding of the tonal/harmonic relations.
 \par
-Christoph Finkensiep suggests in his thesis that the proto-voice model may be an effective way to infer higher level latent entities, such as harmonies or voice leading schemata. Thus in this project I will ask the question: is this parsing model an effective way to annotate harmonies? By ‘effective’ we are referring to two things:
+Finkensiep suggests in his thesis that the proto-voice model may be an effective way to infer higher level latent entities, such as harmonies or voice leading schemata. Thus in this project I will ask the question: is this parsing model an effective way to annotate harmonies? By ‘effective’ we are referring to two things:
 \begin{itemize}
   \item Accuracy: can the model successfully emulate how experts annotate harmonic progressions in musical passages? 
   \item Practicality: can the model be used to do this within a reasonable time frame?
@@ -493,11 +500,114 @@ The following describes an overview of the project repository:
 \section{Core Implementation}
 
 \subsection{Heuristic Parser}
-This is not a descriptive name. Think of a new name to describe the implementation of the search space of partial reductions.
+This is not a descriptive name. Think of a new name to describe the implementation of the search space of partial reductions. We use the outer representation of structure and outer operations. This is an abstraction.
 
+\subsubsection{Parsing Operations}
+Piece represented by an alternating list of slices and transitions, this is called a path. Define path formally. inductive definitions. dont need the Nothing: just Path trans slice. Transition can be frozen or unfrozen, and boundary or non boundary. Boundary is represented by vertical line, frozen is represented by two lines.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{pathFromSlices}
+  \caption{Path initiliasation}
+  \label{fig:pathInit}
+\end{figure}
+
+\begin{definition}[Path]
+A path is an alternating sequence of an two types of elements, in our case transitions and slices. Definition: Haskell code block or mathematical definition?
+\end{definition}
+
+Our goal is to reduce the piece into a partial redution by appluying operations until we have one slice per segment. Diagram of this state. This means we have one group of notes per segment, and this group of notes should represent the harmony of the segment.
+
+We parse by applying the inverse of the generative operations, right to left. Unsplit, Unspread, Unfreeze.
+\par
+
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{parseops}
+  \caption{Parse operations}
+  \label{fig:parseops}
+\end{figure}
+
+\FloatBarrier
+\subsubsection{State Space}
+
+This is how we define the search. We start at the right, the end of the piece. We have a pointer to the current node, and all preceeding slices are open and subsequent slices are frozen. Open Slices can be reduced, but only to the point that there is one slice in a segment. We keep track of the operations performed as it (1). allows us to the draw out the derivation for the partial reduction at the end, and (2). it is used later for calculate a cost for each operation for the heuristic search.
+
+
+
+
+% \begin{figure}[h]
+%   \centering
+%   \includegraphics[width=\textwidth]{parsestates}
+%   \caption{Parse operations}
+%   \label{fig:parseops}
+% \end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{searchstate}
+  \caption{Search state}
+  \label{fig:searchstate}
+\end{figure}
+\par
+\par
+
+\FloatBarrier
+\subsubsection{Enumerating State transitions}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.7\textwidth]{frozenenum}
+  \caption{Unfreeze operation}
+  \label{fig:frozenenum}
+\end{figure}
+
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.7\textwidth]{sssemiopenenum}
+  \caption{Enumeration of operations mid parse. Maybe for appendix? This could be much more concise.}
+  \label{fig:sssemiopenenum}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{statetransitions}
+  \caption{State Transition diagram}
+  \label{fig:statetrans}
+\end{figure}
+\FloatBarrier
+
+In the state transition diagram (Figure \ref{fig:statetrans}), we see all the possible parse states (Is this actually useful? Maybe for appendix). This was useful for me as it helps to conceptualise how the full parse actually works. The dimensions of this digramm of the search state depends on the length of the piece, and the size of each segment. We can see that there is a process of moving to the right to unfreeze transitions, and moving towards the left during reduction operations. Perhaps some simplification of the diagram would be useful. This transition diagram does not consider segment boundaries.
+
+sdfsdfs
+
+sdf
+
+\FloatBarrier
+\subsubsection{Boundary handling}
+
+It is important thhat we don't reduce to an empty segment, because that would mean we've lost all information about the segment, and would not be able to make a harmonic inference. In order to prohibit this, we add additional constraints to the parse operations for each opertation based on the boolean boundary value of all involved transitions.
+\par
+We use karnaugh maps to determine the boolean expression for these constraints.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.7\textwidth]{karnaughunfreeze}
+  \caption{Determine boolean boundary expressions for the freeze operations}
+  \label{fig:karnaugh}
+\end{figure}
+
+\par 
+Could show other maps in the appendix.
+
+
+\FloatBarrier
 \subsection{Evaluation Module}
 We need to know exactly what we are trying to achieve before we can understand the baseline and extention implementations.
 
+\FloatBarrier
 \subsubsection{Probabilistic Model of Harmony}
 When evaluating using the protovoice model: we assume that we result in only chord tones for each segment. Thus we can use the chord tone probabilities to evaluate the prediction. 
 \par
@@ -513,6 +623,7 @@ Could also use a more sophisticated notion of accuracy, using a chord similarity
 
 \section{Baseline implementation}
 
+
 \subsection{Random Sample Parser}
 As a crude baseline we develop two algorithms based on randomly sampling notes for each segment to infer the chord label. 
 \par
@@ -520,9 +631,11 @@ The pure random sample algorithm simply samples random notes for each segment, a
 \par 
 The per segment sample algorithm samples notes from each segment. Could just sample a random number of notes from each segment, or just use all the notes in the segment to predict the most likely chord label. This is reminiscent of using a key-profile model \cite{temperleyBayesianApproachKeyFinding2002} to find local keys.
 
+\FloatBarrier
 \subsection{Random Choice Search}
 Now we use our implementation of the protovoice parser, but just do a random walk in the tree of partial reductions. By comparing this against the random ample parser, we can get an idea of the utility of the model. We show that this works surprisingly well.
 
+\FloatBarrier
 \section{Extension Implementation}
 
 \subsection{Heuristic Design}
@@ -536,12 +649,89 @@ Segment by segment heuristic parse - avoids the problem, but is slightly hacky. 
 Always consider a certain number of slices and spreads.
 \par
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.7\textwidth]{splitsssemiopen}
+  \caption{Split operation}
+  \label{fig:splitoperation}
+\end{figure}
+
+\FloatBarrier
+\subsubsection{Scoring Unsplit Operations}
+Consider the Split rule : \[t \to t'_{l}~s'~t'_{r}\]
+\par
+During a split, each edge in the transition and each node in an adjacent slice can be elaborated by one or more inner operations.
+These new edges can be discarded or kept to form the new edge of $t'_l$ and $t'_r$.
+\par 
+The notes in the child slice $s$ can either have edges connected to the left neighboring slice or right neighbouring slice, or both. I.e for each note in the child slice, it can be a an ornmentation of a previous note, subsequent note, both, or repetition of prev note, subsequent note etc. So we consider the chord tone profiles of the involved slices. 
+
+We first guess the chord type each parent slice. 
+\[\theta_l = \mathop{argmax}_{c \in C} P(s_l|c) ~~,~~ \theta_r = \mathop{argmax}_{c \in C} P(s_r|c) '\]
+
+We now consider each edge individually, considering their likelihoods based on the proabilistic model of harmony along with theoretical assumptions. 
+
+\paragraph{Single Sided Operations} 
+\begin{itemize}
+  \item Right Neighbour (Left Neighbour anagolously)
+    \[ x \implies x \to n~~, x,n \in P \]
+    \[x \sim \text{Categorical}(\sigma_{ct}^{\theta_l})\]
+    \[n \sim \text{Categorical}(\sigma_{or}^{\theta_r})\]
+    Find \[P(x,n~|~\theta_l)\]
+  \item Right Repeat (Left Repeat anagolously)
+    \[ x \implies x \to x~~, x \in P \]
+    \[x \sim \text{Categorical}(\sigma_{ct}^{\theta_l})\]
+    Find \[P(x~|~\theta_l)\]
+\end{itemize}
+\paragraph{Two Sided Operations} 
+\begin{itemize}
+  \item Root Note: This operation is only done once in the original model. In our case we do not need to consider due to segment boundaries.
+  \item Full Repeat: 
+    \[ x \implies x \to n~~, x,n \in P \]
+    \[x \sim \text{Categorical}(\sigma_{ct}^{\theta_l})\]
+    \[n \sim \text{Categorical}(\sigma_{or}^{\theta_r})\]
+    Find \[P(x,n~|~\theta_l)\]
+  \item Left Repeat of Right: 
+    \[ x \to y \implies x \to y' \to y \]
+    \[y \sim \text{Categorical}(\sigma_{ct}^{\theta_l})\]
+    Find \[P(y~|~\theta_l)\]
+  \item Full Neighbour:
+    \[ x_1 \to x_2 \implies x_1 \to n \to x_2, x \in P \]
+    % \[x \sim \text{Categorical}(\sigma_{ct}^{\theta_l})\]
+    Find \[P(|~\theta_l,\theta_r)\]
+\end{itemize}
+
+\FloatBarrier
+\subsubsection{Scoring Unspread Operations}
+
+Consider the Spread rule : \[t_l s_r \to t'_l s_l t'_m s_r t'_r\]
+We make the assumption that $s$, $s_l$, \& $s_r$ are all realisations of the same chord. This lines up with the music theorretical basis for this operation in the model(justify).
+\par 
+Thus we find the most likely chord (optional extension: marginalise over all chords)
+\[\theta = \mathop{argmax}_{c \in C} P (s|c)\]
+\par 
+When then measure the extent to which the parent slics match this chord.
+
+\[p(s_l, s_r| \theta)\]
+
+We can calculate $p(s_l|\theta)$ and $p(s_r|\theta)$ using the multinomial distribution probability density function as described in the preparation chapter.
+
+\FloatBarrier
+\subsubsection{Scoring Unfreeze Operations}
+We assign 0 cost to unfreeze operations. This means we need to be careful about ensure that we don't just unfreeze the entire piece immediately. Careful construction of the search algorithm can ensure this. More later.
+
+\FloatBarrier
+\subsubsection{Full state evalutation}
+We need to combine all of these in a fair way. Also the distinction between splits and spreads need to be considred, as they are different operations, the calculations of likelihood may cause an imbalance. 
+
+\FloatBarrier
 \subsection{Heuristic Search}
 Step 2: Relax the heuristic search in order to reduce runtime/ lower complexity.
 \par 
 In the case that there are 85,000,000 options, perhaps we should sample the options rather than evaluating all of them. 
 \par 
 This version of heuristic search should be able to parse full pieces (hopefully), so can be used to compare with the baselines on an entire corpus.
+
+
 
 \section{Testing}
 Show unit tests, and examples of the test/development cycle for the heuristic search development
