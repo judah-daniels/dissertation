@@ -171,30 +171,40 @@ None
 \pagestyle{headings}
 
 \chapter{Introduction}
-\textit{This dissertation explores efficient search strategies for parsing a symbolic music data using a musical grammar. We present ... which extends a recent model, addressing problems of intractability by using Heuristic search methods. We will see that that my novel heuristic search algorithm achieves .... }
+\textit{This dissertation explores efficient search strategies for parsing symbolic music data using a musical grammar for Automatic Chord Estimation (ACE). We first present a naive implementation of a parsing algorithm based on a recent grammatical model, then address problems of intractability through classical heuristic search methods. We will see that that my novel heuristic search algorithm achieves commendable results, providing a strong foundation for a more sophisticated automated analysis system. }
 
 \section{Motivation}
 
-A piece of music can be described using a sequence of chords, representing a higher level harmonic structure of a piece. There is a small, finite set of chord types, but each chord can be realised on the musical surface in a practically infinite number of ways. Given a score, we wish to infer the underlying chord types. This is often a time consuming and cognitively demanding expert task \cite{masadaChordRecognitionSymbolic2018}, hence its utility.
-
+Most of western tonal music can be described using a sequence of chords, representing a higher level harmonic structure of a piece. Automatic Chord Estimation (ACE) is the task of inferring the sequence of chords for a given piece from symbolic (such as a score) or audio data. There is a small, finite set of chord types, but each chord can be realised on the musical surface in a practically infinite number of ways. Given a score (a symbolic representation of a piece of music), we wish to infer the sequence of underlying chord types. 
+\par
+Automatic Chord Estimation has both theoretical and practical applications. Novel ways to understand harmonic structure are sought after by music theorists, aiding the analysis and composition of pieces. Analysis of music often starts with the manual labeling each chord, which is a time consuming and cogntively demanding expert task. Sequences of chords provide compact representations for use in analysis, music identification and music similarity finding. More broadly speaking, any system that involves the understanding of written music will benefit from chord estimation. 
 \par
 The paper \textit{Modeling and Inferring Proto-voice Structure in Free Polyphony} describes a generative model that encodes the recursive and hierarchical dependencies between notes, giving rise to a grammar-like hierarchical system \cite{finkensiepMODELINGINFERRINGPROTOVOICE2021}. This proto-voice model can be used to reduce a piece into a hierarchical structure which encodes an understanding of the tonal/harmonic relations.
 \par
-Finkensiep suggests in his thesis that the proto-voice model may be an effective way to infer higher level latent entities, such as harmonies or voice leading schemata. Thus in this project I will ask the question: is this parsing model an effective way to annotate harmonies? By ‘effective’ we are referring to two things:
+Insert descriptive diagram???
+\par
+Finkensiep suggests in his thesis that the proto-voice model may be an effective way to infer higher level latent entities such as harmonies. Thus, in this project I will answer the question: is this model an effective way to annotate harmonies? By ‘effective’ we are referring to two things:
 \begin{itemize}
   \item Accuracy: can the model successfully emulate how experts annotate harmonic progressions in musical passages? 
   \item Practicality: can the model be used to do this within a reasonable time frame?
 \end{itemize}
 
-While the original model could in theory be used to generate harmonic annotations, its exhaustive search strategy would be prohibitively time-consuming in practice for any but the shortest musical extracts; one half measure can have over 100,000 valid derivations \cite{finkensiepStructureFreePolyphony2023}. My approach will be to explore the use of heuristic search algorithms to solve this problem.
+While the original model could in theory be used to generate harmonic annotations, an exhaustive search strategy would be prohibitively time-consuming in practice for any but the shortest musical extracts; one half measure can have over 100,000 valid derivations \cite{finkensiepStructureFreePolyphony2023}. My approach will be to explore the use of heuristic search algorithms to solve this problem.
 
 \section{Related Work}
-First grammar/rule-based systems \cite{maxwellExpertSystemHarmonizing1992} \cite{winogradLinguisticsComputerAnalysis1968}, optimisation algorithms \cite{pardoAlgorithmsChordalAnalysis2002} and supervised learning approaches making use of large datasets \cite{niEndtoendMachineLearning2011} \cite{mcleodModularSystemHarmonic2021} \cite{masadaChordRecognitionSymbolic2018}.
-\par
-Distinction to be drawn between approaches that take segmented or non-segmented pieces. Some models make use of a joint segmentation and labelling approach \cite{masadaChordRecognitionSymbolic2018}... 
 
+% The problem of automated chord estimation has been subject to attention since the 80s, with handcrafted grammar/rule-based being. 
+Automatic chord estimation systems first emerged in in the 60's, making use of handcrafted grammar/rule-based systems \cite{maxwellExpertSystemHarmonizing1992} \cite{winogradLinguisticsComputerAnalysis1968}, followed by the development of optimisation algorithms in the early 2000s \cite{pardoAlgorithmsChordalAnalysis2002}. In more recent years, supervised learning approaches have have risen in popularity, exploiting large datasets and improved compute power \cite{niEndtoendMachineLearning2011} \cite{mcleodModularSystemHarmonic2021} \cite{masadaChordRecognitionSymbolic2018}. 
+\par 
+The proto-voice model is the first to provide a unified theory that relates three aspects of tonal music analysis that are typically considered independently: voice-leading, how notes relate to each other \textit{sequentially}; harmony, how notes relate to each other through \textit{simulataneity}; and note function, how notes relate to each other through recursive \textit{functional dependencies}. Previous models have been developed alongside parsing algorithms to perform automatic chord estimation that consider these dimensions of musical structure separately \cite{maxwellExpertSystemHarmonizing1992} \cite{winogradLinguisticsComputerAnalysis1968}, but in this project we use the relationship between these dimensions of music as the basis of heuristic design.
 \par
-More general heuristic search techniques for huge search spaces.
+% Distinction to be drawn between approaches that take segmented or non-segmented pieces. Some models make use of a joint segmentation and labelling approach \cite{masadaChordRecognitionSymbolic2018}. 
+
+\section{Achievements}
+
+This was an ambitious project, and I met all of my success criteria and completed the extension tasks. I show that the protovoice model can be used to effectively annotate pieces with chord labels, and these results provide a promising foundation for the model being developed further as a sophisticated tool for the automated analysis of western total music.
+
+% Blow my trumpet here. Overview of what I achieved, problems I solved etc. Say that this is forming a basis of an ISMIR 2023 submission.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Preparation
@@ -205,40 +215,77 @@ More general heuristic search techniques for huge search spaces.
 
 \section{Background Material}
 
-\subsection{Proto-voice Model}
-TODO: Brief description of what notes are, what is a piece of music, introduce relevant musical terminology (Score, note, protovoice, repetition, neighbor/ ornament(choose one?)). Conflict of meaning with root-note (generative operation) and root note (musical terminology). What are the main assumptions/ information we need to know in order to understand the proto-voice model?
+\subsection{Voices}
 
+The Protovoice model is concerned with the analysis of Western Classical music, although it could be adapted to different musical styles. For the purposes of this dissertation I will make music theoretical assumptions, but their justification is left to the appendix.
 \par
-TODO: Motivation of the model as a generative model on the note level, describing the piece as a DAG (Directed Acyclic Graph). What is a proto-voice exactly? 
+The input we are concerned with is called a score, a symbolic abstraction of a piece of music based on a 2-dimensional axis.
 \par 
+The marks on on score represents notes, with the pitch of the note corresponding to its position on the vertical axis\footnote{This is a simplification as there are other factors that determine the pitch, such as the key signature, accidentals and intonation.}, and the notes' position in time represented by the horizontal axis.
+\par
+The notion of a \textit{voice} is crucial for the understanding of the protovoice model. A voice typically refers to a single melodic line (sequence of notes) that is part of a polyphonic (multiple voices) musical composition. The use of the word is derived from it's use in Bach's four-voice chorales, which consist of 4 sung melodic lines. The term voice is used is used more generally however, the melodic lines do not need to be sung or voice-like in character and can be performed by any melodic instrument. 
+\par
+A piece of music, Explain polyphony and monophony here?
+\par
+Little diagram of a piece of music, with voices explicitly marked.
+\par
+Three musical concepts that the protovoice model makes use of:
 
-The proto-voice model is characterised by 3 primitive generative operations on notes.
+\begin{itemize}
+  \item \textbf{Voice-leading}: What are voices? Implicit vs Explicit voices. Define Stepwise
+  \item \textbf{Harmony}: notes that perceived as sounded simulatiously cause an emergent cognitive phenomonon of harmony, wherein the way the collection of notes sounds together depends on the pitch relationship between notes.
+  \item \textbf{Functional Dependencies}: Repetition/ ornamentation.
+\end{itemize}
+\par 
+Insert Diagram demonstrating all three phenoma given a simple example with lines.
+\par
+
+
+\subsection{The Protovoice Model}
+% TODO: Brief description of what notes are, what is a piece of music, introduce relevant musical terminology (Score, note, protovoice, repetition, neighbor/ ornament(choose one?)). Conflict of meaning with root-note (generative operation) and root note (musical terminology). What are the main assumptions/ information we need to know in order to understand the proto-voice model?
+\par
+The protovoice model is a generative model on the note level of a piece of music, which represents a piece of music as a graph where each note is a node, and notes are connected by stepwise protovoice edges. It generates a piece of music through sequential operations on notes, inserting new notes with edges connected to existing notes.
+
+% TODO: Motivation of the model as a generative model on the note level, describing the piece as a DAG (Directed Acyclic Graph). What is a proto-voice exactly? 
+
+\par 
+\subsubsection{Inner Operations} % (fold)
+\label{sub:Inner Operations}
+
+A \textit{protovoice} is a sequence of edges between notes based on functional dependencies. The protovoice model is characterised by 3 primitive generative operations on notes.
+\par 
 
 \begin{itemize}
   % \setlength\itemsep{1em}
- \item Repetitions 
-  \item Neighbor notes 
-  \item Passing notes
+  \item Repetitions: a note of the same pitch is repeated before or after a given note
+  \item Neighbor notes: a stepwise ornament to a note. 
+  \item Passing notes: notes connecting two protovoices that are separated by a larger interval.
 \end{itemize}
 
-Operations with two notes are represented by edge replacement. 
+These operations relate notes to one or two \textit{parent} notes, which we can describe as rules. Operations on a single parent are represented by attaching a new \textit{child} note with an edge connected to a parent note: 
+\[p \implies x \to p \text{~~~~or~~~~} p \implies p \to x \]. 
+Operations with two parents are represented by edge replacement. 
 \[p_1 \to p_2 ~~~\implies~~ p_1 \to c \to p_2 \label{edge replacement}\]
+% subsection Inner Operations (end)
 
-\subsubsection{Proto-voice Operations}
+\subsubsection{Outer Operations}
 
-To model simulataneity of notes we introduce slices, which are multisets of pitches, representing segments of a piece where a group of notes are heard. 
+To model simulataneity of notes we introduce slices, representing segments of a piece where a group of notes are heard. These provide a higher level abstraction that are used to capture more musical structure, which we refer to as \textit{outer structure}
 \par 
 Diagram showing a slice + a diagram showing a higher level slices, grouping an arpegiation.
 \par 
 A slice $m$ is defined as a multiset of pitches.
 \par 
-A transition $t = (s_l, e, s_r)$  relates two slices with a configuration of edges $e=(e_{reg}, e_{pass})$, a set of regular edges (repetition or neighbor), and a set of passing edges.
+A transition $t = (s_l, e, s_r)$  relates two slices with a configuration of edges $e=(e_{reg}, e_{pass})$, a set of regular edges (repetition or neighbor), and a set of passing edges. 
 \par
+
 Outer operations (Diagram of all three operations): 
 \par
 Split: \[t \to t'_l s' t'_r\]
 Spread: \[t_l~s~t_r \to t'_l~s'_l~t'_m~s'_r~t'_r\]
 Freeze: \[t \to t \]
+\par 
+
 
 \subsubsection{Proto-voice harmony}
 How do we get from a proto-voice (partial)derivation to a harmonic inference?
@@ -721,7 +768,7 @@ We assign 0 cost to unfreeze operations. This means we need to be careful about 
 
 \FloatBarrier
 \subsubsection{Full state evalutation}
-We need to combine all of these in a fair way. Also the distinction between splits and spreads need to be considred, as they are different operations, the calculations of likelihood may cause an imbalance. 
+We need to combine all of these in a fair way. Also the distinction between splits and spreads need to be considred, as they are different operations, the calculations of likelihood may cause an imbalance. All likelihoods are stored in log space.
 
 \FloatBarrier
 \subsection{Heuristic Search}
@@ -730,6 +777,8 @@ Step 2: Relax the heuristic search in order to reduce runtime/ lower complexity.
 In the case that there are 85,000,000 options, perhaps we should sample the options rather than evaluating all of them. 
 \par 
 This version of heuristic search should be able to parse full pieces (hopefully), so can be used to compare with the baselines on an entire corpus.
+\par 
+Beam of size n, with 1 for a freeze, k for spread, n-k-1 
 
 
 
