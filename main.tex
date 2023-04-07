@@ -182,14 +182,15 @@ There were no special difficulties encountered in this project
 \textit{This dissertation explores efficient search strategies for parsing symbolic music data using a musical grammar for Automatic Chord Estimation (ACE). We first present a naive implementation of a parsing algorithm based on a recent grammatical model, then address problems of intractability through classical heuristic search methods. We will see that that my novel heuristic search algorithm achieves commendable results, providing a strong foundation for a more sophisticated automated analysis system. }
 
 \section{Motivation}
-
-Most of western tonal music can be described using a sequence of chords, representing a higher level harmonic structure of a piece. Automatic Chord Estimation (ACE) is the task of inferring the sequence of chords for a given piece from symbolic (such as a score) or audio data. There is a small, finite set of chord types, but each chord can be realised on the musical surface in a practically infinite number of ways. Given a score (a symbolic representation of a piece of music), we wish to infer the sequence of underlying chord types. 
+Most of western tonal music can be described using a sequence of chords, representing a higher level harmonic structure of a piece. Automatic Chord Estimation (ACE) is the task of inferring the sequence of chords for a given piece from symbolic or audio data. There is a small, finite set of chord types, but each chord can be realised on the musical surface in a practically infinite number of ways. Given a score (a symbolic representation of a piece of music), we wish to infer the sequence of underlying chord types. 
 \par
 Automatic Chord Estimation has both theoretical and practical applications. Novel ways to understand harmonic structure are sought after by music theorists, aiding the analysis and composition of pieces. Analysis of music often starts with the manual labeling each chord, which is a time consuming and cogntively demanding expert task. Sequences of chords provide compact representations for use in analysis, music identification and music similarity finding. More broadly speaking, any system that involves the understanding of written music will benefit from chord estimation. 
 \par
 The paper \textit{Modeling and Inferring Protovoice Structure in Free Polyphony} describes a generative model that encodes the recursive and hierarchical dependencies between notes, giving rise to a grammar-like hierarchical system \cite{finkensiepModelingInferringProtovoice2021}. This protovoice model can be used to reduce a piece into a hierarchical structure which encodes an understanding of the tonal/harmonic relations.
 \par
-Insert descriptive diagram???
+\textit{Problem overview diagram to be added}
+\par
+\textit{Problem overview diagram to be added}
 \par
 Finkensiep suggests in his thesis that the protovoice model may be an effective way to infer higher level latent entities such as harmonies. Thus, in this project I will answer the question: is this model an effective way to annotate harmonies? By ‘effective’ we are referring to two things:
 \begin{itemize}
@@ -225,7 +226,7 @@ This was an ambitious project, and I met all of my success criteria and complete
 
 \subsection{Voices}
 
-The Protovoice model is a formal model concerned with the analysis of Western Classical music, although it could be adapted to different musical styles \cite{finkensiepStructureFreePolyphony2023}. 
+The Protovoice model is a formal model primarily concerned with the analysis of Western Classical music, although it could be applied to different musical styles, such as jazz or some popular western music \cite{finkensiepStructureFreePolyphony2023}. 
 % For the purposes of this dissertation I will make music theoretical assumptions, but their justification is left to the appendix.
 \par
 The input we are concerned with is called a score, a symbolic abstraction of a piece of music based on a 2-dimensional axis.
@@ -233,7 +234,7 @@ The input we are concerned with is called a score, a symbolic abstraction of a p
 The marks on on score represents notes, with the pitch of the note corresponding to its position on the vertical axis\footnote{This is a simplification as there are other factors that determine the pitch, such as the key signature, accidentals and intonation.}, and the notes' position in time represented by the horizontal axis.
 \begin{figure}
   \centering
-  \includegraphics[width=0.85\textwidth]{scores/pitchTime.png}
+  \includegraphics[width=0.85\textwidth]{prep/pitchTime.png}
   \captionsetup{width=.9\linewidth}
   \caption{An example of music notation. The five lines going across the page is the \textit{stave}. The three marks denote an ascending stepwise sequence.}
   \label{fig:pitchTime}
@@ -244,56 +245,43 @@ The notion of a \textit{voice} is crucial for the understanding of the protovoic
 \par
 Polyphony refers to a piece of music that can contains more than one voice. Typically polyphonic music will have a set number of voices throughout the piece, but free polyphony refers to music where the number of voices is arbitrary and can change throughout the piece.
 \par
-\textit{Little diagram of a piece of music, with voices explicitly marked.}
-\par
+There are three types of relations between notes that form the basis for the protovoice model:
 
-Three musical concepts that the protovoice model makes use of:
-
-\subsubsection{Voice-leading} % (fold)
-\label{sub:Voice-leading}
-What are voices? Implicit vs Explicit voices. Define Stepwise
+\begin{itemize}
+  \item \textbf{Horizontal}: As music is perceived in time, natural sequential relations arise between subsequent notes, in fact, we can define a total order on the notes of a piece of music based on their positions on the horizontal axis.
+  \item \textbf{Vertical}: This refers to the pitch axis on the score. The vertical(pitch) arrangement of the notes determine the emergent harmony when they are perceived simultaneously. Typically, multiple \textit{voices} heard together will lead to an emerging sequence of harmonies, which can be described using chord labels.
+    % notes that perceived as sounded simulatiously cause an emergent cognitive phenomonon of harmony, wherein the way the collection of notes sounds together depends on the pitch relationship between notes.
+  \item \textbf{Functional}: Functional relations refer to the purpose or function of a note relative to another note. These functions can include repetitions, where both notes have the same \textit{pitch}, or ornaments/neighbour notes, where the child note is typically a step (single unit of pitch) away from the parent note. These relations can be applied recursively, giving rise to a network of dependencies.
+\end{itemize}
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.45\textwidth]{scores/cadencevoices}
+  \includegraphics[width=0.45\textwidth]{prep/cadencevoices}
   \captionsetup{width=.9\linewidth}
-  \caption{A short cadential phrases with the upper voice coloured blue. The final note shows the two voices meeting.}
-  \label{fig:cadenceFunctions}
+  \caption{A short cadential phrases with two voices. The notes in the upper voice are coloured blue. The final note shows the two voices meeting.}
+  \label{fig:cadenceVoices}
 \end{figure}
 
-% subsection Voice-leading (end)
-\subsubsection{Harmony} % (fold)
-\label{sub:Harmony}
-notes that perceived as sounded simulatiously cause an emergent cognitive phenomonon of harmony, wherein the way the collection of notes sounds together depends on the pitch relationship between notes.
-
 \begin{figure}
   \centering
-  \includegraphics[width=0.45\textwidth]{scores/cadenceharmony}
-  \captionsetup{width=.9\linewidth}
-  \caption{Chord labels for the short cadential phrase, note that the second chord label, G, spans two groups of notes.}
-  \label{fig:cadenceFunctions}
-\end{figure}
-
-% subsection Harmony (end)
-\subsubsection{Functional Dependencies} % (fold)
-\label{sub:Functional Dependencies}
-Dependency relations refer to the purpose or function of a note relative to another note. 
-Repetition/ ornamentation.
-
-\begin{figure}
-  \centering
-  \includegraphics[width=0.45\textwidth]{scores/cadencefunctions}
+  \includegraphics[width=0.45\textwidth]{prep/cadencefunctions}
   \captionsetup{width=.9\linewidth}
   \caption{Functional dependencies between notes. We show neighbour note relations in orange and repetitions in red.}
   \label{fig:cadenceFunctions}
 \end{figure}
 
+\begin{figure}
+  \centering
+  \includegraphics[width=0.45\textwidth]{prep/cadenceharmony}
+  \captionsetup{width=.9\linewidth}
+  \caption{Chord labels for the short cadential phrase, note that the second chord label, G, spans two groups of notes.}
+  \label{fig:cadenceHarmony}
+\end{figure}
+
 \FloatBarrier
+% subsection Voices (end)
 
-
-% subsection Functional Dependencies (end)
-
-\subsection{The Protovoice Model}
+\subsection{The Protovoice Model} % (fold)
 \par
 The protovoice model is a generative model which represents a piece of music as a graph where each note is a node, and notes are connected by stepwise protovoice edges. It generates a piece of music through sequential operations on notes, inserting new notes with edges connected to existing notes.
 
@@ -322,44 +310,63 @@ Operations with two parents are represented by edge replacement.
   p_1 \to p_2 ~~~\implies~~ p_1 \to c \to p_2 \label{edge replacement}
   \label{eq:doublesidedinnerop}
 \end{equation}
-% subsection Inner Structure (end)
 
+% subsubsection Inner Structure (end)
 \subsubsection{Outer Structure}
 \label{sub:Outer Structure}
 
 The inner structure provided by protovoices captures the sequential and functional organisation of notes, but does not capture when notes are simultaneous. To model simulataneity of notes we introduce \textit{slices}, representing segments of a piece where a group of notes are heard, and \textit{transitions} which contain the protovoice edges between notes in the two neighbouring slices. These provide a higher level abstraction that are used to capture more musical structure. As slices and transitions contain notes and edges respectively, we call the slices and transitions \textit{outer structure}, and the notes and edges contained therein \textit{inner structure}.
 
-\par 
-Diagram showing a slice + a diagram showing a higher level slices, grouping an arpegiation.
+\begin{figure}
+  \centering
+  \begin{subfigure}[t]{.55\textwidth}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{prep/cadenceouterder.png}
+    \caption{Outer structure}
+    \label{fig:cadenceOuterDer}
+  \end{subfigure}
+  \begin{subfigure}[t]{.42\textwidth}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{prep/cadenceinnerder.png}
+    \caption{Inner structure}
+    \label{fig:cadenceInnerDer}
+  \end{subfigure}
+  \begin{subfigure}[t]{.8\textwidth}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{prep/cadencederivation.png}
+    \caption{Abstract notation}
+    \label{fig:cadenceDerivation}
+  \end{subfigure}
+
+
+  \captionsetup{width=.9\linewidth}
+  \caption{An example derivation of the phrase shown in Figure~\ref{fig:cadenceVoices}. }
+  \label{fig:innerOuterStructure}
+\end{figure}
+
 \par 
 A slice $m$ is defined as a multiset of pitches. A transition $t = (s_l, e, s_r)$ relates two slices with a configuration of edges $e=(e_{reg}, e_{pass})$, a set of regular edges (repetition or neighbor), and a multiset of passing edges. This unifies the inner protovoice structure with the outer slice structure. 
 \par
 The outer structure is transformed by applying three operations recursively:
 \par
 
-\FloatBarrier
-
 \begin{figure}
   \centering
   \begin{subfigure}[t]{.28\textwidth}
-    \centering\includegraphics[keepaspectratio,width=\textwidth]{outer/split}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{prep/outer/split}
     \caption{\texttt{split}}
     \label{fig:splitOp}
   \end{subfigure}
   \begin{subfigure}[t]{.46\textwidth}
-    \centering\includegraphics[keepaspectratio,width=0.91\textwidth]{outer/spread}
+    \centering\includegraphics[keepaspectratio,width=0.91\textwidth]{prep/outer/spread}
     \caption{\texttt{spread}}
     \label{fig:spreadOP}
   \end{subfigure}
   \begin{subfigure}[t]{.24\textwidth}
-    \centering\includegraphics[keepaspectratio,width=\textwidth]{outer/freeze}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{prep/outer/freeze}
     \caption{\texttt{freeze}}
     \label{fig:freezeOp}
   \end{subfigure}
-
+  \centering
   \captionsetup{width=.9\linewidth}
-  \caption{The three operations on outer structure as described in \cite{finkensiepModelingInferringProtovoice2021}. \\
-  The original slices and transitions are shown at the top of each diagram, while the lower part shows the generated structure after each outer operation is applied.}
+  \caption{The three operations on outer structure. }
   \label{fig:outerOperations}
 \end{figure}
 
@@ -381,11 +388,11 @@ The outer structure is transformed by applying three operations recursively:
 \end{equation}
 \end{itemize}
 
+Figure~\ref{fig:outerOperations} shows each of these operations diagramatically. The original slices and transitions are shown at the top of each diagram, while the lower part shows the generated structure after each outer operation is applied.
+
 \FloatBarrier
-
+% subsubsection Outer Structure (end)
 \subsubsection{Proto-voice harmony}
-
-
 
 How do we get from a proto-voice (partial)derivation to a harmonic inference?
 \par
