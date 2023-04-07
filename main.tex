@@ -229,32 +229,74 @@ The Protovoice model is a formal model concerned with the analysis of Western Cl
 % For the purposes of this dissertation I will make music theoretical assumptions, but their justification is left to the appendix.
 \par
 The input we are concerned with is called a score, a symbolic abstraction of a piece of music based on a 2-dimensional axis.
-\par 
+
 The marks on on score represents notes, with the pitch of the note corresponding to its position on the vertical axis\footnote{This is a simplification as there are other factors that determine the pitch, such as the key signature, accidentals and intonation.}, and the notes' position in time represented by the horizontal axis.
-\par
+\begin{figure}
+  \centering
+  \includegraphics[width=0.85\textwidth]{scores/pitchTime.png}
+  \captionsetup{width=.9\linewidth}
+  \caption{An example of music notation. The five lines going across the page is the \textit{stave}. The three marks denote an ascending stepwise sequence.}
+  \label{fig:pitchTime}
+\end{figure}
+
 The notion of a \textit{voice} is crucial for the understanding of the protovoice model. A voice typically refers to a single melodic line (sequence of notes) that is part of a musical composition. The term is derived from its use in choral music, such as J.S Bach's four-voice chorales, which consist of 4 sung melodic lines. The term voice is used is used more generally however, the melodic lines do not need to be sung or voice-like in character and can be performed by any melodic instrument. 
+\FloatBarrier
 \par
 Polyphony refers to a piece of music that can contains more than one voice. Typically polyphonic music will have a set number of voices throughout the piece, but free polyphony refers to music where the number of voices is arbitrary and can change throughout the piece.
 \par
 \textit{Little diagram of a piece of music, with voices explicitly marked.}
 \par
+
 Three musical concepts that the protovoice model makes use of:
 
-\begin{itemize}
-  \item \textbf{Voice-leading}: What are voices? Implicit vs Explicit voices. Define Stepwise
-  \item \textbf{Harmony}: notes that perceived as sounded simulatiously cause an emergent cognitive phenomonon of harmony, wherein the way the collection of notes sounds together depends on the pitch relationship between notes.
-  \item \textbf{Functional Dependencies}: Repetition/ ornamentation.
-\end{itemize}
-\par 
-Insert Diagram demonstrating all three phenoma given a simple example with lines.
-\par
+\subsubsection{Voice-leading} % (fold)
+\label{sub:Voice-leading}
+What are voices? Implicit vs Explicit voices. Define Stepwise
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.45\textwidth]{scores/cadencevoices}
+  \captionsetup{width=.9\linewidth}
+  \caption{A short cadential phrases with the upper voice coloured blue. The final note shows the two voices meeting.}
+  \label{fig:cadenceFunctions}
+\end{figure}
+
+% subsection Voice-leading (end)
+\subsubsection{Harmony} % (fold)
+\label{sub:Harmony}
+notes that perceived as sounded simulatiously cause an emergent cognitive phenomonon of harmony, wherein the way the collection of notes sounds together depends on the pitch relationship between notes.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.45\textwidth]{scores/cadenceharmony}
+  \captionsetup{width=.9\linewidth}
+  \caption{Chord labels for the short cadential phrase, note that the second chord label, G, spans two groups of notes.}
+  \label{fig:cadenceFunctions}
+\end{figure}
+
+% subsection Harmony (end)
+\subsubsection{Functional Dependencies} % (fold)
+\label{sub:Functional Dependencies}
+Dependency relations refer to the purpose or function of a note relative to another note. 
+Repetition/ ornamentation.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.45\textwidth]{scores/cadencefunctions}
+  \captionsetup{width=.9\linewidth}
+  \caption{Functional dependencies between notes. We show neighbour note relations in orange and repetitions in red.}
+  \label{fig:cadenceFunctions}
+\end{figure}
+
+\FloatBarrier
+
+
+% subsection Functional Dependencies (end)
 
 \subsection{The Protovoice Model}
-% TODO: Brief description of what notes are, what is a piece of music, introduce relevant musical terminology (Score, note, protovoice, repetition, neighbor/ ornament(choose one?)). Conflict of meaning with root-note (generative operation) and root note (musical terminology). What are the main assumptions/ information we need to know in order to understand the proto-voice model?
 \par
 The protovoice model is a generative model which represents a piece of music as a graph where each note is a node, and notes are connected by stepwise protovoice edges. It generates a piece of music through sequential operations on notes, inserting new notes with edges connected to existing notes.
 
-% TODO: Motivation of the model as a generative model on the note level, describing the piece as a DAG (Directed Acyclic Graph). What is a proto-voice exactly? 
 
 \par 
 \subsubsection{Inner Structure} % (fold)
