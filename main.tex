@@ -3,8 +3,10 @@
 \usepackage[pdfborder={0 0 0}]{hyperref}    % turns references into hyperlinks
 \usepackage[left=25mm, right=25mm, bottom=25mm, top=20mm]{geometry}  % adjusts page layout
 \usepackage{graphicx}  % allows inclusion of PDF, PNG and JPG images
+\usepackage{subcaption}
 \usepackage{verbatim}
 \usepackage{amsfonts}
+\usepackage{xcolor}
 \usepackage{placeins}
 \usepackage{amsthm}
 \usepackage{amsmath}
@@ -76,13 +78,18 @@
 
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[section]
-\graphicspath { {figs/}}
+
+\graphicspath{{figs/}}
 
 \begin{document}
 
 \include{metadata}
 
 \bibliographystyle{acm}
+
+
+\setlength{\parskip}{10pt}
+\setlength{\parindent}{0pt}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Title
@@ -120,44 +127,45 @@ I, \mfullname{} of \mcollege, being a candidate for Part II of the Computer Scie
 
 \chapter*{Proforma}
 
+% \hbadness=0
 
 {\large
-\begin{tabular}{ll}
+  \begin{tabular}{ll}
 Candidate Number:   & \bf \mcandidate                   \\
 Project Title:      & \bf \mtitle                       \\
 Examination:        & \bf \mexamination, \mdate         \\
 Word Count:         & \bf \mwordcount\footnotemark[1]   \\
-Code Line Count:    & \bf \mlinecount                   \\
+Code Line Count:    & \bf \mlinecount\footnotemark[2]   \\
 Project Originator: & \bf \moriginator                  \\
 Supervisor:         & \bf \msupervisor                  \\ 
 \end{tabular}
 }
 
 \footnotetext[1]{This word count was computed
-by \texttt{detex diss.tex | tr -cd '0-9A-Za-z $\tt\backslash$n' | wc -w}
+by \texttt{texcount main.tex}
+}
+\footnotetext[2]{This code line count was computed
+by using \texttt{cloc}
 }
 \stepcounter{footnote}
 
-
 \section*{Original Aims of the Project}
-% At most 100 words
-
+The original aim was to implement a parsing algorithm for symbolic music, using the derivation to infer the underlying harmonic structure, then explore data driven approaches for heuristic design.
 
 
 \section*{Work Completed}
-% At most 100 words
 
-All that has been completed appears in this dissertation.
+
 
 \section*{Special Difficulties}
-% At most 100 words
-
-None
+There were no special difficulties encountered in this project
 
 \newpage
-
+{
+\renewcommand{\baselinestretch}{0.75}\normalsize
 \tableofcontents
-
+\renewcommand{\baselinestretch}{1.0}\normalsize
+}
 \listoffigures
 
 \newpage
@@ -179,11 +187,11 @@ Most of western tonal music can be described using a sequence of chords, represe
 \par
 Automatic Chord Estimation has both theoretical and practical applications. Novel ways to understand harmonic structure are sought after by music theorists, aiding the analysis and composition of pieces. Analysis of music often starts with the manual labeling each chord, which is a time consuming and cogntively demanding expert task. Sequences of chords provide compact representations for use in analysis, music identification and music similarity finding. More broadly speaking, any system that involves the understanding of written music will benefit from chord estimation. 
 \par
-The paper \textit{Modeling and Inferring Proto-voice Structure in Free Polyphony} describes a generative model that encodes the recursive and hierarchical dependencies between notes, giving rise to a grammar-like hierarchical system \cite{finkensiepMODELINGINFERRINGPROTOVOICE2021}. This proto-voice model can be used to reduce a piece into a hierarchical structure which encodes an understanding of the tonal/harmonic relations.
+The paper \textit{Modeling and Inferring Protovoice Structure in Free Polyphony} describes a generative model that encodes the recursive and hierarchical dependencies between notes, giving rise to a grammar-like hierarchical system \cite{finkensiepModelingInferringProtovoice2021}. This protovoice model can be used to reduce a piece into a hierarchical structure which encodes an understanding of the tonal/harmonic relations.
 \par
 Insert descriptive diagram???
 \par
-Finkensiep suggests in his thesis that the proto-voice model may be an effective way to infer higher level latent entities such as harmonies. Thus, in this project I will answer the question: is this model an effective way to annotate harmonies? By ‘effective’ we are referring to two things:
+Finkensiep suggests in his thesis that the protovoice model may be an effective way to infer higher level latent entities such as harmonies. Thus, in this project I will answer the question: is this model an effective way to annotate harmonies? By ‘effective’ we are referring to two things:
 \begin{itemize}
   \item Accuracy: can the model successfully emulate how experts annotate harmonic progressions in musical passages? 
   \item Practicality: can the model be used to do this within a reasonable time frame?
@@ -196,7 +204,7 @@ While the original model could in theory be used to generate harmonic annotation
 % The problem of automated chord estimation has been subject to attention since the 80s, with handcrafted grammar/rule-based being. 
 Automatic chord estimation systems first emerged in in the 60's, making use of handcrafted grammar/rule-based systems \cite{maxwellExpertSystemHarmonizing1992} \cite{winogradLinguisticsComputerAnalysis1968}, followed by the development of optimisation algorithms in the early 2000s \cite{pardoAlgorithmsChordalAnalysis2002}. In more recent years, supervised learning approaches have have risen in popularity, exploiting large datasets and improved compute power \cite{niEndtoendMachineLearning2011} \cite{mcleodModularSystemHarmonic2021} \cite{masadaChordRecognitionSymbolic2018}. 
 \par 
-The proto-voice model is the first to provide a unified theory that relates three aspects of tonal music analysis that are typically considered independently: voice-leading, how notes relate to each other \textit{sequentially}; harmony, how notes relate to each other through \textit{simulataneity}; and note function, how notes relate to each other through recursive \textit{functional dependencies}. Previous models have been developed alongside parsing algorithms to perform automatic chord estimation that consider these dimensions of musical structure separately \cite{maxwellExpertSystemHarmonizing1992} \cite{winogradLinguisticsComputerAnalysis1968}, but in this project we use the relationship between these dimensions of music as the basis of heuristic design.
+The protovoice model is the first to provide a unified theory that relates three aspects of tonal music analysis that are typically considered independently: voice-leading, how notes relate to each other \textit{sequentially}; harmony, how notes relate to each other through \textit{simulataneity}; and note function, how notes relate to each other through recursive \textit{functional dependencies}. Previous models have been developed alongside parsing algorithms to perform automatic chord estimation that consider these dimensions of musical structure separately \cite{maxwellExpertSystemHarmonizing1992} \cite{winogradLinguisticsComputerAnalysis1968}, but in this project we use the relationship between these dimensions of music as the basis of heuristic design.
 \par
 % Distinction to be drawn between approaches that take segmented or non-segmented pieces. Some models make use of a joint segmentation and labelling approach \cite{masadaChordRecognitionSymbolic2018}. 
 
@@ -211,23 +219,24 @@ This was an ambitious project, and I met all of my success criteria and complete
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Preparation}
-\textit{In this chapter, I present the work which was undertaken before the code was written. After a brief description of my starting point, I provide an exposition of the Proto-voice Model which forms the foundation of this project. Subsequently, I discuss probabilistic programming and Bayesian inference, including a probabilistic model of harmony. Finally, I describe the software engineering techniques and principles used throughout the project. }
+\textit{In this chapter, I present the work which was undertaken before the code was written. After a brief description of my starting point, I provide an exposition of the Protovoice Model which forms the foundation of this project. Subsequently, I discuss probabilistic programming and Bayesian inference, including a probabilistic model of harmony. Finally, I describe the software engineering techniques and principles used throughout the project. }
 
 \section{Background Material}
 
 \subsection{Voices}
 
-The Protovoice model is concerned with the analysis of Western Classical music, although it could be adapted to different musical styles. For the purposes of this dissertation I will make music theoretical assumptions, but their justification is left to the appendix.
+The Protovoice model is a formal model concerned with the analysis of Western Classical music, although it could be adapted to different musical styles \cite{finkensiepStructureFreePolyphony2023}. 
+% For the purposes of this dissertation I will make music theoretical assumptions, but their justification is left to the appendix.
 \par
 The input we are concerned with is called a score, a symbolic abstraction of a piece of music based on a 2-dimensional axis.
 \par 
 The marks on on score represents notes, with the pitch of the note corresponding to its position on the vertical axis\footnote{This is a simplification as there are other factors that determine the pitch, such as the key signature, accidentals and intonation.}, and the notes' position in time represented by the horizontal axis.
 \par
-The notion of a \textit{voice} is crucial for the understanding of the protovoice model. A voice typically refers to a single melodic line (sequence of notes) that is part of a polyphonic (multiple voices) musical composition. The use of the word is derived from it's use in Bach's four-voice chorales, which consist of 4 sung melodic lines. The term voice is used is used more generally however, the melodic lines do not need to be sung or voice-like in character and can be performed by any melodic instrument. 
+The notion of a \textit{voice} is crucial for the understanding of the protovoice model. A voice typically refers to a single melodic line (sequence of notes) that is part of a musical composition. The term is derived from its use in choral music, such as J.S Bach's four-voice chorales, which consist of 4 sung melodic lines. The term voice is used is used more generally however, the melodic lines do not need to be sung or voice-like in character and can be performed by any melodic instrument. 
 \par
-A piece of music, Explain polyphony and monophony here?
+Polyphony refers to a piece of music that can contains more than one voice. Typically polyphonic music will have a set number of voices throughout the piece, but free polyphony refers to music where the number of voices is arbitrary and can change throughout the piece.
 \par
-Little diagram of a piece of music, with voices explicitly marked.
+\textit{Little diagram of a piece of music, with voices explicitly marked.}
 \par
 Three musical concepts that the protovoice model makes use of:
 
@@ -240,19 +249,18 @@ Three musical concepts that the protovoice model makes use of:
 Insert Diagram demonstrating all three phenoma given a simple example with lines.
 \par
 
-
 \subsection{The Protovoice Model}
 % TODO: Brief description of what notes are, what is a piece of music, introduce relevant musical terminology (Score, note, protovoice, repetition, neighbor/ ornament(choose one?)). Conflict of meaning with root-note (generative operation) and root note (musical terminology). What are the main assumptions/ information we need to know in order to understand the proto-voice model?
 \par
-The protovoice model is a generative model on the note level of a piece of music, which represents a piece of music as a graph where each note is a node, and notes are connected by stepwise protovoice edges. It generates a piece of music through sequential operations on notes, inserting new notes with edges connected to existing notes.
+The protovoice model is a generative model which represents a piece of music as a graph where each note is a node, and notes are connected by stepwise protovoice edges. It generates a piece of music through sequential operations on notes, inserting new notes with edges connected to existing notes.
 
 % TODO: Motivation of the model as a generative model on the note level, describing the piece as a DAG (Directed Acyclic Graph). What is a proto-voice exactly? 
 
 \par 
-\subsubsection{Inner Operations} % (fold)
-\label{sub:Inner Operations}
+\subsubsection{Inner Structure} % (fold)
+\label{sub:Inner Structure}
 
-A \textit{protovoice} is a sequence of edges between notes based on functional dependencies. The protovoice model is characterised by 3 primitive generative operations on notes.
+A \textit{protovoice} is a sequence of edges between notes. The protovoice model is characterised by 3 primitive generative operations on notes.
 \par 
 
 \begin{itemize}
@@ -263,67 +271,156 @@ A \textit{protovoice} is a sequence of edges between notes based on functional d
 \end{itemize}
 
 These operations relate notes to one or two \textit{parent} notes, which we can describe as rules. Operations on a single parent are represented by attaching a new \textit{child} note with an edge connected to a parent note: 
-\[p \implies x \to p \text{~~~~or~~~~} p \implies p \to x \]. 
+\begin{equation}
+  p \implies x \to p \text{~~~~or~~~~} p \implies p \to x 
+  \label{eq:singlesidedinnerop}
+\end{equation}
 Operations with two parents are represented by edge replacement. 
-\[p_1 \to p_2 ~~~\implies~~ p_1 \to c \to p_2 \label{edge replacement}\]
-% subsection Inner Operations (end)
+\begin{equation}
+  p_1 \to p_2 ~~~\implies~~ p_1 \to c \to p_2 \label{edge replacement}
+  \label{eq:doublesidedinnerop}
+\end{equation}
+% subsection Inner Structure (end)
 
-\subsubsection{Outer Operations}
+\subsubsection{Outer Structure}
+\label{sub:Outer Structure}
 
-To model simulataneity of notes we introduce slices, representing segments of a piece where a group of notes are heard. These provide a higher level abstraction that are used to capture more musical structure, which we refer to as \textit{outer structure}
+The inner structure provided by protovoices captures the sequential and functional organisation of notes, but does not capture when notes are simultaneous. To model simulataneity of notes we introduce \textit{slices}, representing segments of a piece where a group of notes are heard, and \textit{transitions} which contain the protovoice edges between notes in the two neighbouring slices. These provide a higher level abstraction that are used to capture more musical structure. As slices and transitions contain notes and edges respectively, we call the slices and transitions \textit{outer structure}, and the notes and edges contained therein \textit{inner structure}.
+
 \par 
 Diagram showing a slice + a diagram showing a higher level slices, grouping an arpegiation.
 \par 
-A slice $m$ is defined as a multiset of pitches.
-\par 
-A transition $t = (s_l, e, s_r)$  relates two slices with a configuration of edges $e=(e_{reg}, e_{pass})$, a set of regular edges (repetition or neighbor), and a set of passing edges. 
+A slice $m$ is defined as a multiset of pitches. A transition $t = (s_l, e, s_r)$ relates two slices with a configuration of edges $e=(e_{reg}, e_{pass})$, a set of regular edges (repetition or neighbor), and a multiset of passing edges. This unifies the inner protovoice structure with the outer slice structure. 
+\par
+The outer structure is transformed by applying three operations recursively:
 \par
 
-Outer operations (Diagram of all three operations): 
-\par
-Split: \[t \to t'_l s' t'_r\]
-Spread: \[t_l~s~t_r \to t'_l~s'_l~t'_m~s'_r~t'_r\]
-Freeze: \[t \to t \]
-\par 
+\FloatBarrier
 
+\begin{figure}
+  \centering
+  \begin{subfigure}[t]{.28\textwidth}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{outer/split}
+    \caption{\texttt{split}}
+    \label{fig:splitOp}
+  \end{subfigure}
+  \begin{subfigure}[t]{.46\textwidth}
+    \centering\includegraphics[keepaspectratio,width=0.91\textwidth]{outer/spread}
+    \caption{\texttt{spread}}
+    \label{fig:spreadOP}
+  \end{subfigure}
+  \begin{subfigure}[t]{.24\textwidth}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{outer/freeze}
+    \caption{\texttt{freeze}}
+    \label{fig:freezeOp}
+  \end{subfigure}
+
+  \captionsetup{width=.9\linewidth}
+  \caption{The three operations on outer structure as described in \cite{finkensiepModelingInferringProtovoice2021}. \\
+  The original slices and transitions are shown at the top of each diagram, while the lower part shows the generated structure after each outer operation is applied.}
+  \label{fig:outerOperations}
+\end{figure}
+
+\begin{itemize}
+  \item A \textbf{split} replaces a transition $t$ by inserting a new slice $s'$ and two surrounding transitions $t_l$ and $t_r$. Each of the edges in $t$ can have by one or more inner operations applied to it. The edges generated by these inner operations can either be discarded, or keep to form the new edges of $t_l$ and $t_r$.
+\begin{equation}
+  t \to t'_l~s'~t'_r
+  \label{eq:splitrule}
+\end{equation}
+  \item A \textbf{spread} replaces a slice $s$ by distributing its notes to two child slices $s'_l$ and $s'_r$. 
+\begin{equation}
+  t_l~s~t_r \to t'_l~s'_l~t'_m~s'_r~t'_r
+  \label{eq:spreadrule}
+\end{equation}
+\item A \textbf{freeze} marks a transition as terminal, such that the edges within the transition can no longer have operations applied to it. 
+\begin{equation}
+  t \to \underline{t}
+  \label{eq:freezerule}
+\end{equation}
+\end{itemize}
+
+\FloatBarrier
 
 \subsubsection{Proto-voice harmony}
+
+
+
 How do we get from a proto-voice (partial)derivation to a harmonic inference?
 \par
-Explain what harmony is, and how the proto-voice model allows us to capture harmony. Elaboration of the introduction.
+Explain what harmony is, and how the proto-voice model allows us to capture harmony. Elaboration of the introduction. Explain the problem of chord tone identification, and it's relation to voice leading (repeition and ornamentation) and protovoices.
 \par
 What assumptions are needed for a protovoice derivation to be able to describe harmonic entities? These shape heuristic design.
 \par
-
+Score with latent harmony. 
+\par
+Explain what is meant by a reduction 
+\par 
+What is meant by a partial reduction
+\par 
+The partial reduction which is the goal (one slice per chord label). Our goal when parsing is ascertain slices that correspond to the chord labels, having explicit explained away ornementations through the protovoice edges. 
 
 \subsection{Probabilistic Programming}
+Probabilistic programming is the combination of model definitions and statistical inference algorithms for computing the conditional distribution of inputs that could have given rise to the observed output. 
+\par 
+In the context of ACE, we can reframe the generation of a piece as having the underlying sequence of chord labels as an \textbf{input}, and the musical surface or score being the \textbf{observed output}. 
+\par 
+
+We can \textit{factorize} a probabity distribution into a \textit{prior} and a \textit{likelihood}. By choosing priors that are conjugate to the likelihood, we get a posterior distribution that is 
+
 Provide an explanation of all the concepts I learned and used in this project. 
 Techniques such as marginalisation, joint distributions, bayes rule etc. 
-Probabilistic programming is the combination model definitions and statistical inference algorithms for computing the conditional distribution of inputs (chords) that could have given rise to the observed output (score). We are making the assumption that the score is a realisation of the latent harmonic entities. 
 
 Dirchelet distributions
+
 Beta distribution  
+
 Multinomiall distribution 
+
 Normal Distribution 
 
 \par 
 Inference as model $\to$ data $\to$ prob distribution $\to$ chord guess
 
 \subsection{Probabilistic Model of Harmony}
+We are making the assumption that the score is a realisation of the latent harmonic entities. 
 
 Outline of the probabilistic model of harmony, describing the parts that are relevant for harmonic annotations. This section allows the reader to understand the evaluation and heuristic modules.
 
+\subsubsection{Model definition}
+We have a set of pitches $\mathcal{P}$ and a set chord-types $\mathcal{C}$. A chord label is defined as a tuple of \textit{root note} pitch and chord-type: $\mathcal{L} = \mathcal{P} \times \mathcal{C}$. We perform a transform of the pitches of each note relative to the chord's root note that is being considered, such that we only need to consider the chord type. 
+
 \par
-Describe how the parameters were attained
+The priors for the model are as follows:
+\begin{equation}
+\begin{align*} 
+              && \vec{\chi} &\sim \text{Dirichlet}(0.5, |\mathcal{C}|)     && \text{prior of the chord type} \\
+              && \lambda &\sim \text{Gamma}(3, 1)     && \text{prior of the note rate} \\
+  \forall c:  && \theta_c  &\sim \text{Beta}(1, 1)        && \text{prior of each note being a chordtone/ ornament} \\
+  \forall c:  && \vec{\phi}_{ct}^{c}  &\sim \text{Dirichlet}(0.5, |\mathcal{P}|)        && \text{pitch for each ornament} \\
+  \forall c:  && \vec{\phi}_{or}^{c}  &\sim \text{Dirichlet}(0.5, |\mathcal{P}|)        && \text{pitch for each chord tone} \\
+  % \forall i:  && L_i | \vec{\chi} &\sim \text{Categorical}(\vec{\chi}) && \text{chord label of each data point} \\
+  %             && N_i | L_i, v &\sim \text{Multinomial}(v_{L_i})  && \text{notes of each data point} \\
+\end{align*}
+\label{eq:phm}
+\end{equation}
+\par 
+Given this model we can use it to generate a single chord as follows:
+
 \par
 Then describe how to go from the parameters to chord, chordtone and ornamentation distributions
 \par
 
-Parameters:
-\par
-pHarmonies: $\mathbb{N}^{n_c}$\\
-pChordtones: $\mathbb{N}^{n_c}$\\
-pOrnaments: $\mathbb{N}^{n_c}$
+\subsubsection{Model inference}
+Given the model, we can use a dataset to learn the parameters of the model. These parameters can then be used for inference as follows.
+For each datapoint, the chord label 
+\begin{equation}
+\begin{align*} 
+  \forall i:  && L_i | \vec{\chi} &\sim \text{Categorical}(\vec{\chi}) && \text{chord label of each data point} \\
+              && N_i | L_i, v &\sim \text{Multinomial}(v_{L_i})  && \text{notes of each data point} \\
+\end{align*}
+\label{eq:chordlabeldp}
+\end{equation}
+
 \par
 Chordtypes, $C = \{\text{M,~m, Mm7, om, o7, mm7, \%7, MM7, +, Ger, It, Fr, mM7, +7}\}$
 
@@ -345,28 +442,67 @@ Then for each chord tone,
 \[p_{or} \sim \text{Categorical}(\vec{\phi}_{or})\]
 We get the distribution of likelihoods for each pitch.
 
-
-
-
-
-
 \subsection{Heuristic Search Algorithms}
+Heuristic search algorithms are a subset of search algorithms used to find a sequence of actions from an initial state that results in a goal state. The problem is defined as follows:
+\begin{itemize}
+  \item We have an \textit{initial state} $s_0$ where $s_0 \in S$, the set of possible states
+  \item We have set of \textit{actions} $A$, modelled by the function $action: A\times S \to S$
+  \item We have \textit{goal test}, modelled by the function $goal: S \to \{true, false\}$
+  \item There is a \textit{cost} associated with every path, modelled by $cost: A \times S \to \mathbb{R}$
+  \item Finally, we have a function \textit{expand} is a \textit{cost} associated with every path, modelled by $cost: A \times S \to \mathbb{R}$
+  \item We wish to find the minimum cost path from the initial state $s_0$ to a goal state. 
+  % \item We have an initial state $s_o \in S$, which is the empty reduction, corresponding to the unreduced surface of the piece. The score is represented as a sequence of slices grouping notes that sound simultaneously. We are also given the segmentation of the original chord labels that we wish to retrieve.
+  % \item We have a set of actions, $A$ modelled by a function $action: A \times S \to S$. These actions correspond to a single reduction step.
+  %   \begin{itemize}
+  %     \item The reduction steps are the inverses of the operations defined by the generative proto-voice model.
+  %   \end{itemize}
+  % \item Finally we have a goal test, $goal: S \to \{true,false\}$ which is true iff the partial reduction $s$ has exactly one slice per segment of the input.
+  %   \begin {itemize}
+  % \item This means the partial reduction $s$ contains a sequence of slices which start and end positions corresponding to the segmentation of the piece.
+  %   \end {itemize}
+  % \item At the first stage, this will be implemented using a random graph search algorithm, picking each action randomly, according to precomputed distributions.
+  % \item The state space $S$ is the set of all possible partial reductions of a piece along with each reduction step that has been done so far. 
+  % \item We have an initial state $s_o \in S$, which is the empty reduction, corresponding to the unreduced surface of the piece. The score is represented as a sequence of slices grouping notes that sound simultaneously. We are also given the segmentation of the original chord labels that we wish to retrieve.
+  % \item We have a set of actions, $A$ modelled by a function $action: A \times S \to S$. These actions correspond to a single reduction step.
+  %   \begin{itemize}
+  %     \item The reduction steps are the inverses of the operations defined by the generative proto-voice model.
+  %   \end{itemize}
+  % \item Finally we have a goal test, $goal: S \to \{true,false\}$ which is true iff the partial reduction $s$ has exactly one slice per segment of the input.
+  %   \begin {itemize}
+  % \item This means the partial reduction $s$ contains a sequence of slices which start and end positions corresponding to the segmentation of the piece.
+  %   \end {itemize}
+  % \item At the first stage, this will be implemented using a random graph search algorithm, picking each action randomly, according to precomputed distributions.
+\end{itemize}
 
-Provide an outline of the heuristic search paradigm with a formalisation.
-\par
-Provide a brief overview of different techniques that are used to prune the search space that might be relevant.
+The way we solve these problems is through a graph search, with each node representing a state, and each edge representing an action and associated cost. At each iteration, we incorporate a \textit{policy}(search strategy) which determines which nodes in the search tree are chosen to be expanded. Typically, in these problems the search state is intractable, such that a breadth first search would not be feasible. As such, a priority queue is used to choose which nodes to expand, with the priority being calculated using a \textit{heuristic}.
+
+\subsubsection{Best First Search}
+\subsubsection{Greedy search}
+\subsubsection{Exhaustive search}
+\subsubsection{Beam search}
+As a result of the very large branching factor in the graph of partial reductions, even a best-first search would lead to memory overflow. Beam search is an optimisation of best-first search that serves to reduce its memory requirements. 
+
+
+
+
+%
+% Provide an outline of the heuristic search paradigm with a formalisation.
+% \par
+% Provide a brief overview of different techniques that are used to prune the search space that might be relevant.
 
 \section{Starting Point}
 
 \subsection{Relevant courses and experience}
 
-\paragraph{Haskell}{I was introduced to Haskell during an internship during the summer before starting this project (July to August 2022). This project is an excuse to learn the language.}
-\paragraph{Python}{I have experience coding in Python.}
+\paragraph{Haskell}{I was introduced to Haskell during an internship during the summer before starting this project (July to August 2022). As a result, I had 2 months of experience with the language beforehand. I chose to use Haskell in order to further familiarise myself with the language, and because of its amenability to parsing algorithms.}
 
-\paragraph{IB}{ Formal Models of Language, Artificial Intelligence.}
+\paragraph{Python}{I have experience coding in Python from personal projects as well as the 1A \textit{Scientific Computing Practical Course}. This was chosen to made use of powerful existing libraries for handling large datasets and running experiments. }
+
+\paragraph{IB}{ Two modules from 1B provide a foundation for this project. \textit{Formal Models of Language} introduces the ideas and terminology used in the protovoice model, and \textit{Artificial Intelligence} provides a background for classical search algorithms as well as some of the probabilistic frameworks used in the project.}
 
 \subsection{Existing codebase}
-NOTE: I need to restructure the codebase to reflect the different modules more clearly. This will help with the flow to the dissertation.
+\subsubsection{Protovoices-haskell}
+This project was implementated in a fork of the pre-existing \textit{protovoices-haskell} github repository. This repository contains custom data structures and types, allowing interoperability with other projects making use of the same model. I also make use of learned parameters from the implementation of the paper \textit{Bayesian Model of Extended Chord Profiles}\cite{finkensiepChordTypesOrnamentation2023}. 
 
 The following describes the protovoices-haskell repository, and where my code contribution will lie:
 \par
@@ -390,23 +526,26 @@ The following describes the protovoices-haskell repository, and where my code co
 
 \section{Requirements Analysis}
 
-Table of main components with a dependency and risk analysis 
+
 
 \begin{table}[ht]
-  \caption{Overview of main deliverables along with a risk analysis}
+  \caption{Project Deliverables}
+  \vspace{\baselineskip}
   \label{requirements}
-  \begin{tabularx}{\textwidth}{cXcc}
-    ID & Delieverable & Priority & Risk \\
+  \centering
+  \begin{tabularx}{0.9\textwidth}{cXcc}
+    {\large \textbf{ID}} & \large \textbf{Deliverable} & \large \textbf{Priority} & \large \textbf{Risk} \\
     \toprule
     \texttt{core1} & Evaluation Module & High & Low \\
-    \texttt{core2} & End to End Pipeline  & High & Medium \\
-    \texttt{core3} & Parser  & High & Medium \\
-    \texttt{base1} & Random Choice search & High & Low \\
-    \texttt{base2} & Random Sample & High & Low \\
+  \texttt{core2} & End to End Pipeline  & High & Medium \\
+    \texttt{core3} & Parser & High & High \\
+    \texttt{base1} & Random Choice Parser & High & Low \\
+    \texttt{base2} & Random Sample Parser & Medium & Low \\
     \texttt{ext1} & Heuristic Search 1 & Medium & High \\
-    \texttt{ext2} & Heuristic Search 2 & Medium & High \\
+    \texttt{ext2} & Heuristic Search 2 & Low & High \\
   \end{tabularx}
 \end{table}
+
 \par
 Short description of where the risk lies. 
 \par
@@ -423,6 +562,10 @@ Usig the dependency and risk analysis above, I created this gantt chart, and tot
 
 Include Gantt chart.
 
+Agile? 
+
+Continous integration and frequent commits.
+
 \subsection{Languages, libraries and tools}
 The chapter will also cite any new programming languages and systems which had to be learnt 
 
@@ -433,29 +576,31 @@ The chapter will also cite any new programming languages and systems which had t
   \label{Languages}
   \begin{center}
     \begin{tabularx}{.9\textwidth}{cXc}
-      Tool & Purpose & License \\
+      {\large \textbf{Tool}} & {\large \textbf{Purpose}} & {\large \textbf{License}} \\
       \toprule
-      Haskell & Main language & ... \\
+      Haskell & Main language, used for the core and extension implementations & GHCL \\
       \midrule
-      GHC & Compiling and profiling to inspect time performance and memory usage  & GPL-3.0+ \\
+      GHC & Compiling and profiling to inspect time performance and memory usage  & BSD-3.0 \\
       \midrule
-      Haskell-Musicology & ... & ... \\
+      Haskell-Musicology & Library with data-types for pitches & BSD-3.0 \\
       \midrule
-      Dimcat & ... & ... \\
+      Python & Secondary language for experiments and analysis & PSFL \\
       \midrule
-      Python & ... & ... \\
+      Dimcat & DIgital Musicology Corpus Analysis Toolkit & GPL-3.0 \\
       \midrule
-      Numpy & ... & ... \\
+      Numpy & Python library for scientific computing & BSD-3.0 \\
       \midrule
-      Pandas & ... & ... \\
+      Pandas & Python library for data manipulation & BSD-3.0 \\
       \midrule
-      MS3 & ... & ... \\
+      MS3 & Python library for parsing MuseScore files & GPL-3.0 \\
       \midrule
-      Musescore 3 & ... & ... \\
+      Musescore 3 & Music notation software & GPL-3.0 \\
       \midrule
-      Protovoice Annotation Tool & ... & ... \\
+      Protovoice Annotation Tool & Used to view derivations & GPL-3.0 \\
       \midrule
-      Git & Version Control, Continuous Integration & ... \\
+      Docker & Containerised software service used to run experiments on a HPC & Free/Paid \\
+      \midrule
+      Git & Version Control, Continuous Integration & GPL-3.0 \\
       \bottomrule
     \end{tabularx}
   \end{center}
@@ -470,9 +615,27 @@ The chapter will also cite any new programming languages and systems which had t
 
 \section{Repository Overview:}
 
-Insert block diagram of components here.
+\subsubsection{Repository Justification}
 
-\vspace{50\baselineskip}
+The repository has been split into four main folders, with the addition of \texttt{Main.hs} which serves as an interface between the python experiment code and the algorithms developed in Haskell. 
+\begin{itemize}
+  \item Firstly, the \texttt{src/Core/} folder contains all the core code, including the implementation of the parsing search state and inference functions using the probabilistic model of harmony, as well as some helper code for file handling. 
+  \item The \texttt{experiments/} folder contains all the python code that is used for this project. The experiments consist of three stages, as described by the three main files: \texttt{preprocess.py}, \texttt{experiments.py} and \texttt{analysis.py}. Splitting these stages up prevents wasteful computation, as all the pre-processing can be done just once, while experiments are run on the processed data iteratively alongside algorithm development. 
+  \item The \texttt{src/Algorithms/} folder contains all the parsing algorithms including the baseline and extension search algorithms. Having all the algorithms contained in one module allows experiments to be run using any selection of algorithms and input data, facilitating the evaluation process.  
+  \item Finally, the \texttt{test/} folder contains unit tests and end-to-end tests for use in Continuous Integration.
+\end{itemize}
+
+Figure~\ref{fig:blockDiagram} illustrates how these modules are connected. 
+
+% \vspace{50\baselineskip}
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{blockDiagram.png}
+  \caption{Block diagram of project components}
+  \label{fig:blockDiagram}
+\end{figure}
+
+\FloatBarrier
 
 \DTsetlength{0em}{1.3em}{0em}{0.7pt}{3pt}       
 \setlength{\DTbaselineskip}{15pt}  %minimum size for \normalsize
@@ -501,6 +664,8 @@ Insert block diagram of components here.
     .2 harmonic-inference \vspace{\DTbaselineskip}.
     .2 experiments/.
     .3 preprocess.ipynb.
+    .3 experiments.ipynb.
+    .3 analysis.ipynb.
     .3 dcml\_params.json.
     .3 inputs/ \vspace{\DTbaselineskip}.
     .2 test/ \vspace{\DTbaselineskip}.
@@ -518,7 +683,9 @@ Extension Implementation (Section x)
 Utilities
 \vspace{5\DTbaselineskip}\\
 Entry Point
-\vspace{8.2\DTbaselineskip}\\
+\vspace{3\DTbaselineskip}\\
+Running Experiments
+\vspace{6\DTbaselineskip}\\
 Unit Tests (Section x)
 
   \end{minipage} & 
@@ -542,7 +709,8 @@ Unit Tests (Section x)
 \end{tabularx}
 \end{table}
 
-The following describes an overview of the project repository:
+% The repository for this project is a fork of an existing repository that contains useful data-types and functions for working with the protovoice model \cite{finkensiepModelingInferringProtovoice2021}. Uses these allows for interoperability with other projects involving the model.
+
 
 \section{Core Implementation}
 
@@ -569,7 +737,7 @@ We parse by applying the inverse of the generative operations, right to left. Un
 \par
 
 
-\begin{figure}[h]
+\begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{parseops}
   \caption{Parse operations}
@@ -591,7 +759,7 @@ This is how we define the search. We start at the right, the end of the piece. W
 %   \label{fig:parseops}
 % \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{searchstate}
   \caption{Search state}
@@ -603,7 +771,7 @@ This is how we define the search. We start at the right, the end of the piece. W
 \FloatBarrier
 \subsubsection{Enumerating State transitions}
 
-\begin{figure}[h]
+\begin{figure}[ht]
   \centering
   \includegraphics[width=0.7\textwidth]{frozenenum}
   \caption{Unfreeze operation}
@@ -611,14 +779,14 @@ This is how we define the search. We start at the right, the end of the piece. W
 \end{figure}
 
 
-\begin{figure}[h]
+\begin{figure}[ht]
   \centering
   \includegraphics[width=0.7\textwidth]{sssemiopenenum}
   \caption{Enumeration of operations mid parse. Maybe for appendix? This could be much more concise.}
   \label{fig:sssemiopenenum}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{statetransitions}
   \caption{State Transition diagram}
@@ -639,7 +807,7 @@ It is important thhat we don't reduce to an empty segment, because that would me
 \par
 We use karnaugh maps to determine the boolean expression for these constraints.
 
-\begin{figure}[h]
+\begin{figure}[ht]
   \centering
   \includegraphics[width=0.7\textwidth]{karnaughunfreeze}
   \caption{Determine boolean boundary expressions for the freeze operations}
@@ -696,7 +864,7 @@ Segment by segment heuristic parse - avoids the problem, but is slightly hacky. 
 Always consider a certain number of slices and spreads.
 \par
 
-\begin{figure}[h]
+\begin{figure}[ht]
   \centering
   \includegraphics[width=0.7\textwidth]{splitsssemiopen}
   \caption{Split operation}
@@ -831,13 +999,13 @@ Things to note
 
 \section{Future Work}
 
-\cite{finkensiep_modeling_2021}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % the bibliography
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \addcontentsline{toc}{chapter}{Bibliography}
+
 \nocite{*}
 % \addbibresource{Disseration.bib}
 \bibliography{Dissertation}

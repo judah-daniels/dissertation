@@ -43,7 +43,7 @@
 % Further Explanation of the background and the objectives.
 A piece of music can be described using a sequence of chords, representing a higher level harmonic structure of a piece. There is a small, finite set of chord types, but each chord can be realised on the musical surface in a practically infinite number of ways. Given a score, we wish to infer the underlying chord types. 
 \par
-The paper \textit{Modeling and Inferring Proto-voice Structure in Free Polyphony} describes a generative model that encodes the recursive and hierarchical dependencies between notes, giving rise to a grammar-like hierarchical system \cite{finkensiep_modeling_2021}. This proto-voice model can be used to reduce a piece into a hierarchical structure which encodes an understanding of the tonal/harmonic relations of a piece. 
+The paper \textit{Modeling and Inferring Proto-voice Structure in Free Polyphony} describes a generative model that encodes the recursive and hierarchical dependencies between notes, giving rise to a grammar-like hierarchical system \cite{finkensiepModelingInferringProtovoice2021}. This proto-voice model can be used to reduce a piece into a hierarchical structure which encodes an understanding of the tonal/harmonic relations of a piece. 
 %A reduction is represented by a sequence of slices, where each slice is a set of pitches with a pointer to a starting and ending surface position
 \par
 Christoph Finkensiep suggests in his paper that the proto-voice model may be an effective way to infer higher level latent entities, such as harmonies or voice leading schemata. Thus in this project I will ask the question: is this parsing model an effective way to annotate harmonies? By `effective' we are referring to two things: \begin{itemize}
@@ -51,7 +51,7 @@ Christoph Finkensiep suggests in his paper that the proto-voice model may be an 
   \item Practicality: can the model be used to do this within a reasonable time frame?
 \end{itemize}
 % Harmonic annotations segment a piece, marking each segment with a chord label. The goal is then to obtain these labels from the score given the segmentation.
-While the original model could in theory be used to generate harmonic annotations, its exhaustive search strategy would be prohibitively time-consuming in practice for any but the shortest musical extracts; one half measure can have over 100,000 valid derivations \cite{finkensiep_modeling_2021}. My approach will be to explore the use of heuristic search algorithms to solve this problem.
+While the original model could in theory be used to generate harmonic annotations, its exhaustive search strategy would be prohibitively time-consuming in practice for any but the shortest musical extracts; one half measure can have over 100,000 valid derivations \cite{finkensiepModelingInferringProtovoice2021}. My approach will be to explore the use of heuristic search algorithms to solve this problem.
 % My project will extend the use of this model into field of harmonic analysis by inferring harmonic annotations for a piece. 
 % \par
 % As the protovoice model is generative, this harmonic analysis will consist of applying the inverse of the generative operations in order to find a reduction. The search-space for this model is intractable; one half measure can have over 100,000 valid derivations\cite{finkensiep_modeling_2021}.
@@ -103,7 +103,7 @@ The core of this project is essentially a search problem characterised as follow
 
 The second core task is to create an evaluation module that iterates over the test dataset, and evaluates the partial reduction computed by the search algorithm above. This will be done by comparing the outputs to ground truth annotations from the Annotated Beethoven Corpus.
 \par
-In order to do this I will make use of the statistical harmony model from Finkensiep's thesis, \textit{The Structure of Free Polyphony} \cite{finkensiep_structure_2022}. This model provides a way of mapping between the slices that the algorithm generates and the chords in the ground truth. This can be used to empirically measure how closely the slices match the expert annotations.   
+In order to do this I will make use of the statistical harmony model from Finkensiep's thesis, \textit{The Structure of Free Polyphony} \cite{finkensiepStructureFreePolyphony2023}. This model provides a way of mapping between the slices that the algorithm generates and the chords in the ground truth. This can be used to empirically measure how closely the slices match the expert annotations.   
 \par
 
 % from above by measuring the likelihood that the chord label produced the slice notes.
@@ -155,17 +155,17 @@ The following describes existing code and languages that will be used for this p
 \keyword{Python} -- Python will be used for data handling. I have experience coding in Python.
 \par
 \bigskip
-\keyword{Prior Research} - Over the summer I have been reading the literature on computational models of music, as well as various parsing algorithms such as semi-ring parsing \cite{goodman_semiring_1999}, and the CYK algorithm, which is used in the implementation of the proto-voice model.
+\keyword{Prior Research} - Over the summer I have been reading the literature on computational models of music, as well as various parsing algorithms such as semi-ring parsing \cite{goodmanSemiringParsing1999}, and the CYK algorithm, which is used in the implementation of the proto-voice model.
 \par
 \bigskip
-\keyword{Protovoices-Haskell} -- The paper \textit{Modeling and Inferring Proto-Voice Structure in Free Polyphony}\cite{finkensiep_modeling_2021} includes an implementation of the proto-voice model in Haskell. A fork of this repository will form the basis of my project.
+\keyword{Protovoices-Haskell} -- The paper \textit{Modeling and Inferring Proto-Voice Structure in Free Polyphony}\cite{finkensiepModelingInferringProtovoice2021} includes an implementation of the proto-voice model in Haskell. A fork of this repository will form the basis of my project.
 This repository includes as parsing module which will be used to perform the actions in the search space of partial reductions. There is module that can exhaustively enumerate reductions of a piece, but this is infeasible in practice due to the blowup of the derivation forest.
 \par
 \bigskip
-\keyword{MS3} -- This is a library for parsing MuseScore Files and manipulating labels\cite{johannes_ms3_2021}, which I will use as part of the data processing pipeline.
+\keyword{MS3} -- This is a library for parsing MuseScore Files and manipulating labels\cite{johannesMs3ParsingMuseScore2021}, which I will use as part of the data processing pipeline.
 \par
 \bigskip
-\keyword{ABC} -- The \textit{Annotated Beethoven Corpus}\cite{neuwirth_annotated_2018} contains analyses of all Beethoven string quartets composed between 1800 and 1826), encoded in a human and machine readable format. This will be used as a dataset for this project. 
+\keyword{ABC} -- The \textit{Annotated Beethoven Corpus}\cite{neuwirthAnnotatedBeethovenCorpus2018} contains analyses of all Beethoven string quartets composed between 1800 and 1826), encoded in a human and machine readable format. This will be used as a dataset for this project. 
 \par
 %
 % The following describes the protovoices-haskell repository, and where my code contribution will lie:
@@ -200,11 +200,11 @@ This project will be deemed a success if I complete the following tasks:
 
 \section{Timetable}
 \setlength{\extrarowheight}{.4em}
-\begin{tabularx}{\textwidth}{@{}l  p{180pt} p{110pt} @{}}
+{\small \begin{tabularx}{\textwidth}{@{} p{125pt} X p{110pt} @{}}
   \toprule
   Time frame       & Work & Evidence   \\ 
   \midrule
-  \textbf{Michaelmas} (Oct 4 to Dec 2)  & &    \\ 
+  \bfseries{Michaelmas} (Oct 4 to Dec 2)  & &    \\ 
   Oct 14 to Oct 24 & \textit{Oct 14}: Final proposal deadline.
                       Preparation work: familiarise myself with the dataset and the proto-voice model implementation.   
                       Work on manipulating reductions using the proto-voice parser provided by the paper. & None       \\
@@ -212,37 +212,32 @@ This project will be deemed a success if I complete the following tasks:
   Nov 7 to Nov 21 &  Random Search implementation &   None     \\
   Nov 21 to Dec 5 &  Evaluation Module. Continue with search implementation. & Evaluate a manually created derivation and plot results \\
   \midrule
-  \textbf{Vacation} (Dec 3 to Jan 16)  & &    \\ 
+  \bfseries{Vacation} (Dec 3 to Jan 16)  & &    \\ 
   Dec 5 to Dec 11 &  Evaluate performance of random search. Begin to work on extensions & Plot results       \\
   Dec 10 to Dec 21 &  Trial different heuristics. Implement an end-to-end pipeline from input to evaluation. & None    \\
   Dec 21 to Dec 27 &  None & None    \\
   Dec 27 to Jan 10 &  Continue trialing and evaluating heuristics & \textit{Fulfill success criterion: At least one heuristic technique gives better performance than random search.}\\
   \midrule
-  \textbf{Lent} (Jan 17 to  Mar 17)   &  &    \\ 
+  \bfseries{Lent} (Jan 17 to  Mar 17)   &  &    \\ 
   Jan 4 to Jan 20 &  Buffer Period to help keep on track& None       \\
   Jan 20 to Feb 3 
                   &
                 \textit{Feb 3}: Progress Report Deadline.
                   Write progress report and prepare presentation. 
                   Write draft \textit{Evaluation} chapter  & Progress Report (approx. 1 page)      \\
-
                   Feb 3 to Feb 17 & Prepare presentation. & \textit{Feb 8 -- 15}: Progress Report presentation       \\
   Feb 17 to Mar 3 & \textit{Feb 17}: How to write a Dissertation briefing. Write draft Introduction and Preparation chapters. Incorporate feedback on Evaluation chapter. &Send draft Introduction and Preparation chapter to supervisor       \\
   Mar 3 to Mar 17 & Write draft Implementation chapters. Incorporate feedback on Introduction and Preparation chapters.& Send draft Implementation chapters to Supervisor       \\
   \midrule
-  \textbf{Vacation} (Mar 18 to Apr 24)  & &    \\ 
+  \bfseries{Vacation} (Mar 18 to Apr 24)  & &    \\ 
   Mar 18 to Mar 31 & Complete draft dissertation. & Send draft dissertation to supervisor       \\
   Mar 31 to April 15 & Give time for supervisor to read dissertation & None \\
   April 15 to April 25 & Incorporate feedback, make final revisions and checks of the whole dissertation & Submit dissertation and source code\\
   \midrule
-  \textbf{Easter} (Apr 25 to Jun 16)  &  &    \\ 
+  \bfseries{Easter} (Apr 25 to Jun 16)  &  &    \\ 
    April 25 to May 12 & None      & None             \\ 
   \bottomrule
-\end{tabularx}
-% \section{Evaluation}
-% Given the goal is to infer the harmonic annotations given a piece, the main metric by which this project will be evaluated will be based on how accurate the inferred annotations are. 
-% This metric will be calculated using perceptually-informed chord label evaluation, comparing the inferred annotations with the ground truth.
-
+\end{tabularx}}
 \section{Resources}
 I plan to use my own laptop for development: MacBook Pro 16-inch, M1 Max, 32GB Ram, 1TB SSD, 24-core GPU.
 
@@ -255,8 +250,8 @@ Peter Harrison, head of Centre for Music and Science at Cambridge, has agreed to
 We have agreed on a timetable for supervisions for this year. I am also working with Christoph Finkensiep, a PHD student at the DCML, and originator of the proto-voice model.
 Professor Larry Paulson has agreed to be the representative university teaching officer.
 
-% \bibliography{Dissertation}
-% \bibliographystyle{plain}
+\bibliography{Dissertation}
+\bibliographystyle{plain}
 
 \end{document}
 
