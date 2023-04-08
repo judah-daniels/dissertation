@@ -6,6 +6,7 @@
 \usepackage{subcaption}
 \usepackage{verbatim}
 \usepackage{amsfonts}
+\usepackage{amssymb}
 \usepackage{xcolor}
 \usepackage{placeins}
 \usepackage{amsthm}
@@ -186,9 +187,7 @@ Most of western tonal music can be described using a sequence of chords, represe
 \par
 Automatic Chord Estimation has both theoretical and practical applications. Novel ways to understand harmonic structure are sought after by music theorists, aiding the analysis and composition of pieces. Analysis of music often starts with the manual labeling each chord, which is a time consuming and cogntively demanding expert task. Sequences of chords provide compact representations for use in analysis, music identification and music similarity finding. More broadly speaking, any system that involves the understanding of written music will benefit from chord estimation. 
 \par
-The paper \textit{Modeling and Inferring Protovoice Structure in Free Polyphony} describes a generative model that encodes the recursive and hierarchical dependencies between notes, giving rise to a grammar-like hierarchical system \cite{finkensiepModelingInferringProtovoice2021}. This protovoice model can be used to reduce a piece into a hierarchical structure which encodes an understanding of the tonal/harmonic relations.
-\par
-\textit{Problem overview diagram to be added}
+The paper \textit{Modeling and Inferring Protovoice Structure in Free Polyphony} describes a generative model that encodes the recursive and hierarchical dependencies between notes, giving rise to a grammar-like hierarchical system \cite{finkensiepModelingInferringProtovoice2021}. This model can be used to reduce a piece into a hierarchical structure which encodes an understanding of the tonal/harmonic relations.
 \par
 \textit{Problem overview diagram to be added}
 \par
@@ -234,16 +233,16 @@ The input we are concerned with is called a score, a symbolic abstraction of a p
 The marks on on score represents notes, with the pitch of the note corresponding to its position on the vertical axis\footnote{This is a simplification as there are other factors that determine the pitch, such as the key signature, accidentals and intonation.}, and the notes' position in time represented by the horizontal axis.
 \begin{figure}
   \centering
-  \includegraphics[width=0.85\textwidth]{prep/pitchTime.png}
+  \includegraphics[width=0.55\textwidth]{prep/pitchTime.png}
   \captionsetup{width=.9\linewidth}
-  \caption{An example of music notation. The five lines going across the page is the \textit{stave}. The three marks denote an ascending stepwise sequence.}
+  \caption{An example of music notation showing an ascending stepwise sequence.}
   \label{fig:pitchTime}
 \end{figure}
 
 The notion of a \textit{voice} is crucial for the understanding of the protovoice model. A voice typically refers to a single melodic line (sequence of notes) that is part of a musical composition. The term is derived from its use in choral music, such as J.S Bach's four-voice chorales, which consist of 4 sung melodic lines. The term voice is used is used more generally however, the melodic lines do not need to be sung or voice-like in character and can be performed by any melodic instrument. 
 \FloatBarrier
 \par
-Polyphony refers to a piece of music that can contains more than one voice. Typically polyphonic music will have a set number of voices throughout the piece, but free polyphony refers to music where the number of voices is arbitrary and can change throughout the piece.
+Polyphony refers to a piece of music that can contains more than one voice. Typically polyphonic music will have a set number of voices throughout the piece, but \textit{free polyphony} refers to music where the number of voices is arbitrary and can change throughout the piece.
 \par
 There are three types of relations between notes that form the basis for the protovoice model:
 
@@ -251,14 +250,14 @@ There are three types of relations between notes that form the basis for the pro
   \item \textbf{Horizontal}: As music is perceived in time, natural sequential relations arise between subsequent notes, in fact, we can define a total order on the notes of a piece of music based on their positions on the horizontal axis.
   \item \textbf{Vertical}: This refers to the pitch axis on the score. The vertical(pitch) arrangement of the notes determine the emergent harmony when they are perceived simultaneously. Typically, multiple \textit{voices} heard together will lead to an emerging sequence of harmonies, which can be described using chord labels.
     % notes that perceived as sounded simulatiously cause an emergent cognitive phenomonon of harmony, wherein the way the collection of notes sounds together depends on the pitch relationship between notes.
-  \item \textbf{Functional}: Functional relations refer to the purpose or function of a note relative to another note. These functions can include repetitions, where both notes have the same \textit{pitch}, or ornaments/neighbour notes, where the child note is typically a step (single unit of pitch) away from the parent note. These relations can be applied recursively, giving rise to a network of dependencies.
+  \item \textbf{Functional}: Functional relations refer to the purpose or function of a note relative to another note. These functions can include repetitions, where both notes have the same \textit{pitch}, or ornaments/neighbour notes, where the child note is a step (single unit of pitch) away from the parent note. These relations can be applied recursively, giving rise to a network of dependencies.
 \end{itemize}
 
 \begin{figure}
   \centering
   \includegraphics[width=0.45\textwidth]{prep/cadencevoices}
   \captionsetup{width=.9\linewidth}
-  \caption{A short cadential phrases with two voices. The notes in the upper voice are coloured blue. The final note shows the two voices meeting.}
+  \caption{A short cadential phrases with two voices.}
   \label{fig:cadenceVoices}
 \end{figure}
 
@@ -266,7 +265,7 @@ There are three types of relations between notes that form the basis for the pro
   \centering
   \includegraphics[width=0.45\textwidth]{prep/cadencefunctions}
   \captionsetup{width=.9\linewidth}
-  \caption{Functional dependencies between notes. We show neighbour note relations in orange and repetitions in red.}
+  \caption{Functional dependencies between notes.}
   \label{fig:cadenceFunctions}
 \end{figure}
 
@@ -274,7 +273,7 @@ There are three types of relations between notes that form the basis for the pro
   \centering
   \includegraphics[width=0.45\textwidth]{prep/cadenceharmony}
   \captionsetup{width=.9\linewidth}
-  \caption{Chord labels for the short cadential phrase, note that the second chord label, G, spans two groups of notes.}
+  \caption{Chord labels for the short cadential phrase.}
   \label{fig:cadenceHarmony}
 \end{figure}
 
@@ -283,21 +282,25 @@ There are three types of relations between notes that form the basis for the pro
 
 \subsection{The Protovoice Model} % (fold)
 \par
-The protovoice model is a generative model which represents a piece of music as a graph where each note is a node, and notes are connected by stepwise protovoice edges. It generates a piece of music through sequential operations on notes, inserting new notes with edges connected to existing notes.
+The protovoice model is a formal generative model which represents a piece of music as a graph where each note is a node, and notes are connected by stepwise protovoice edges. It generates a piece of music through sequential operations on notes, inserting new notes with edges connected to existing notes.
 
 
 \par 
 \subsubsection{Inner Structure} % (fold)
 \label{sub:Inner Structure}
 
-A \textit{protovoice} is a sequence of edges between notes. The protovoice model is characterised by 3 primitive generative operations on notes.
+We represent protovoices as a graph $G$ with one vertex for each note, a vertex each for the beginning ($\rtimes$) and end ($\ltimes$) of the piece, and edges that indicate connections between notes.
+We define a note as $p \in \mathcal{P}$ where $\mathcal{P}$ is the set of pitches, i.e the set of vertical positions on the score\footnote{See Appendix C for a detailed explaination of the pitch representation used in this project}. 
+A \textit{protovoice} is a path within this graph.
+
 \par 
+The protovoice model is characterised by 3 primitive generative operations on notes.
 
 \begin{itemize}
   % \setlength\itemsep{1em}
-  \item Repetitions: a note of the same pitch is repeated before or after a given note
-  \item Neighbor notes: a stepwise ornament to a note. 
-  \item Passing notes: notes connecting two protovoices that are separated by a larger interval.
+  \item \textbf{Repetitions:} a note of the same pitch is repeated before or after a given note
+  \item \textbf{Neighbor notes:} a stepwise ornament to a note. 
+  \item \textbf{Passing notes:} notes connecting two protovoices that are separated by a larger interval.
 \end{itemize}
 
 These operations relate notes to one or two \textit{parent} notes, which we can describe as rules. Operations on a single parent are represented by attaching a new \textit{child} note with an edge connected to a parent note: 
@@ -311,41 +314,64 @@ Operations with two parents are represented by edge replacement.
   \label{eq:doublesidedinnerop}
 \end{equation}
 
+The generation of a piece begins with the empty piece ($\rtimes \to \ltimes$) and involves the recursive application of inner operations, or rules. The full set of rules is left to the appendix, but here are a few as an example:
+\begin{equation}
+  \begin{align}
+    x &\implies n \to x && \text{\texttt{left-neighbor}}
+  \label{eq:leftNeighbor} \\
+    \rtimes \to \ltimes &\implies \rtimes \to x \to \ltimes && \text{\texttt{root-note}}
+  \label{eq:rootNote} \\
+    x \to y &\implies x \to x' \to y && \text{\texttt{repeat-after'}}
+  \label{eq:repeatAfter}\\
+  \end{align} 
+\end{equation}
 % subsubsection Inner Structure (end)
 \subsubsection{Outer Structure}
 \label{sub:Outer Structure}
 
-The inner structure provided by protovoices captures the sequential and functional organisation of notes, but does not capture when notes are simultaneous. To model simulataneity of notes we introduce \textit{slices}, representing segments of a piece where a group of notes are heard, and \textit{transitions} which contain the protovoice edges between notes in the two neighbouring slices. These provide a higher level abstraction that are used to capture more musical structure. As slices and transitions contain notes and edges respectively, we call the slices and transitions \textit{outer structure}, and the notes and edges contained therein \textit{inner structure}.
-
-\begin{figure}
-  \centering
-  \begin{subfigure}[t]{.55\textwidth}
-    \centering\includegraphics[keepaspectratio,width=\textwidth]{prep/cadenceouterder.png}
-    \caption{Outer structure}
-    \label{fig:cadenceOuterDer}
-  \end{subfigure}
-  \begin{subfigure}[t]{.42\textwidth}
-    \centering\includegraphics[keepaspectratio,width=\textwidth]{prep/cadenceinnerder.png}
-    \caption{Inner structure}
-    \label{fig:cadenceInnerDer}
-  \end{subfigure}
-  \begin{subfigure}[t]{.8\textwidth}
-    \centering\includegraphics[keepaspectratio,width=\textwidth]{prep/cadencederivation.png}
-    \caption{Abstract notation}
-    \label{fig:cadenceDerivation}
-  \end{subfigure}
-
-
-  \captionsetup{width=.9\linewidth}
-  \caption{An example derivation of the phrase shown in Figure~\ref{fig:cadenceVoices}. }
-  \label{fig:innerOuterStructure}
-\end{figure}
-
-\par 
-A slice $m$ is defined as a multiset of pitches. A transition $t = (s_l, e, s_r)$ relates two slices with a configuration of edges $e=(e_{reg}, e_{pass})$, a set of regular edges (repetition or neighbor), and a multiset of passing edges. This unifies the inner protovoice structure with the outer slice structure. 
+The inner structure provided by protovoices captures the sequential and functional organisation of notes, but does not capture when notes are simultaneous. To model simulataneity of notes we introduce \textit{slices}, representing segments of a piece where a group of notes are heard, and \textit{transitions} which contain the protovoice edges between notes in the two neighbouring slices. These provide a higher level abstraction that are used to capture more musical structure. 
 \par
-The outer structure is transformed by applying three operations recursively:
-\par
+As slices and transitions contain notes and edges respectively, we call the slices and transitions \textit{outer structure}, and the notes and edges contained therein \textit{inner structure}.
+
+\begin{definition}[Multiset] A \textit{multiset} is a set that allows multiple instances for each of its elements, formally defined as an ordered pair $(A,m)$ where $A$ is the \textit{underlying set} of the multiset, and $m:A \to \mathbb{Z}^+$ gives the \textit{multiplicity}, such that the number of occurences of $a$ in $(A,m)$ is given by $m(a)$. 
+\end{definition}
+
+\begin{definition}[Slice] A \textit{slice} $s \in \mathcal{S}$ is defined as a multiset of pitches $(\mathcal{P}, m)$. 
+\begin{equation}
+  s = \left\{ p_1^{m(p_1)} , \dots, p_n^{m(p_n)} \right\}  
+  \label{eq:sliceDef}
+\end{equation}
+\end{definition}
+
+\begin{definition}[Transition] A \textit{transition} $t \in \mathcal{T}$ relates two adjacent slices, $s_l$ and $s_r$, with a configuration of edges $e$. 
+  \begin{equation}
+    \begin{align}
+      $t = (s_l, e, s_r)$ 
+    \end{align}
+    \label{eq:biPath}
+  \end{equation}
+\end{definition}
+
+The slices and transitions form a graph given slices as nodes and transitions as edges (containing inner edges). However as transitions only relate sequentially adjacent slices, the outer structure is in fact a \textit{path graph} and can thus be represented as a list of vertices.
+
+\begin{definition}[Path Graph] \footnote{This is refered to as a \texttt{Path} in the source code} A \textit{path graph} is a graph which can be represented as an alternating sequence of elements from two sets $A$ and $B$, defined inductively as:
+  \begin{equation}
+    \begin{align}
+      P &= a     &&&& a \in A \\
+      P &= abP   &&&& a \in A, b \in B 
+    \end{align}
+    \label{eq:biPath}
+  \end{equation}
+\end{definition}
+
+\begin{definition}[Outer Structure] ~\\The \textit{outer structure} is thus defined as a Path Graph, represented as:
+\begin{equation}
+    \begin{align}
+      P = t_1~s_1~t_2~s_2~\dots~t_n     &&&& t_i \in \mathcal{T},~s_i \in \mathcal{S},~ i \in 1\dots n \\
+    \end{align}
+  \label{eq:outerStructureDef}
+\end{equation}
+\end{definition}
 
 \begin{figure}
   \centering
@@ -370,6 +396,8 @@ The outer structure is transformed by applying three operations recursively:
   \label{fig:outerOperations}
 \end{figure}
 
+The outer structure is transformed by applying three operations recursively:
+
 \begin{itemize}
   \item A \textbf{split} replaces a transition $t$ by inserting a new slice $s'$ and two surrounding transitions $t_l$ and $t_r$. Each of the edges in $t$ can have by one or more inner operations applied to it. The edges generated by these inner operations can either be discarded, or keep to form the new edges of $t_l$ and $t_r$.
 \begin{equation}
@@ -390,6 +418,33 @@ The outer structure is transformed by applying three operations recursively:
 
 Figure~\ref{fig:outerOperations} shows each of these operations diagramatically. The original slices and transitions are shown at the top of each diagram, while the lower part shows the generated structure after each outer operation is applied.
 
+The generation of a piece thus begins with the empty transition $t_0$, followed by a \texttt{split} operation, which generates the root slice of the piece. 
+
+Figure~\ref{fig:innerOuterStructure} gives an example derivation of the short phrase shown in Figure~\ref{fig:cadenceVoices}. In Figure~\ref{fig:cadenceOuterDer}, we can see that 4 outer operations have been applied to generate the surface. The spread operation intoduces a passing edge between e and c, shown as the dashed line in Figure~\ref{fig:cadenceInnerDer}. Note that the vertically aligned notes in Figure~\ref{fig:cadenceInnerDer} correspond to the notes in the surface slices in Figure~\ref{fig:cadenceOuterDer}, and the final surface shown on the right of Figure~\ref{fig:cadenceDerivation}.
+\begin{figure}
+  \centering
+  \begin{subfigure}[h]{.55\textwidth}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{prep/cadenceouterder.png}
+    \caption{Outer structure}
+    \label{fig:cadenceOuterDer}
+  \end{subfigure}
+  \begin{subfigure}[h]{.42\textwidth}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{prep/cadenceinnerder.png}
+    \caption{Inner structure}
+    \label{fig:cadenceInnerDer}
+  \end{subfigure}
+  \begin{subfigure}[h]{.8\textwidth}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{prep/cadencederivation.png}
+    \caption{Abstract notation}
+    \label{fig:cadenceDerivation}
+  \end{subfigure}
+
+
+  \captionsetup{width=.9\linewidth}
+  \caption{An example derivation of the phrase shown in Figure~\ref{fig:cadenceVoices}. }
+  \label{fig:innerOuterStructure}
+\end{figure}
+
 \FloatBarrier
 % subsubsection Outer Structure (end)
 \subsubsection{Proto-voice harmony}
@@ -407,6 +462,76 @@ Explain what is meant by a reduction
 What is meant by a partial reduction
 \par 
 The partial reduction which is the goal (one slice per chord label). Our goal when parsing is ascertain slices that correspond to the chord labels, having explicit explained away ornementations through the protovoice edges. 
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[t]{.44\textwidth}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{prep/harm/unreducedScore.png}
+    \caption{}
+    \label{fig:}
+  \end{subfigure}
+  \begin{subfigure}[t]{.44\textwidth}
+    \centering\includegraphics[keepaspectratio,width=0.85\textwidth]{prep/harm/reducedScore.png}
+    \caption{}
+    \label{fig:}
+  \end{subfigure}
+
+  \begin{subfigure}[t]{.496\textwidth}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{prep/harm/unreducedOuter.png}
+    \caption{}
+    \label{fig:}
+  \end{subfigure}
+  \begin{subfigure}[t]{.496\textwidth}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{prep/harm/reducedOuter.png}
+    \caption{}
+    \label{fig:}
+  \end{subfigure}
+
+  \captionsetup{width=.9\linewidth}
+  \caption{Applying a reduction to aid harmonic inference}
+  \label{fig:pvHarmony}
+\end{figure}
+
+
+\subsection{Heuristic Search Algorithms}
+Heuristic search algorithms are a subset of search algorithms used to find a sequence of actions from an initial state that results in a goal state. The problem is defined as follows:
+\begin{itemize}
+  \item We have an \textit{initial state} $s_0$ where $s_0 \in S$, the set of possible states
+  \item We have set of \textit{actions} $A$, modelled by the function $action: A\times S \to S$
+  \item We have \textit{goal test}, modelled by the function $goal: S \to \{true, false\}$
+  \item There is a \textit{cost} associated with every path, modelled by $cost: A \times S \to \mathbb{R}$
+  \item Finally, we have a function \textit{expand} is a \textit{cost} associated with every path, modelled by $cost: A \times S \to \mathbb{R}$
+  \item We wish to find the minimum cost path from the initial state $s_0$ to a goal state. 
+  % \item We have an initial state $s_o \in S$, which is the empty reduction, corresponding to the unreduced surface of the piece. The score is represented as a sequence of slices grouping notes that sound simultaneously. We are also given the segmentation of the original chord labels that we wish to retrieve.
+  % \item We have a set of actions, $A$ modelled by a function $action: A \times S \to S$. These actions correspond to a single reduction step.
+  %   \begin{itemize}
+  %     \item The reduction steps are the inverses of the operations defined by the generative proto-voice model.
+  %   \end{itemize}
+  % \item Finally we have a goal test, $goal: S \to \{true,false\}$ which is true iff the partial reduction $s$ has exactly one slice per segment of the input.
+  %   \begin {itemize}
+  % \item This means the partial reduction $s$ contains a sequence of slices which start and end positions corresponding to the segmentation of the piece.
+  %   \end {itemize}
+  % \item At the first stage, this will be implemented using a random graph search algorithm, picking each action randomly, according to precomputed distributions.
+  % \item The state space $S$ is the set of all possible partial reductions of a piece along with each reduction step that has been done so far. 
+  % \item We have an initial state $s_o \in S$, which is the empty reduction, corresponding to the unreduced surface of the piece. The score is represented as a sequence of slices grouping notes that sound simultaneously. We are also given the segmentation of the original chord labels that we wish to retrieve.
+  % \item We have a set of actions, $A$ modelled by a function $action: A \times S \to S$. These actions correspond to a single reduction step.
+  %   \begin{itemize}
+  %     \item The reduction steps are the inverses of the operations defined by the generative proto-voice model.
+  %   \end{itemize}
+  % \item Finally we have a goal test, $goal: S \to \{true,false\}$ which is true iff the partial reduction $s$ has exactly one slice per segment of the input.
+  %   \begin {itemize}
+  % \item This means the partial reduction $s$ contains a sequence of slices which start and end positions corresponding to the segmentation of the piece.
+  %   \end {itemize}
+  % \item At the first stage, this will be implemented using a random graph search algorithm, picking each action randomly, according to precomputed distributions.
+\end{itemize}
+
+The way we solve these problems is through a graph search, with each node representing a state, and each edge representing an action and associated cost. At each iteration, we incorporate a \textit{policy}(search strategy) which determines which nodes in the search tree are chosen to be expanded. Typically, in these problems the search state is intractable, such that a breadth first search would not be feasible. As such, a priority queue is used to choose which nodes to expand, with the priority being calculated using a \textit{heuristic}.
+
+\subsubsection{Best First Search}
+\subsubsection{Greedy search}
+\subsubsection{Exhaustive search}
+\subsubsection{Beam search}
+As a result of the very large branching factor in the graph of partial reductions, even a best-first search would lead to memory overflow. Beam search is an optimisation of best-first search that serves to reduce its memory requirements. 
 
 \subsection{Probabilistic Programming}
 Probabilistic programming is the combination of model definitions and statistical inference algorithms for computing the conditional distribution of inputs that could have given rise to the observed output. 
@@ -490,49 +615,6 @@ Then for each chord tone,
 \[p_{ct} \sim \text{Categorical}(\vec{\phi}_{ct})\]
 \[p_{or} \sim \text{Categorical}(\vec{\phi}_{or})\]
 We get the distribution of likelihoods for each pitch.
-
-\subsection{Heuristic Search Algorithms}
-Heuristic search algorithms are a subset of search algorithms used to find a sequence of actions from an initial state that results in a goal state. The problem is defined as follows:
-\begin{itemize}
-  \item We have an \textit{initial state} $s_0$ where $s_0 \in S$, the set of possible states
-  \item We have set of \textit{actions} $A$, modelled by the function $action: A\times S \to S$
-  \item We have \textit{goal test}, modelled by the function $goal: S \to \{true, false\}$
-  \item There is a \textit{cost} associated with every path, modelled by $cost: A \times S \to \mathbb{R}$
-  \item Finally, we have a function \textit{expand} is a \textit{cost} associated with every path, modelled by $cost: A \times S \to \mathbb{R}$
-  \item We wish to find the minimum cost path from the initial state $s_0$ to a goal state. 
-  % \item We have an initial state $s_o \in S$, which is the empty reduction, corresponding to the unreduced surface of the piece. The score is represented as a sequence of slices grouping notes that sound simultaneously. We are also given the segmentation of the original chord labels that we wish to retrieve.
-  % \item We have a set of actions, $A$ modelled by a function $action: A \times S \to S$. These actions correspond to a single reduction step.
-  %   \begin{itemize}
-  %     \item The reduction steps are the inverses of the operations defined by the generative proto-voice model.
-  %   \end{itemize}
-  % \item Finally we have a goal test, $goal: S \to \{true,false\}$ which is true iff the partial reduction $s$ has exactly one slice per segment of the input.
-  %   \begin {itemize}
-  % \item This means the partial reduction $s$ contains a sequence of slices which start and end positions corresponding to the segmentation of the piece.
-  %   \end {itemize}
-  % \item At the first stage, this will be implemented using a random graph search algorithm, picking each action randomly, according to precomputed distributions.
-  % \item The state space $S$ is the set of all possible partial reductions of a piece along with each reduction step that has been done so far. 
-  % \item We have an initial state $s_o \in S$, which is the empty reduction, corresponding to the unreduced surface of the piece. The score is represented as a sequence of slices grouping notes that sound simultaneously. We are also given the segmentation of the original chord labels that we wish to retrieve.
-  % \item We have a set of actions, $A$ modelled by a function $action: A \times S \to S$. These actions correspond to a single reduction step.
-  %   \begin{itemize}
-  %     \item The reduction steps are the inverses of the operations defined by the generative proto-voice model.
-  %   \end{itemize}
-  % \item Finally we have a goal test, $goal: S \to \{true,false\}$ which is true iff the partial reduction $s$ has exactly one slice per segment of the input.
-  %   \begin {itemize}
-  % \item This means the partial reduction $s$ contains a sequence of slices which start and end positions corresponding to the segmentation of the piece.
-  %   \end {itemize}
-  % \item At the first stage, this will be implemented using a random graph search algorithm, picking each action randomly, according to precomputed distributions.
-\end{itemize}
-
-The way we solve these problems is through a graph search, with each node representing a state, and each edge representing an action and associated cost. At each iteration, we incorporate a \textit{policy}(search strategy) which determines which nodes in the search tree are chosen to be expanded. Typically, in these problems the search state is intractable, such that a breadth first search would not be feasible. As such, a priority queue is used to choose which nodes to expand, with the priority being calculated using a \textit{heuristic}.
-
-\subsubsection{Best First Search}
-\subsubsection{Greedy search}
-\subsubsection{Exhaustive search}
-\subsubsection{Beam search}
-As a result of the very large branching factor in the graph of partial reductions, even a best-first search would lead to memory overflow. Beam search is an optimisation of best-first search that serves to reduce its memory requirements. 
-
-
-
 
 %
 % Provide an outline of the heuristic search paradigm with a formalisation.
