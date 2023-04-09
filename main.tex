@@ -3,6 +3,7 @@
 \usepackage[pdfborder={0 0 0}]{hyperref}    % turns references into hyperlinks
 \usepackage[left=25mm, right=25mm, bottom=25mm, top=20mm]{geometry}  % adjusts page layout
 \usepackage{graphicx}  % allows inclusion of PDF, PNG and JPG images
+\usepackage{titlesec}
 \usepackage{subcaption}
 \usepackage{verbatim}
 \usepackage{mathdots}
@@ -192,7 +193,16 @@ Most of western tonal music can be described using a sequence of chords, represe
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.95\textwidth]{intro/overview}
+  \begin{subfigure}[t]{\textwidth}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{intro/overview/generation}
+    \caption{Modelling}
+    \label{fig:modellingOverview}
+  \end{subfigure}
+  \begin{subfigure}[t]{\textwidth}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{intro/overview/inference}
+    \caption{Inference}
+    \label{fig:inferenceOverview}
+  \end{subfigure}
   \caption{Problem overview}
   \label{fig:overview}
 \end{figure}
@@ -209,7 +219,9 @@ Most of western tonal music can be described using a sequence of chords, represe
 Automatic Chord Estimation has both theoretical and practical applications. Novel ways to understand harmonic structure are sought after by music theorists, aiding the analysis and composition of pieces. Analysis of music often starts with the manual labeling each chord, which is a time consuming and cogntively demanding expert task. Sequences of chords provide compact representations for use in analysis, music identification and music similarity finding. More broadly speaking, any system that involves the understanding of written tonal music will benefit from chord estimation. 
 
 The paper \textit{Modeling and Inferring Protovoice Structure in Free Polyphony} describes a generative model that encodes the recursive and hierarchical dependencies between notes, giving rise to a grammar-like hierarchical system \cite{finkensiepModelingInferringProtovoice2021}.
-This model can be used to reduce a piece into a hierarchical structure which encodes an understanding of the tonal/harmonic relations, and hence approximate $p(S|L)$.
+This model can be used to reduce a piece into a hierarchical structure which encodes an understanding of the tonal/harmonic relations.
+
+% , and hence approximate $p(S|L)$.
 
 % Finkensiep suggests in his thesis that the protovoice model may be an effective way to infer higher level latent entities such as harmonies. Thus, in this project I will answer the question: is this model an effective way to annotate harmonies? By ‘effective’ we are referring to two things:
 % \begin{itemize}
@@ -240,6 +252,7 @@ This was an ambitious project, and I met all of my success criteria and complete
 \chapter{Preparation}
 % \textit{In this chapter, I present the work which was undertaken before the code was written. I first provide an exposition of the Protovoice Model which forms the foundation of this project, describing how it can be used to infer harmony. Subsequently, I discuss probabilistic programming and Bayesian inference, including a probabilistic model of harmony. Finally, I describe the software engineering techniques and principles used throughout the project. }
 
+\section{Bayesian Inference}
 \section{Overview of Approach}
 
 \textbf{Probabilistic programming} is a programming paradigm that makes use of
@@ -277,8 +290,8 @@ The approach taken in this project to solve the problem is as follows:
 
 \begin{figure}
   \centering
-  \includegraphics[width=\textwidth]{intro/inferenceOverview}
-  \caption{Overview of the combined model}
+  \includegraphics[width=\textwidth]{intro/combinedModel}
+  \caption{Overview of the inference process.}
   \label{fig:inferenceOverview}
 \end{figure}
 
@@ -519,12 +532,17 @@ Figure~\ref{fig:innerOuterStructure} gives an example derivation of the short ph
 
 The goal of parsing is to find a \textit{plausible derivation} of the given surface. For a derivation to be \textit{plausible} it needs be consistent with a valid musical \textit{interpretation}. Although this is non-trivial, plausibility can be approximately represented by a probability distribution, analogously to probabilistic context free grammars(PCFGs).
 \par
+\begin{definition}[Reduction]
+  A \textit{reduction} is defined as as the inverse of a generative process, and is synonymous with a \textit{derivation}. When parsing we \textit{reduce} a piece by applying inverses of the generative operations. The structure midway through a parse of a surface is called a \textit{partial reduction} of that surface.
+\end{definition}
+\par
 \begin{definition}[Derivation plausibility]
   The plausibility of a derivation is given by the product of the probabilities of each of the production rules used. Given a derivation $D$, its plausibility is defined:
   \begin{equation}
     p(D|\text{surface}) = \prod_{r \in D}  p(r|\text{surface})
   \end{equation}
 \end{definition}
+
 
 Assuming we can calculate $p(r|\text{surface})$, we can find the most plausible derivation by taking the maximum likelihood estimate (MLE) of the distribution
 \begin{equation}
@@ -588,9 +606,6 @@ In general, the heuristic function $h(n)$ depends on  the description of $n$, th
 % subsection protovoiceParsing (end)
 \FloatBarrier
 \section{Inferring Harmony}
-\begin{definition}[Reduction]
-  A \textit{reduction} is defined as as the inverse of the generated process. When parsing we \textit{reduce} a piece by applying inverses of the generative operations. The state during a parse is called a \textit{partial reduction}.
-\end{definition}
 
 The task of inferring harmony (ACE) poses \textbf{three main challenges}: 
 \begin{itemize}
