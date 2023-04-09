@@ -175,6 +175,7 @@ There were no special difficulties encountered in this project
 
 \newpage
 \section*{Acknowledgements}
+I'd like to thank Christoph Finkensiep and Peter Harrison for being awesome.
 
 
 
@@ -187,19 +188,34 @@ There were no special difficulties encountered in this project
 \textit{This dissertation explores efficient search strategies for parsing symbolic music data using a musical grammar for Automatic Chord Estimation (ACE). We first present a naive implementation of a parsing algorithm based on a recent grammatical model, then address problems of intractability through classical heuristic search methods. We will see that that my novel heuristic search algorithm achieves commendable results, providing a strong foundation for a more sophisticated automated analysis system. }
 
 \section{Motivation}
-Most of western tonal music can be described using a sequence of chords, representing a higher level harmonic structure of a piece. Automatic Chord Estimation (ACE) is the task of inferring the sequence of chords for a given piece from symbolic or audio data. There is a small, finite set of chord types, but each chord can be realised on the musical surface in a practically infinite number of ways. Given a score (a symbolic representation of a piece of music), we wish to infer the sequence of underlying chord types. 
-\par
-Automatic Chord Estimation has both theoretical and practical applications. Novel ways to understand harmonic structure are sought after by music theorists, aiding the analysis and composition of pieces. Analysis of music often starts with the manual labeling each chord, which is a time consuming and cogntively demanding expert task. Sequences of chords provide compact representations for use in analysis, music identification and music similarity finding. More broadly speaking, any system that involves the understanding of written music will benefit from chord estimation. 
-\par
-The paper \textit{Modeling and Inferring Protovoice Structure in Free Polyphony} describes a generative model that encodes the recursive and hierarchical dependencies between notes, giving rise to a grammar-like hierarchical system \cite{finkensiepModelingInferringProtovoice2021}. This model can be used to reduce a piece into a hierarchical structure which encodes an understanding of the tonal/harmonic relations.
-\par
-\textit{Problem overview diagram to be added}
-\par
-Finkensiep suggests in his thesis that the protovoice model may be an effective way to infer higher level latent entities such as harmonies. Thus, in this project I will answer the question: is this model an effective way to annotate harmonies? By ‘effective’ we are referring to two things:
-\begin{itemize}
-  \item Accuracy: can the model successfully emulate how experts annotate harmonic progressions in musical passages? 
-  \item Practicality: can the model be used to do this within a reasonable time frame?
-\end{itemize}
+Most of western tonal music can be described using a sequence of chords, representing a higher level harmonic structure of a piece. Automatic Chord Estimation (ACE) is the task of inferring the sequence of chords for a given piece from symbolic or audio data. There is a small, finite set of chord types, but each chord can be realised on the musical surface in a practically infinite number of ways. Given a score $S$ (a symbolic representation of a piece of music), we wish to infer the sequence of underlying chord types $L = l_0, \dots, l_n$. 
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.95\textwidth]{intro/overview}
+  \caption{Problem overview}
+  \label{fig:overview}
+\end{figure}
+
+
+\begin{equation}
+  \begin{align}
+    % \hat L &= \argmax_L\left(p(L|S)\right)  \\
+    \hat L &= \argmax_L p(S|L) 
+    % \underbrace{P(L)}_\text{prior}
+  \end{align}
+\end{equation} 
+
+Automatic Chord Estimation has both theoretical and practical applications. Novel ways to understand harmonic structure are sought after by music theorists, aiding the analysis and composition of pieces. Analysis of music often starts with the manual labeling each chord, which is a time consuming and cogntively demanding expert task. Sequences of chords provide compact representations for use in analysis, music identification and music similarity finding. More broadly speaking, any system that involves the understanding of written tonal music will benefit from chord estimation. 
+
+The paper \textit{Modeling and Inferring Protovoice Structure in Free Polyphony} describes a generative model that encodes the recursive and hierarchical dependencies between notes, giving rise to a grammar-like hierarchical system \cite{finkensiepModelingInferringProtovoice2021}.
+This model can be used to reduce a piece into a hierarchical structure which encodes an understanding of the tonal/harmonic relations, and hence approximate $p(S|L)$.
+
+% Finkensiep suggests in his thesis that the protovoice model may be an effective way to infer higher level latent entities such as harmonies. Thus, in this project I will answer the question: is this model an effective way to annotate harmonies? By ‘effective’ we are referring to two things:
+% \begin{itemize}
+%   \item Accuracy: can the model successfully emulate how experts annotate harmonic progressions in musical passages? 
+%   \item Practicality: can the model be used to do this within a reasonable time frame?
+% \end{itemize}
 
 While the original model could in theory be used to generate harmonic annotations, an exhaustive search strategy would be prohibitively time-consuming in practice for any but the shortest musical extracts; one half measure can have over 100,000 valid derivations \cite{finkensiepStructureFreePolyphony2023}. My approach will be to explore the use of heuristic search algorithms to solve this problem.
 
@@ -216,20 +232,68 @@ The protovoice model is the first to provide a unified theory that relates three
 
 This was an ambitious project, and I met all of my success criteria and completed the extension tasks. I show that the protovoice model can be used to effectively annotate pieces with chord labels, and these results provide a promising foundation for the model being developed further as a sophisticated tool for the automated analysis of western total music.
 
-% Blow my trumpet here. Overview of what I achieved, problems I solved etc. Say that this is forming a basis of an ISMIR 2023 submission.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Preparation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Preparation}
-\textit{In this chapter, I present the work which was undertaken before the code was written. I first provide an exposition of the Protovoice Model which forms the foundation of this project, describing how it can be used to infer harmony. Subsequently, I discuss probabilistic programming and Bayesian inference, including a probabilistic model of harmony. Finally, I describe the software engineering techniques and principles used throughout the project. }
+% \textit{In this chapter, I present the work which was undertaken before the code was written. I first provide an exposition of the Protovoice Model which forms the foundation of this project, describing how it can be used to infer harmony. Subsequently, I discuss probabilistic programming and Bayesian inference, including a probabilistic model of harmony. Finally, I describe the software engineering techniques and principles used throughout the project. }
 
-\section{Background Material}
+\section{Overview of Approach}
+
+\textbf{Probabilistic programming} is a programming paradigm that makes use of
+model definitions and statistical inference algorithms to compute the
+conditional distribution of inputs that could have given rise to an observed
+output. 
+
+In the context of ACE, we consider the underlying sequence of chord labels $L_0, L_1,\dots L_n$ as an \textbf{input}, and the musical surface or score as the \textbf{observed output} $S$. 
+
+In this sense, ACE can be solved by finding the most likely sequence of labels for the given score, described by the equation: 
+
+\begin{equation}
+  \hat L = \argmax_L p\left(S | L\right)
+  \label{eq:aceProbSol}
+\end{equation}
+
+The difficulty arises from the complexity and prohibitively large number of the \textbf{latent variables} $\phi$; in reality, we need to maximise $p(S|L,\phi)p(\phi)$.
+
+\begin{equation}
+  \hat L = \argmax_L p(S | L,\phi) p(\phi)
+  \label{eq:aceProbSolLatent}
+\end{equation}
+
+In this domain, $\phi$ consists of an \textbf{practically infinite} set of variables. These include the author's compositional conception, their musical conception, cognitive phenonoma experienced by listeners, shared experience distilled into music theory, musical trends/culture and notational conventions. 
+
+This cannot be solved analytically, but we can find ways to approximate $p(S|L;\phi)p(\phi)$ using models that encode domain specific knowledge about both the music generation and labelling processes. 
+
+The approach taken in this project to solve the problem is as follows:
+
+\begin{itemize}
+  \item First we use the \textit{protovoice model} to \textit{reduce} a musical surface, simplifying the score by removing redundant notes from the surface, using domain specific knowledge to infer structure\footnote{We are relying on the assumption that this structure is somehow shared between the processes of composition, listening, and analysis. This is a fair assumption to make given they are all considering the same thing.}. 
+  \item Subsequently, using a \textit{probabilistic model of harmony} we find the conditional likelihood of the \textit{reduced} score given a sequence of labels.
+  \item Finally, we choose the sequence of labels that \textit{maximises the likelihood} of the reduced score.
+\end{itemize}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{intro/inferenceOverview}
+  \caption{Overview of the combined model}
+  \label{fig:inferenceOverview}
+\end{figure}
+
+
+
+We denote the protovoice reduction transformation as $f_{pv}:(\mathcal{S}, \Phi) \to (\mathcal{S'})$.
+We then consider computing $p(S'|L;\phi)$. $S'$ is the reduced surface. In order to be able to use this transformed representation, there is a constraint that $\argmax_L p(S'|L') \approxeq \argmax_L p(S|L)$. That is, after applying the transform, the maximum likelihood estimate of the reduced surface given each sequence of labels should be the same, or as close as possible to that of the unreduced surface. In other words, the solution should be \textit{invariant} or \textit{approximately invariant} to this transformation.
+
+\section{The Protovoice Model}
+The protovoice model is a formal generative model which represents a piece of music as a graph where each note is a node, and notes are connected by stepwise protovoice edges. 
+
+The Protovoice model is primarily concerned with the analysis of Western Classical music, although it could be applied to different musical styles, such as jazz or some popular western music \cite{finkensiepStructureFreePolyphony2023}. 
 
 \subsection{Voices}
 
-The Protovoice model is a formal model primarily concerned with the analysis of Western Classical music, although it could be applied to different musical styles, such as jazz or some popular western music \cite{finkensiepStructureFreePolyphony2023}. 
 % For the purposes of this dissertation I will make music theoretical assumptions, but their justification is left to the appendix.
 \par
 The input we are concerned with is called a score, a symbolic abstraction of a piece of music based on a 2-dimensional axis.
@@ -243,11 +307,14 @@ The marks on on score represents notes, with the pitch of the note corresponding
   \label{fig:pitchTime}
 \end{figure}
 
-The notion of a \textit{voice} is crucial for the understanding of the protovoice model. A voice typically refers to a single melodic line (sequence of notes) that is part of a musical composition. The term is derived from its use in choral music, such as J.S Bach's four-voice chorales, which consist of 4 sung melodic lines. The term voice is used is used more generally however, the melodic lines do not need to be sung or voice-like in character and can be performed by any melodic instrument. 
-\FloatBarrier
-\par
-Polyphony refers to a piece of music that can contains more than one voice. Typically polyphonic music will have a set number of voices throughout the piece, but \textit{free polyphony} refers to music where the number of voices is arbitrary and can change throughout the piece.
-\par
+The notion of a \textit{voice} is crucial for the understanding of the protovoice model.
+A voice typically refers to a single melodic line (sequence of notes) that is part of a musical composition.
+The term is derived from its use in choral music, such as J.S Bach's four-voice chorales, which consist of 4 sung melodic lines.
+The term voice is used is used more generally however, the melodic lines do not need to be sung or voice-like in character and can be performed by any melodic instrument. 
+
+Polyphony refers to a piece of music that can contains more than one voice.
+Typically polyphonic music will have a set number of voices throughout the piece, but \textit{free polyphony} refers to music where the number of voices is arbitrary and can change throughout the piece.
+
 There are three types of relations between notes that form the basis for the protovoice model:
 
 \begin{itemize}
@@ -261,7 +328,7 @@ There are three types of relations between notes that form the basis for the pro
   \centering
   \includegraphics[width=0.45\textwidth]{prep/cadencevoices}
   \captionsetup{width=.9\linewidth}
-  \caption{A short cadential phrases with two voices.}
+  \caption{A short cadential phrase with two voices.}
   \label{fig:cadenceVoices}
 \end{figure}
 
@@ -277,21 +344,17 @@ There are three types of relations between notes that form the basis for the pro
   \centering
   \includegraphics[width=0.45\textwidth]{prep/cadenceharmony}
   \captionsetup{width=.9\linewidth}
-  \caption{Chord labels for the short cadential phrase.}
+  \caption{Chord labels shown with segment boundaries.}
   \label{fig:cadenceHarmony}
 \end{figure}
 
 \FloatBarrier
 % subsection Voices (end)
 
-\subsection{The Protovoice Model} % (fold)
-\par
-The protovoice model is a formal generative model which represents a piece of music as a graph where each note is a node, and notes are connected by stepwise protovoice edges. It generates a piece of music through sequential operations on notes, inserting new notes with edges connected to existing notes.
-
-
-\par 
-\subsubsection{Inner Structure} % (fold)
+\subsection{Inner Structure} % (fold)
 \label{sub:Inner Structure}
+
+Internally, the protovoice model generates a piece of music through sequential operations on notes, inserting new notes with edges connected to existing notes.
 
 We represent protovoices as a graph $G$ with one vertex for each note, a vertex each for the beginning ($\rtimes$) and end ($\ltimes$) of the piece, and edges that indicate connections between notes.
 We define a note as $p \in \mathcal{P}$ where $\mathcal{P}$ is the set of pitches, i.e the set of vertical positions on the score\footnote{See Appendix C for a detailed explaination of the pitch representation used in this project}. 
@@ -329,8 +392,8 @@ The generation of a piece begins with the empty piece ($\rtimes \to \ltimes$) an
   \label{eq:repeatAfter}\\
   \end{align} 
 \end{equation}
-% subsubsection Inner Structure (end)
-\subsubsection{Outer Structure}
+% subsection Inner Structure (end)
+\subsection{Outer Structure}
 \label{sub:Outer Structure}
 
 The inner structure provided by protovoices captures the sequential and functional organisation of notes, but does not capture when notes are simultaneous. To model simulataneity of notes we introduce \textit{slices}, representing segments of a piece where a group of notes are heard, and \textit{transitions} which contain the protovoice edges between notes in the two neighbouring slices. These provide a higher level abstraction that are used to capture more musical structure. 
@@ -450,8 +513,8 @@ Figure~\ref{fig:innerOuterStructure} gives an example derivation of the short ph
 \end{figure}
 
 \FloatBarrier
-% subsubsection Outer Structure (end)
-\subsection{Parsing} % (fold)
+% subsection Outer Structure (end)
+\section{Parsing} % (fold)
 \label{sub:protovoiceParsing}
 
 The goal of parsing is to find a \textit{plausible derivation} of the given surface. For a derivation to be \textit{plausible} it needs be consistent with a valid musical \textit{interpretation}. Although this is non-trivial, plausibility can be approximately represented by a probability distribution, analogously to probabilistic context free grammars(PCFGs).
@@ -465,7 +528,7 @@ The goal of parsing is to find a \textit{plausible derivation} of the given surf
 
 Assuming we can calculate $p(r|\text{surface})$, we can find the most plausible derivation by taking the maximum likelihood estimate (MLE) of the distribution
 \begin{equation}
-  D_{opt} = \argmax_{D} \left( p(D|\text{surface})\right)
+  \hat D = \argmax_{D} \left( p(D|\text{surface})\right)
   \label{eq:mapApproach}
 \end{equation}
 
@@ -476,7 +539,7 @@ This presents \textbf{two key problems} to be solved:
   \item \textbf{Combinatorial explosion}: Even if we could calculate $p(D|\text{surface})$ analytically, we would be prohibited by the large branching factor; a single piece can have upwards of $9^{9^{9^{{\iddots}^{9^{9}}}}}$ possible derivations\footnote{I need a better way to represent the scale here. Perhaps I'll try to actually estimate a number}.
 \end{itemize}
 
-\subsection{Heuristic Search Algorithms}
+\section{Heuristic Search Algorithms}
 
 Heuristic search algorithms are introduced in 1B \textit{Artificial Intelligence}, so I will therefore assume the reader has knowledge of the heuristic search paradigm.
 
@@ -524,7 +587,7 @@ In general, the heuristic function $h(n)$ depends on  the description of $n$, th
 %
 % subsection protovoiceParsing (end)
 \FloatBarrier
-\subsection{Inferring Harmony}
+\section{Inferring Harmony}
 \begin{definition}[Reduction]
   A \textit{reduction} is defined as as the inverse of the generated process. When parsing we \textit{reduce} a piece by applying inverses of the generative operations. The state during a parse is called a \textit{partial reduction}.
 \end{definition}
@@ -532,21 +595,11 @@ In general, the heuristic function $h(n)$ depends on  the description of $n$, th
 The task of inferring harmony (ACE) poses \textbf{three main challenges}: 
 \begin{itemize}
   \item \textbf{Segmentation}: Segmentation is splitting of the score into segments which each have an individual label. For example, Figure~\ref{fig:pvHarmony} shows each segment separated by a dashed grey line. As these segments are typically not given a priori, both the segmentation and harmony needs to be inferred. Performing the joint task of segmentation and labelling is beyond the scope of this project, however, so we will assume that the segmentation is given.
-  \item \textbf{Ambiguity}: The notes in a given segment may not be enough to determine the chord label, as context is vital. For example, the D and B in Figure~\ref{fig:pvHarmony}. Furthermore, ambiguity is often used with much license to create artistic interest.
-  \item \textbf{Non chord-tones}
+  \item \textbf{Ambiguity}: The notes in a given segment may not be enough to determine the chord label. For example, the slice containing notes D and B in Figure~\ref{fig:pvHarmony} could be a realisation of a Bm triad, but the context of the neighbouring slices as well as the functional dependencies of the notes makes it clear that the label should be a G. Furthermore, ambiguity is often used with much license to create artistic interest.
+  \item \textbf{Non chord-tones}: The slices in a given segment will typically consist of combination of \textit{chord-tones} and \textit{non chord-tones}. The chord tones directly define the harmony, so to perform ACE, an algorithm will need to distinguish between the two. Previous approaches have involved modelling generation as a noisy process, such that the non chord-tones are considered as noise\cite{temperleyAlgorithmHarmonicAnalysis1997}. The protovoice model allows us \textit{explicitly} explain away non chord-tones. In Figure~\ref{fig:pvHarmonyUnreducedOuter}, the non chord-tone is denoted in red. By applying a reduction that removes the neighbour note, E, we result in a single slice in that segment which only contains chord-tones(Figure~\ref{fig:pvHarmonyReducedOuter}), thus describing the chord label more clearly, shown in Figure~\ref{fig:pvHarmonyReducedInner}.
 \end{itemize}
 
-Difficulty of inferring harmony: ambiguity, and ornamentation, segmentation. 
-
-Protovoice model.
-
-
-
-For the sake 
-
-
-The goal is to 
-The partial reduction which is the goal (one slice per chord label). Our goal when parsing is ascertain slices that correspond to the chord labels, having explicit explained away ornementations through the protovoice edges. 
+The method I will use to infer harmony using the protovoice model is to find a \textit{partial reduction} which has one slice per chord label, having explicitly explained away non chord-tones (ornamentations) through protovoice edges. \footnote{How can I make this stand out on the page more? This is a very important statement} Given this, the chord labels can be inferred using probabilistic methods.
 
 \begin{figure}
   \centering
@@ -577,94 +630,23 @@ The partial reduction which is the goal (one slice per chord label). Our goal wh
   \label{fig:pvHarmony}
 \end{figure}
 
-\subsection{Probabilistic Programming}
-Probabilistic programming is the combination of model definitions and statistical inference algorithms for computing the conditional distribution of inputs that could have given rise to the observed output. 
-\par 
-In the context of ACE, we can reframe the generation of a piece as having the underlying sequence of chord labels as an \textbf{input}, and the musical surface or score being the \textbf{observed output}. 
-\par 
-
-We can \textit{factorize} a probabity distribution into a \textit{prior} and a \textit{likelihood}. By choosing priors that are conjugate to the likelihood, we get a posterior distribution that is 
-
-Provide an explanation of all the concepts I learned and used in this project. 
-Techniques such as marginalisation, joint distributions, bayes rule etc. 
-
-Dirchelet distributions
-
-Beta distribution  
-
-Multinomiall distribution 
-
-Normal Distribution 
-
-\par 
-Inference as model $\to$ data $\to$ prob distribution $\to$ chord guess
-
-\subsection{Probabilistic Model of Harmony}
-We are making the assumption that the score is a realisation of the latent harmonic entities. 
-
-Outline of the probabilistic model of harmony, describing the parts that are relevant for harmonic annotations. This section allows the reader to understand the evaluation and heuristic modules.
-
-\subsubsection{Model definition}
-We have a set of pitches $\mathcal{P}$ and a set chord-types $\mathcal{C}$. A chord label is defined as a tuple of \textit{root note} pitch and chord-type: $\mathcal{L} = \mathcal{P} \times \mathcal{C}$. We perform a transform of the pitches of each note relative to the chord's root note that is being considered, such that we only need to consider the chord type. 
-
-\par
-The priors for the model are as follows:
-\begin{equation}
-\begin{align*} 
-              && \vec{\chi} &\sim \text{Dirichlet}(0.5, |\mathcal{C}|)     && \text{prior of the chord type} \\
-              && \lambda &\sim \text{Gamma}(3, 1)     && \text{prior of the note rate} \\
-  \forall c:  && \theta_c  &\sim \text{Beta}(1, 1)        && \text{prior of each note being a chordtone/ ornament} \\
-  \forall c:  && \vec{\phi}_{ct}^{c}  &\sim \text{Dirichlet}(0.5, |\mathcal{P}|)        && \text{pitch for each ornament} \\
-  \forall c:  && \vec{\phi}_{or}^{c}  &\sim \text{Dirichlet}(0.5, |\mathcal{P}|)        && \text{pitch for each chord tone} \\
-  % \forall i:  && L_i | \vec{\chi} &\sim \text{Categorical}(\vec{\chi}) && \text{chord label of each data point} \\
-  %             && N_i | L_i, v &\sim \text{Multinomial}(v_{L_i})  && \text{notes of each data point} \\
-\end{align*}
-\label{eq:phm}
-\end{equation}
-\par 
-Given this model we can use it to generate a single chord as follows:
-
-\par
-Then describe how to go from the parameters to chord, chordtone and ornamentation distributions
-\par
-
-\subsubsection{Model inference}
-Given the model, we can use a dataset to learn the parameters of the model. These parameters can then be used for inference as follows.
-For each datapoint, the chord label 
-\begin{equation}
-\begin{align*} 
-  \forall i:  && L_i | \vec{\chi} &\sim \text{Categorical}(\vec{\chi}) && \text{chord label of each data point} \\
-              && N_i | L_i, v &\sim \text{Multinomial}(v_{L_i})  && \text{notes of each data point} \\
-\end{align*}
-\label{eq:chordlabeldp}
-\end{equation}
-
-\par
-Chordtypes, $C = \{\text{M,~m, Mm7, om, o7, mm7, \%7, MM7, +, Ger, It, Fr, mM7, +7}\}$
-
-\[\vec{\chi}' \sim \text{Dirchlet} (\text{pHarmonies}, n_c) \]
-
-\[\vec{\chi} = \mathbb{E} (\vec{X}_i) = \frac{\alpha_i}{\sum\limits_j \alpha_j} \]
-
-Chord: \[c \sim \text{Categorical}(\vec{\chi})\]
-
-Single chordtone distribution. We want to find $P(p|c, ct)$ probability of the pitch given the chord, and that the note is a chordtone:
-\[\vec{\phi}_{ct}' \sim \text{Dirchlet}(pChordtones, n_p) \implies \vec{\phi}\]
-
-For each of these parameters we use the MLE to get our probability distribution. 
-\[\vec{\phi}_{ct} = \text{MLE} (\vec{\phi}_{ct}')\]
-\[\vec{\phi}_{or} = \text{MLE} (\vec{\phi}_{or}')\]
-\[\vec{\chi}= \text{MLE} (\vec{\chi}') \]
-Then for each chord tone,
-\[p_{ct} \sim \text{Categorical}(\vec{\phi}_{ct})\]
-\[p_{or} \sim \text{Categorical}(\vec{\phi}_{or})\]
-We get the distribution of likelihoods for each pitch.
-
+% We can \textit{factorize} a probabity distribution into a \textit{prior} and a \textit{likelihood}. By choosing priors that are conjugate to the likelihood, we get a posterior distribution that is 
 %
-% Provide an outline of the heuristic search paradigm with a formalisation.
-% \par
-% Provide a brief overview of different techniques that are used to prune the search space that might be relevant.
+% Provide an explanation of all the concepts I learned and used in this project. 
+% Techniques such as marginalisation, joint distributions, bayes rule etc. 
+%
+% Dirchelet distributions
+%
+% Beta distribution  
+%
+% Multinomiall distribution 
+%
+% Normal Distribution 
+%
+% \par 
+% Inference as model $\to$ data $\to$ prob distribution $\to$ chord guess
 
+\footnote{I'm considering adding a small section describing some relevant distributions. Dirchelet, Beta, Multinomial, categorical? If so, should I explain the probablistic harmony model here? Or keep this to the implementation}
 \section{Starting Point}
 
 \subsection{Relevant courses and experience}
@@ -678,28 +660,30 @@ We get the distribution of likelihoods for each pitch.
 \subsection{Existing codebase}
 \subsubsection{Protovoices-haskell}
 This project was implementated in a fork of the pre-existing \textit{protovoices-haskell} github repository. This repository contains custom data structures and types, allowing interoperability with other projects making use of the same model. I also make use of learned parameters from the implementation of the paper \textit{Bayesian Model of Extended Chord Profiles}\cite{finkensiepChordTypesOrnamentation2023}. 
+\footnote{NOTE: How best to justify this?}
 
-The following describes the protovoices-haskell repository, and where my code contribution will lie:
-\par
-\medskip
-\dirtree{%
-.1 protovoices-haskell.
-.2 app.
-.3 MainExamples.hs.
-.3 MainISMIR.hs.
-% .3 MainLearning.hs.
-% .3 MainHeuristicSearch.hs <- My code.
-.3 ....
-.2 src.
-.3 \textbf{Heuristics} <- My code.  
-% .4 …  <- My code.
-.3 ....
-.2 test.
-% .2 testdata.
-.2 ....
-}
-
+% The following describes the protovoices-haskell repository, and where my code contribution will lie:
+% \par
+% \medskip
+% \dirtree{%
+% .1 protovoices-haskell.
+% .2 app.
+% .3 MainExamples.hs.
+% .3 MainISMIR.hs.
+% % .3 MainLearning.hs.
+% % .3 MainHeuristicSearch.hs <- My code.
+% .3 ....
+% .2 src.
+% .3 \textbf{Heuristics} <- My code.  
+% % .4 …  <- My code.
+% .3 ....
+% .2 test.
+% % .2 testdata.
+% .2 ....
+% }
+%
 \section{Requirements Analysis}
+
 
 
 
@@ -994,14 +978,80 @@ Could show other maps in the appendix.
 
 
 \FloatBarrier
+\subsection{Probabilistic Model of Harmony}
+We are making the assumption that the score is a realisation of the latent harmonic entities. 
+
+Outline of the probabilistic model of harmony, describing the parts that are relevant for harmonic annotations. This section allows the reader to understand the evaluation and heuristic modules.
+
+\subsubsection{Model definition}
+We have a set of pitches $\mathcal{P}$ and a set chord-types $\mathcal{C}$. A chord label is defined as a tuple of \textit{root note} pitch and chord-type: $\mathcal{L} = \mathcal{P} \times \mathcal{C}$. We perform a transform of the pitches of each note relative to the chord's root note that is being considered, such that we only need to consider the chord type. 
+
+\par
+The priors for the model are as follows:
+\begin{equation}
+\begin{align*} 
+              && \vec{\chi} &\sim \text{Dirichlet}(0.5, |\mathcal{C}|)     && \text{prior of the chord type} \\
+              && \lambda &\sim \text{Gamma}(3, 1)     && \text{prior of the note rate} \\
+  \forall c:  && \theta_c  &\sim \text{Beta}(1, 1)        && \text{prior of each note being a chordtone/ ornament} \\
+  \forall c:  && \vec{\phi}_{ct}^{c}  &\sim \text{Dirichlet}(0.5, |\mathcal{P}|)        && \text{pitch for each ornament} \\
+  \forall c:  && \vec{\phi}_{or}^{c}  &\sim \text{Dirichlet}(0.5, |\mathcal{P}|)        && \text{pitch for each chord tone} \\
+  % \forall i:  && L_i | \vec{\chi} &\sim \text{Categorical}(\vec{\chi}) && \text{chord label of each data point} \\
+  %             && N_i | L_i, v &\sim \text{Multinomial}(v_{L_i})  && \text{notes of each data point} \\
+\end{align*}
+\label{eq:phm}
+\end{equation}
+\par 
+Given this model we use it to generate a single chord as follows:
+
+\par
+Then describe how to go from the parameters to chord, chordtone and ornamentation distributions
+\par
+
+\subsubsection{Model inference}
+Given the model, we use a dataset to learn the parameters of the model. These parameters can then be used for inference as follows.
+For each datapoint, the chord label 
+\begin{equation}
+\begin{align*} 
+  \forall i:  && L_i | \vec{\chi} &\sim \text{Categorical}(\vec{\chi}) && \text{chord label of each data point} \\
+              && N_i | L_i, v &\sim \text{Multinomial}(v_{L_i})  && \text{notes of each data point} \\
+\end{align*}
+\label{eq:chordlabeldp}
+\end{equation}
+
+\par
+Chordtypes, $C = \{\text{M,~m, Mm7, om, o7, mm7, \%7, MM7, +, Ger, It, Fr, mM7, +7}\}$
+
+\[\vec{\chi}' \sim \text{Dirchlet} (\text{pHarmonies}, n_c) \]
+
+\[\vec{\chi} = \mathbb{E} (\vec{X}_i) = \frac{\alpha_i}{\sum\limits_j \alpha_j} \]
+
+Chord: \[c \sim \text{Categorical}(\vec{\chi})\]
+
+Single chordtone distribution. We want to find $P(p|c, ct)$ probability of the pitch given the chord, and that the note is a chordtone:
+\[\vec{\phi}_{ct}' \sim \text{Dirchlet}(pChordtones, n_p) \implies \vec{\phi}\]
+
+For each of these parameters we use the MLE to get our probability distribution. 
+\[\vec{\phi}_{ct} = \text{MLE} (\vec{\phi}_{ct}')\]
+\[\vec{\phi}_{or} = \text{MLE} (\vec{\phi}_{or}')\]
+\[\vec{\chi}= \text{MLE} (\vec{\chi}') \]
+Then for each chord tone,
+\[p_{ct} \sim \text{Categorical}(\vec{\phi}_{ct})\]
+\[p_{or} \sim \text{Categorical}(\vec{\phi}_{or})\]
+We get the distribution of likelihoods for each pitch.
+
+%
+% Provide an outline of the heuristic search paradigm with a formalisation.
+% \par
+% Provide a brief overview of different techniques that are used to prune the search space that might be relevant.
+
 \subsection{Evaluation Module}
 We need to know exactly what we are trying to achieve before we can understand the baseline and extention implementations.
 
 \FloatBarrier
 \subsubsection{Probabilistic Model of Harmony}
-When evaluating using the protovoice model: we assume that we result in only chord tones for each segment. Thus we can use the chord tone probabilities to evaluate the prediction. 
+When evaluating using the protovoice model: we assume that we result in only chord tones for each segment. Thus we use the chord tone probabilities to evaluate the prediction. 
 \par
-When just using a random sample, we have to assume that there is a mixture model of chord tones and ornaments. We can use the learnt parameters to determine the distribution.
+When just using a random sample, we have to assume that there is a mixture model of chord tones and ornaments. We use the learnt parameters to determine the distribution.
 \par
 These two measures of likelihoods are comparable as they are drawn from the same distributions.
 \par
@@ -1146,7 +1196,7 @@ Show unit tests, and examples of the test/development cycle for the heuristic se
 Things to note
 \begin{itemize}
   \item The fact that segmentation is known ahead of time provides a great deal of information \cite{gothamWhatIfWhen2021}
-  \item So we can use comparisons between the random sample from each segment algorithm and the random parse algorithm to see if the use of the grammar provides an advantage over just sampling the notes directly, without looking at relations between notes.
+  \item So we use comparisons between the random sample from each segment algorithm and the random parse algorithm to see if the use of the grammar provides an advantage over just sampling the notes directly, without looking at relations between notes.
   \item Then we want a heuristic search algorithm that considers each option exhaustively and finds the best local option. This is too computationally expensive to be used for whole pieces. 
   \item Given there can be millions of possible next states in the search, we need to look at different strategies to avoid searching through them all. E.g just sample states. 
   \item Sensitivity Analysis for the heuristic search is useful for the evaluation. Explore how robust it is to handcrafted attacks/ different types of passages.
@@ -1161,6 +1211,36 @@ Things to note
 
 \section{Limitations}
 
+
+I'm solving:
+
+\begin{equation}
+    \hat L &= \argmax_L\left(p(S|L)\right) 
+\end{equation}
+
+But I could be solving:
+
+\begin{equation}
+    \hat L &= \argmax_L\left(p(S|L)p(L)\right) 
+    % \underbrace{P(L)}_\text{prior}
+\end{equation}
+
+In which case:
+
+To compute the conditional probability $p(L|S)$, we use Bayes' theorem:
+\begin{equation}
+  p(L|S) = \frac{p(S|L)~p(L)}{P(S)}
+  \label{eq:lgivenS}
+\end{equation}
+Finding the most likely sequence of labels is found using:
+\begin{equation}
+  \argmax_L \left(\underbrace{p(S|L)}_{\text{likelihood}}~\underbrace{p(L)}_{\text{prior}}\right)
+  \label{eq:lgivenSBayes}
+\end{equation}
+
+The prior probability of a chord sequence $p(L)$ can be learned from a labeled dataset of chord sequences, and the likelihood can be found using a probabilistic harmony model. The likelihood $p(S|L)$ can be found using 
+
+This would be better, but was beyond the scope of the project.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Conclusions
