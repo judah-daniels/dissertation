@@ -932,7 +932,7 @@ The PVHM is described by the following equation:
 The core of this model is that we find the most likely reduction $\mathcal{R}(S)$ of the surface $S$ by inferring the most likely protovoice structure $\hat{D}$, using $top:\mathbf{D} \to \mathbf{S'}$. Given the reduced surface $\mathcal{R}(S)$ we finally solve $\hat{L} = \argmax_L P(L|S, \mathcal{R}(S)) \cdot P(L)$, finding the most likely sequence of chord labels $\hat{L}$ given the reduced surface $\mathcal{R}(S)$
 
 \subsubsection{Development plan}
-This system is modular by design, leading to a natural progression of complexity during the implementation; the baseline models provide a subset of the functionality required for the full system. For example, the harmony model is a prerequisite for the first baseline, but is also used in all subsequent models. 
+This system is modular by design, leading to a natural progression of complexity throughout the implementation; the baseline models provide a subset of the functionality required for the full system. For example, the harmony model is a prerequisite for the first baseline, but is also used in all subsequent models. 
 
 \begin{itemize}
   \item The Baseline Reduction computes a simplified $\mathcal{R}(S)$ using random sampling. 
@@ -943,10 +943,10 @@ This system is modular by design, leading to a natural progression of complexity
   \item The Dual Beam Search implements a custom search algorithm using $\mathcal{H}_0$, parameterised by $\alpha$ and $\beta$, which control operation dependent beam widths.  
 \end{itemize}
 
-\begin{equation}
-  P(S|L) = \sum\limits_{D,S'} P(S|D)~P(D|S')~P(S'|L)
-  \label{eq:inferencePVEQ}
-\end{equation}
+% \begin{equation}
+%   P(S|L) = \sum\limits_{D,S'} P(S|D)~P(D|S')~P(S'|L)
+%   \label{eq:inferencePVEQ}
+% \end{equation}
 \section{Repository Overview:}
 
 \subsubsection{Repository Justification}
@@ -962,7 +962,7 @@ The repository has been split into four main folders, with the addition of \text
 Figure~\ref{fig:blockDiagram} illustrates how these modules are connected. 
 
 % \vspace{50\baselineskip}
-\begin{figure}
+\begin{figure}[h]
   \centering
   \includegraphics[width=\textwidth]{blockDiagram.png}
   \caption{Block diagram of project components}
@@ -970,8 +970,7 @@ Figure~\ref{fig:blockDiagram} illustrates how these modules are connected.
 \end{figure}
 
 {
-
-\begin{table}[!t]
+\begin{table}[h]
   \DTsetlength{0em}{1.3em}{0em}{0.7pt}{3pt}       
   \setlength{\DTbaselineskip}{15pt}  %minimum size for \normalsize
   \renewcommand{\DTstyle}{\ttfamily}
@@ -1042,99 +1041,234 @@ Unit Tests (Section x)
 \end{tabularx}
 \end{table}
 }
+
 % The repository for this project is a fork of an existing repository that contains useful data-types and functions for working with the protovoice model \cite{finkensiepModelingInferringProtovoice2021}. Uses these allows for interoperability with other projects involving the model.
 
-
+\FloatBarrier
 \section{Core Implementation}
 
 
-\begin{itemize}
-  \item First we use the \textit{protovoice model} to \textit{reduce} a musical surface, simplifying the score by removing redundant notes from the surface, using domain specific knowledge to infer the most likely latent structure, $\hat{D}$, which is in turn used to infer the most likely reduced surface, $S'$.
-    % \footnote{We are relying on the assumption that this structure is somehow shared between the processes of composition, listening, and analysis. This is a fair assumption to make given they are all considering the same thing.}. 
-  \item Subsequently, using a \textit{harmony model} $P(S'|L)$ we find the conditional likelihood of the \textit{reduced} surface $S'$ given a hypothesised sequence of labels, $L$.
-  \item Finally, we choose the sequence of labels $\hat{L}$ that \textit{maximises the likelihood} of the reduced score.
-\end{itemize}
+% \begin{itemize}
+%   \item First we use the \textit{protovoice model} to \textit{reduce} a musical surface, simplifying the score by removing redundant notes from the surface, using domain specific knowledge to infer the most likely latent structure, $\hat{D}$, which is in turn used to infer the most likely reduced surface, $S'$.
+%     % \footnote{We are relying on the assumption that this structure is somehow shared between the processes of composition, listening, and analysis. This is a fair assumption to make given they are all considering the same thing.}. 
+%   \item Subsequently, using a \textit{harmony model} $P(S'|L)$ we find the conditional likelihood of the \textit{reduced} surface $S'$ given a hypothesised sequence of labels, $L$.
+%   \item Finally, we choose the sequence of labels $\hat{L}$ that \textit{maximises the likelihood} of the reduced score.
+% \end{itemize}
+%
+% We find a \textbf{reduction} of the original surface $S$, denoted $\hat{S'} = top(\argmax_D P(D|S))$
+%
+% The approach taken in the PVHM is as follows:
+%
+%
+%
+% The method I will use to infer harmony using the protovoice model is to find a plausible \textit{reduced surface} $S'$ which has one slice per chord label, having explicitly explained away non chord-tones (ornamentations) through protovoice edges. 
+% Given this, the chord labels can be inferred using a model of harmony.
+%
 
-We find a \textbf{reduction} of the original surface $S$, denoted $\hat{S'} = top(\argmax_D P(D|S))$
-
-The approach taken in the PVHM is as follows:
-
-
-
-The method I will use to infer harmony using the protovoice model is to find a plausible \textit{reduced surface} $S'$ which has one slice per chord label, having explicitly explained away non chord-tones (ornamentations) through protovoice edges. 
-Given this, the chord labels can be inferred using a model of harmony.
 
 \subsection{End to End Pipeline}
+The next step was to implement a full end-to-end pipeline from input to chord label predictions.
+This was achieved writing \texttt{preprocessing.py}, \texttt{experiments.ipynb} and \texttt{analysis.ipynb}. This was then containerised using Docker, so that experiments could be run using a HPC. A jupyter-lab environment was set up to run the full pipeline.
+
+
+\subsubsection{Data set selection}
+The datasets used contain a selection or corpuses, bodies of work by a single conposer as shown below, these were selected to exhibit a range of different styles. 
+
 \subsubsection{Evaluation Plan}
+Split into a development set and a hold out validation set.
+Hyper parameters are chosen using 10 fold cross validation.
+Evaluation is done using the hold out validation set. 
+This allows assessment of how well the model predicts \textbf{unseen} inputs.
+We are also assessing the trade-off between accuracy and performance.
 
 \subsection{Harmony Model}
-We are making the assumption that the score is a realisation of the latent harmonic entities. 
 
-Outline of the probabilistic model of harmony, describing the parts that are relevant for harmonic annotations. This section allows the reader to understand the evaluation and heuristic modules.
+The first step was to implement the harmony model that allows us to compute $P(L|S')$ and $P(L|S)$. This provides a framework to evaluate all developed algorithms. We use log probabilities.
 
-\subsubsection{Model definition}
-We have a set of pitches $\mathcal{P}$ and a set chord-types $\mathcal{C}$. A chord label is defined as a tuple of \textit{root note} pitch and chord-type: $\mathcal{L} = \mathcal{P} \times \mathcal{C}$. We perform a transform of the pitches of each note relative to the chord's root note that is being considered, such that we only need to consider the chord type. 
 
-\par
-The priors for the model are as follows:
+\subsubsection{Predicting labels from reduced slices}
+We have a set of pitches $\mathcal{P}$ and a set chord-types $\mathcal{C}$.
+A chord label is defined as a tuple of \textit{root note} pitch and chord-type: $\mathcal{L} = (\mathcal{P}, \mathcal{C})$. 
+Consider a slice $s = \left\{ p_1^{m(p_1)} , \dots, p_n^{m(p_n)} \right\}$ where $p_i \in \mathcal{P}$. We consider all possible chord labels $l \in \mathcal{L}$.
+% We perform a transform of the pitches of each note relative to the chord's root note that is being considered, such that we only need to consider the chord type. 
+
+The goal is to find:
 \begin{equation}
-\begin{align*} 
-              && \vec{\chi} &\sim \text{Dirichlet}(0.5, |\mathcal{C}|)     && \text{prior of the chord type} \\
-              && \lambda &\sim \text{Gamma}(3, 1)     && \text{prior of the note rate} \\
-  \forall c:  && \theta_c  &\sim \text{Beta}(1, 1)        && \text{prior of each note being a chordtone/ ornament} \\
-  \forall c:  && \vec{\phi}_{ct}^{c}  &\sim \text{Dirichlet}(0.5, |\mathcal{P}|)        && \text{pitch for each ornament} \\
-  \forall c:  && \vec{\phi}_{or}^{c}  &\sim \text{Dirichlet}(0.5, |\mathcal{P}|)        && \text{pitch for each chord tone} \\
-  % \forall i:  && L_i | \vec{\chi} &\sim \text{Categorical}(\vec{\chi}) && \text{chord label of each data point} \\
-  %             && N_i | L_i, v &\sim \text{Multinomial}(v_{L_i})  && \text{notes of each data point} \\
-\end{align*}
-\label{eq:phm}
-\end{equation}
-\par 
-Given this model we use it to generate a single chord as follows:
-
-\par
-Then describe how to go from the parameters to chord, chordtone and ornamentation distributions
-\par
-
-\subsubsection{Model inference}
-Given the model, we use a dataset to learn the parameters of the model. These parameters can then be used for inference as follows.
-For each datapoint, the chord label 
-\begin{equation}
-\begin{align*} 
-  \forall i:  && L_i | \vec{\chi} &\sim \text{Categorical}(\vec{\chi}) && \text{chord label of each data point} \\
-              && N_i | L_i, v &\sim \text{Multinomial}(v_{L_i})  && \text{notes of each data point} \\
-\end{align*}
-\label{eq:chordlabeldp}
+  \hat{l} = \arg\max_l P(l|s)
+  \label{eq:}
 \end{equation}
 
-\par
-Chordtypes, $C = \{\text{M,~m, Mm7, om, o7, mm7, \%7, MM7, +, Ger, It, Fr, mM7, +7}\}$
+We choose to find $P(s|l)$ rather than $P(s|l)$ as it gives us a \textit{confidence} in our prediction, given by $P(\hat{l}|s)$.
 
-\[\vec{\chi}' \sim \text{Dirchlet} (\text{pHarmonies}, n_c) \]
+We first consider the simple case that all pitches in the slice $s$ are \textit{chord-tones} of the actual label.
 
-\[\vec{\chi} = \mathbb{E} (\vec{X}_i) = \frac{\alpha_i}{\sum\limits_j \alpha_j} \]
+We model the generation of a slice $s$ of size $n$ from a label $l$ as follows:
 
-Chord: \[c \sim \text{Categorical}(\vec{\chi})\]
+\begin{equation}
+  \begin{gathered}
+    % &$For $i \in 1 \dots n$ :$ \\
+    &s \sim $Multinomial$(n, |\mathcal{P}|,\bm{\Phi}_l)\\
+    &$where $\bm{\phi}_{l}^{(p)} = P($Pitch $=c | $Label $=l)\\ 
+    % &$where $\bm{\phi}^T = \left[\bm{\phi}_{1}~~\bm{\phi}_{2}~~\dots~~\bm{\phi}_{|L|} \right]\ 
+    % &$and $\bm{\phi_} = \left[\bm{\phi}_{1}~~\bm{\phi}_{2}~~\dots~~\bm{\phi}_{|L|} \right]\ 
+  \end{gathered}
+  \label{eq:sliceModel}
+\end{equation}
 
-Single chordtone distribution. We want to find $P(p|c, ct)$ probability of the pitch given the chord, and that the note is a chordtone:
-\[\vec{\phi}_{ct}' \sim \text{Dirchlet}(pChordtones, n_p) \implies \vec{\phi}\]
+We define the slice vector $\bm{v}(s) = \left[~m(p_1)~ m(p_2)~\dots~m(p_{k})~\right]$ where $k = |\mathcal{P}|$. Then $P(l|s)$ is given by: 
+\footnote{Struggling with naming here. Using $P$ for pitches conflicts the $P$ for probability.  }
+\begin{equation}
+  \begin{gathered}
+    \begin{aligned}
+      P(l|s) &= P(s|l)\cdot P(l) \\
+             &= f(\bm{v}(s), \bm{\phi}_l)\cdot P(l) \\
+    \end{aligned} \\
+    \text{where $f$ is the multinomial probability density function} \\ 
+    f(x_1, \dots, x_k;p_1, \dots, p_k) = \frac{\Gamma \left(\sum\limits_{i} x_i + 1 \right)}{\prod\limits_{i} \Gamma \left(x_i + 1\right)}~\prod\limits_{i=1}^{k} p_{i}^{x_i}
+  \end{gathered}
+  \label{eq:labelgivenchordtones}
+\end{equation}
 
-For each of these parameters we use the MLE to get our probability distribution. 
-\[\vec{\phi}_{ct} = \text{MLE} (\vec{\phi}_{ct}')\]
-\[\vec{\phi}_{or} = \text{MLE} (\vec{\phi}_{or}')\]
-\[\vec{\chi}= \text{MLE} (\vec{\chi}') \]
-Then for each chord tone,
-\[p_{ct} \sim \text{Categorical}(\vec{\phi}_{ct})\]
-\[p_{or} \sim \text{Categorical}(\vec{\phi}_{or})\]
-We get the distribution of likelihoods for each pitch.
+The log probability $\log P(l|s)$ is given by 
+\begin{equation}
+  \begin{align}
+    \log P(l|s) &= \log P(s|l) + \log P(l) \\      
+                &= \cdots \\
+                &= \log \left(\Gamma\left(\sum\limits_{i} x_i + 1\right) \right) 
+                +  \sum\limits \left( x_i \log p_i^{x_i} - \log \Gamma (x_i + 1) \right) 
+                +  \log P(l)
+  \end{align}
+  \label{eq:loglabelgivenchordtones}
+\end{equation}
 
+So to find the most likely label $l$ given slice $s$ we take:
+\begin{equation}
+  \hat{l} = \arg\max_l \left(\log \left(\Gamma\left(\sum\limits_{i} x_i + 1\right) \right) 
+                +  \sum\limits \left( x_i \log p_i^{x_i} - \log \Gamma (x_i + 1) \right) 
+                +  \log P(l) \right)
+  \label{eq:loglabsol}
+\end{equation}
+
+ %  | otherwise = logFactorialN + logPowers
+ % where
+ %  n = sum xs
+ %  logFactorialN = logGamma $ n + 1
+ %  logPowers = sum $ zipWith powers xs probs
+ %   where
+ %    powers x y = x * log y - logGamma (x + 1)
+
+The full derivation has been omitted for the sake of brevity. Given that $|\mathcal{P}|$ is finite ($30$? I forgot) we can solve this directly. 
+
+\subsubsection{Predicting chordness}
+This is to guide the heuristic search.
+
+We define \textit{chordness} as the likelihood that a given slice could have been generated by the most likely label $\hat{l}$.
+
+\begin{equation}
+  \text{Chordness}(s) = P(s | \hat{l}) P(\hat{l} | s) 
+  \label{eq:chordness}
+\end{equation}
+where $\hat{l} = \argmax_l P(l | s)$ as above.
+
+% Given whether or not each pitch is a chord-tone is independent, we can find $\sum\limits_{p\in s} P(p | l) = \sum\limits_{p \in s} \bm{\phi}$
+
+% The parameters are as follows:
+% \begin{itemize}
+%   \item $\bm{\lambda}$
+%   \item $\bm{\mu}$
+%   \item $\bm{\nu}$
+%   \item $\bm{\xi}$
+%   \item $\bm{\chi}$
+%   \item $\bm{\psi}$
+% \end{itemize}
+%
+% Thus to find $P(s|l)$ we evaluate the multinomial probability density function 
+%
+%
+% \begin{equation}
+% \begin{align*} 
+%               && \vec{\chi} &\sim \text{Dirichlet}(0.5, |\mathcal{C}|)     && \text{prior of the chord type} \\
+%               && \lambda &\sim \text{Gamma}(3, 1)     && \text{prior of the note rate} \\
+%   \forall c:  && \theta_c  &\sim \text{Beta}(1, 1)        && \text{prior of each note being a chordtone/ ornament} \\
+%   \forall c:  && \vec{\phi}_{ct}^{c}  &\sim \text{Dirichlet}(0.5, |\mathcal{P}|)        && \text{pitch for each ornament} \\
+%   \forall c:  && \vec{\phi}_{or}^{c}  &\sim \text{Dirichlet}(0.5, |\mathcal{P}|)        && \text{pitch for each chord tone} \\
+%   % \forall i:  && L_i | \vec{\chi} &\sim \text{Categorical}(\vec{\chi}) && \text{chord label of each data point} \\
+%   %             && N_i | L_i, v &\sim \text{Multinomial}(v_{L_i})  && \text{notes of each data point} \\
+% \end{align*}
+% \label{eq:phm}
+% \end{equation}
+%
+%
+%
+% \par
+% The priors for the model are as follows:
+% \begin{equation}
+% \begin{align*} 
+%               && \vec{\chi} &\sim \text{Dirichlet}(0.5, |\mathcal{C}|)     && \text{prior of the chord type} \\
+%               && \lambda &\sim \text{Gamma}(3, 1)     && \text{prior of the note rate} \\
+%   \forall c:  && \theta_c  &\sim \text{Beta}(1, 1)        && \text{prior of each note being a chordtone/ ornament} \\
+%   \forall c:  && \vec{\phi}_{ct}^{c}  &\sim \text{Dirichlet}(0.5, |\mathcal{P}|)        && \text{pitch for each ornament} \\
+%   \forall c:  && \vec{\phi}_{or}^{c}  &\sim \text{Dirichlet}(0.5, |\mathcal{P}|)        && \text{pitch for each chord tone} \\
+%   % \forall i:  && L_i | \vec{\chi} &\sim \text{Categorical}(\vec{\chi}) && \text{chord label of each data point} \\
+%   %             && N_i | L_i, v &\sim \text{Multinomial}(v_{L_i})  && \text{notes of each data point} \\
+% \end{align*}
+% \label{eq:phm}
+% \end{equation}
+% \par 
+% Given this model we use it to generate a single chord as follows:
+%
+% \par
+% Then describe how to go from the parameters to chord, chordtone and ornamentation distributions
+% \par
+
+% \subsubsection{Model inference}
+% Given the model, we use a dataset to learn the parameters of the model. These parameters can then be used for inference as follows.
+% For each datapoint, the chord label 
+% \begin{equation}
+% \begin{align*} 
+%   \forall i:  && L_i | \vec{\chi} &\sim \text{Categorical}(\vec{\chi}) && \text{chord label of each data point} \\
+%               && N_i | L_i, v &\sim \text{Multinomial}(v_{L_i})  && \text{notes of each data point} \\
+% \end{align*}
+% \label{eq:chordlabeldp}
+% \end{equation}
+%
+% \par
+
+% Chordtypes, $C = \{\text{M,~m, Mm7, om, o7, mm7, \%7, MM7, +, Ger, It, Fr, mM7, +7}\}$
+%
+% \[\vec{\chi}' \sim \text{Dirchlet} (\text{pHarmonies}, n_c) \]
+%
+% \[\vec{\chi} = \mathbb{E} (\vec{X}_i) = \frac{\alpha_i}{\sum\limits_j \alpha_j} \]
+%
+% Chord: \[c \sim \text{Categorical}(\vec{\chi})\]
+%
+% Single chordtone distribution. We want to find $P(p|c, ct)$ probability of the pitch given the chord, and that the note is a chordtone:
+% \[\vec{\phi}_{ct}' \sim \text{Dirchlet}(pChordtones, n_p) \implies \vec{\phi}\]
+%
+% For each of these parameters we use the MLE to get our probability distribution. 
+% \[\vec{\phi}_{ct} = \text{MLE} (\vec{\phi}_{ct}')\]
+% \[\vec{\phi}_{or} = \text{MLE} (\vec{\phi}_{or}')\]
+% \[\vec{\chi}= \text{MLE} (\vec{\chi}') \]
+% Then for each chord tone,
+% \[p_{ct} \sim \text{Categorical}(\vec{\phi}_{ct})\]
+% \[p_{or} \sim \text{Categorical}(\vec{\phi}_{or})\]
+% We get the distribution of likelihoods for each pitch.
+%
 %
 % Provide an outline of the heuristic search paradigm with a formalisation.
 % \par
 % Provide a brief overview of different techniques that are used to prune the search space that might be relevant.
 
 \subsection{Protovoice Parser}
-This is not a descriptive name. Think of a new name to describe the implementation of the search space of partial reductions. We use the outer representation of structure and outer operations. This is an abstraction.
+
+The goal of this section is to construct a parser for the protovoice model $S \to D$. We represent each step as a \texttt{state} and implement \texttt{expand(state)} such that we can use search algorithms to conduct the parse.
+
+Decision as to how to run the parse. We choose have a single point of reduction to lower the number of options at each step.
+
+Given the path graph is linear we treat the surface as a string. 
+
+And apply redution ooperations, reversing the production rules.
+
 
 \subsubsection{Parsing Operations}
 Piece represented by an alternating list of slices and transitions, this is called a path. Define path formally. inductive definitions. dont need the Nothing: just Path trans slice. Transition can be frozen or unfrozen, and boundary or non boundary. Boundary is represented by vertical line, frozen is represented by two lines.
@@ -1345,7 +1479,6 @@ In the case that there are 85,000,000 options, perhaps we should sample the opti
 This version of heuristic search should be able to parse full pieces (hopefully), so can be used to compare with the baselines on an entire corpus.
 \par 
 Beam of size n, with 1 for a freeze, k for spread, n-k-1 
-
 
 \subsection{Dual Beam Search}
 
