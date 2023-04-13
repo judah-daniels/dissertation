@@ -2,8 +2,11 @@
 \documentclass[12pt,a4paper,twoside,openright]{report}
 \usepackage[pdfborder={0 0 0}]{hyperref}    % turns references into hyperlinks
 \usepackage[left=25mm, right=25mm, bottom=25mm, top=20mm]{geometry}  % adjusts page layout
+\usepackage{karnaugh-map}
+\usepackage{tikz}
 \usepackage{graphicx}  % allows inclusion of PDF, PNG and JPG images
 \usepackage{bm}
+\usepackage{listings}
 \usepackage{titlesec}
 \usepackage{subcaption}
 \usepackage{array}
@@ -27,6 +30,37 @@
 \usepackage{cite}
 \usepackage{float} % Prevent Latex from repositioning tables
 \usepackage{graphicx}
+% \usepackage{listings}
+
+\lstset{
+  language=Haskell,
+  basicstyle=\linespread{1}\ttfamily\footnotesize,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray}\textit,
+  stringstyle=\color{orange},
+  showstringspaces=false,
+  breaklines=true,
+  % frame=lines,
+  rulecolor=\color{gray},
+  % numbers=left,
+  % numberstyle=\tiny\color{gray},
+  xleftmargin=2em,
+  framexleftmargin=1.5em,
+  aboveskip=1em,
+  belowskip=1em,
+  escapeinside={(*}{*)},
+  captionpos=b
+}
+
+% lstset{
+%   language=Haskell,
+%   basicstyle=\ttfamily\small,
+%   breaklines=true,
+%   frame=single,
+%   numbers=left,
+%   numberstyle=\tiny\color{gray},
+%   showstringspaces=false
+% }
 
 %--- Remove hbox warning
 \hfuzz=5000.002pt 
@@ -932,7 +966,7 @@ The PVHM is described by the following equation:
 The core of this model is that we find the most likely reduction $\mathcal{R}(S)$ of the surface $S$ by inferring the most likely protovoice structure $\hat{D}$, using $top:\mathbf{D} \to \mathbf{S'}$. Given the reduced surface $\mathcal{R}(S)$ we finally solve $\hat{L} = \argmax_L P(L|S, \mathcal{R}(S)) \cdot P(L)$, finding the most likely sequence of chord labels $\hat{L}$ given the reduced surface $\mathcal{R}(S)$
 
 \subsubsection{Development plan}
-This system is modular by design, leading to a natural progression of complexity throughout the implementation; the baseline models provide a subset of the functionality required for the full system. For example, the harmony model is a prerequisite for the first baseline, but is also used in all subsequent models. 
+This system is modular by design, leading to a natural progression of complexity throughout the implementation; the baseline models provide a subset of the functionality required for the full system. For example, the harmony model is a prerequisite for the first baseline, but is also used in all subsequent models. \footnote{This could be complemented by a diagram showing the progression}
 
 \begin{itemize}
   \item The Baseline Reduction computes a simplified $\mathcal{R}(S)$ using random sampling. 
@@ -1072,13 +1106,20 @@ This was achieved writing \texttt{preprocessing.py}, \texttt{experiments.ipynb} 
 
 
 \subsubsection{Data set selection}
-The datasets used contain a selection or corpuses, bodies of work by a single conposer as shown below, these were selected to exhibit a range of different styles. 
 
-\subsubsection{Evaluation Plan}
-Split into a development set and a hold out validation set.
-Hyper parameters are chosen using 10 fold cross validation.
-Evaluation is done using the hold out validation set. 
-This allows assessment of how well the model predicts \textbf{unseen} inputs.
+The datasets used contain a selection or corpuses, bodies of work by a single composer as shown below, these were selected to exhibit a range of different styles. 
+Each dataset contains an entire set work by a composer consisting of between $15-50$ annotated scores, each with varying lengths.
+
+We divide each dataset into training, validation, and test sets, using a 60:20:20 split, using \textit{stratified sampling} in order to maintain a balanced representation of the different composers.
+
+\subsubsection{Choosing Hyperparameters}
+
+In order to choose hyperparameters, we combine the training and validation sets from each of the five datasets into a single training pool, then use 5-fold cross-validation using the training pool. 
+
+\subsubsection{Final evaluation plan}
+
+For the final evaluation, the performance of all developed algorithms will be evaluated on the hold-out test set (20\%). This is to provide an unbiased estimate of each algorithm's performance on \textbf{unseen} data.
+
 We are also assessing the trade-off between accuracy and performance.
 
 \subsection{Harmony Model}
@@ -1108,7 +1149,7 @@ We model the generation of a slice $s$ of size $n$ from a label $l$ as follows:
   \begin{gathered}
     % &$For $i \in 1 \dots n$ :$ \\
     &s \sim $Multinomial$(n, |\mathcal{P}|,\bm{\Phi}_l)\\
-    &$where $\bm{\phi}_{l}^{(p)} = P($Pitch $=c | $Label $=l)\\ 
+    &$where $\bm{\phi}_{l}^{(p)} = P($Pitch $=p | $Label $=l)\\ 
     % &$where $\bm{\phi}^T = \left[\bm{\phi}_{1}~~\bm{\phi}_{2}~~\dots~~\bm{\phi}_{|L|} \right]\ 
     % &$and $\bm{\phi_} = \left[\bm{\phi}_{1}~~\bm{\phi}_{2}~~\dots~~\bm{\phi}_{|L|} \right]\ 
   \end{gathered}
@@ -1263,109 +1304,192 @@ where $\hat{l} = \argmax_l P(l | s)$ as above.
 
 The goal of this section is to construct a parser for the protovoice model $S \to D$. We represent each step as a \texttt{state} and implement \texttt{expand(state)} such that we can use search algorithms to conduct the parse.
 
-Decision as to how to run the parse. We choose have a single point of reduction to lower the number of options at each step.
+\subsubsection{Parse state}
 
-Given the path graph is linear we treat the surface as a string. 
+We will represent the state as a path graph, and construct a \textit{leftmost} derivation of the surface given protovoice operations.
 
-And apply redution ooperations, reversing the production rules.
-
-
-\subsubsection{Parsing Operations}
-Piece represented by an alternating list of slices and transitions, this is called a path. Define path formally. inductive definitions. dont need the Nothing: just Path trans slice. Transition can be frozen or unfrozen, and boundary or non boundary. Boundary is represented by vertical line, frozen is represented by two lines.
-
-\begin{figure}[ht]
+\begin{figure}[h]
   \centering
-  \includegraphics[width=\textwidth]{pathFromSlices}
-  \caption{Path initiliasation}
-  \label{fig:pathInit}
+  \begin{subfigure}[t]{\textwidth}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{impl/parseState/frozen}
+    \caption{\texttt{SSFrozen}}
+    \label{fig:ssfrozen}
+  \end{subfigure}
+  \begin{subfigure}[t]{\textwidth}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{impl/parseState/semiopen}
+    \caption{\texttt{SSSemiOpen}}
+    \label{fig:sssemiopen}
+  \end{subfigure}
+  \begin{subfigure}[t]{\textwidth}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{impl/parseState/open}
+    \caption{\texttt{SSFrozen}}
+    \label{fig:ssfrozen}
+  \end{subfigure}
+  \captionsetup{width=.9\linewidth}
+  \caption{Parse states}
+  \label{fig:parseState}
 \end{figure}
 
-\begin{definition}[Path]
-A path is an alternating sequence of an two types of elements, in our case transitions and slices. Definition: Haskell code block or mathematical definition?
-\end{definition}
-
-Our goal is to reduce the piece into a partial reduction by applying operations until we have one slice per segment. Diagram of this state. This means we have one group of notes per segment, and this group of notes should represent the harmony of the segment.
-
-We parse by applying the inverse of the generative operations, right to left. Unsplit, Unspread, Unfreeze.
-\par
-
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[width=\textwidth]{parseops}
-  \caption{Parse operations}
-  \label{fig:parseops}
-\end{figure}
-
-\FloatBarrier
-\subsubsection{State Space}
+We begin in the frozen state, at the end of the piece.
 
 This is how we define the search. We start at the right, the end of the piece. We have a pointer to the current node, and all preceeding slices are open and subsequent slices are frozen. Open Slices can be reduced, but only to the point that there is one slice in a segment. We keep track of the operations performed as it (1). allows us to the draw out the derivation for the partial reduction at the end, and (2). it is used later for calculate a cost for each operation for the heuristic search.
 
 
 
+\begin{lstlisting}[caption={protovoiceEvaluator}, captionpos=b]
+data SearchState es es' ns o
+  = SSFrozen !(Path (Maybe es', Bool) (SliceWrapped ns)) 
+  -- ^ Beginning of search - all frozen edges and slices
+  | SSSemiOpen 
+  -- ^ Mid-search
+      { _ssFrozen :: !(Path (Maybe es', Bool) (SliceWrapped ns))
+      -- ^ frozen transitions and slices from current point leftward
+      , _ssMidSlice :: !(SliceWrapped ns)
+      -- ^ the slice at the current posision between gsFrozen and gsOpen
+      , _ssOpen :: !(Path (Trans es) (SliceWrapped ns))
+      -- ^ non-frozen transitions and slices from current point rightward
+      , _ssDeriv :: ![o]
+      -- ^ derivation from current reduction to original surface
+      }
+  | SSOpen !(Path (Trans es) (SliceWrapped ns)) ![o] 
+  -- ^ Single path with unfrozen transition,slices and history
+\end{lstlisting}
+\footnote{This should be changed to \texttt{ParseState}}
 
-% \begin{figure}[h]
-%   \centering
-%   \includegraphics[width=\textwidth]{parsestates}
-%   \caption{Parse operations}
-%   \label{fig:parseops}
-% \end{figure}
+Decision as to how to run the parse. We choose have a single point of reduction to lower the number of options at each step.
+There were three choices as to how to run the parse:
+\begin{itemize}
+  \item Free derivation: Given that the reductions can be applied to arbitrary 
+  \item Right-most derivation:  
+  \item Left-most derivation: blah blah, we choose to do this because 
+\end{itemize}
 
-\begin{figure}[ht]
+
+\subsubsection{Parsing Operations}
+The \texttt{protoVoiceEvaluator} \cite{finkensiepModelingInferringProtovoice2021} provides an interface for the following functions. This code has been simplified in order to omit details:
+
+\begin{figure}[h]
   \centering
-  \includegraphics[width=\textwidth]{searchstate}
-  \caption{Search state}
-  \label{fig:searchstate}
+  \begin{subfigure}[t]{.2\textwidth}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{impl/eval/unfreeze}
+    \caption{\texttt{Unfreeze}}
+    \label{fig:splitOp}
+  \end{subfigure}
+  \begin{subfigure}[t]{.43\textwidth}
+    \centering\includegraphics[keepaspectratio,width=0.8\textwidth]{impl/eval/unspread}
+    \caption{\texttt{Unspread}}
+    \label{fig:spreadOP}
+  \end{subfigure}
+  \begin{subfigure}[t]{.3\textwidth}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{impl/eval/unsplit}
+    \caption{\texttt{Unsplit}}
+    \label{fig:freezeOp}
+  \end{subfigure}
+
+  \captionsetup{width=.9\linewidth}
+  \caption{Reduction operations.}
+  \label{fig:evalOps}
 \end{figure}
-\par
-\par
 
-\FloatBarrier
-\subsubsection{Enumerating State transitions}
+\begin{lstlisting}
 
-\begin{figure}[ht]
+type UnspreadMiddle tr slc v = 
+  (slc, tr, slc) -> Maybe (slc, v)
+
+type UnspreadLeft tr slc = 
+  (tr, slc) -> slc -> [tr]
+
+type UnspreadRight tr slc = 
+  (slc, tr) -> slc -> [tr]
+
+type Unsplit tr slc v =
+  StartStop slc -> tr -> slc -> tr -> StartStop slc -> SplitType -> [(tr, v)]
+
+type Unfreeze tr' tr slc =
+  StartStop slc -> Maybe tr' -> StartStop slc -> [(tr, v)]
+\end{lstlisting}
+
+Transition can be frozen or unfrozen, and boundary or non boundary. Boundary is represented by vertical line, frozen is represented by two lines.
+
+\subsubsection{Boundary handling}
+
+The goal of the parse is to reduce the surface such that there is one slice per segment. 
+
+In order to achieve this we impose constraints on which reduction operations can be performed, dependent on adjacent segment boundaries. 
+
+Each transition has a boolean boundary value which indicates if the transition is across a segment boundary. We use karnaugh maps to determine the boolean expression for these constraints. 
+Let $B_f$, $B_l$, $B_m$, and $B_r$ denote the boundary values of $t_f$, $t_l$, $t_m$ and $t_r$ respectively.
+
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width=0.75\textwidth]{impl/boundarydiagram/diag}
+  \end{center}
+  \caption{General Parse state}
+  \label{fig:parseStateBound}
+\end{figure}
+
+\begin{figure}[h]
   \centering
-  \includegraphics[width=0.7\textwidth]{frozenenum}
-  \caption{Unfreeze operation}
-  \label{fig:frozenenum}
+  \begin{subfigure}[t]{0.73\textwidth}
+    \centering
+    \begin{karnaugh-map}[4][2][1][$B_f$][$B_l$][$B_m$]
+      \end{karnaugh-map}
+    \caption{Unfreeze}
+    \label{fig:unfreezeKarn}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.65\textwidth}
+    \centering
+    \begin{karnaugh-map}[4][4][1][$B_f$][$B_l$][$B_m$][$B_r]
+      \end{karnaugh-map}
+    \caption{Unsplit}
+    \label{fig:unfreezeKarn}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.3\textwidth}
+    \centering
+      \begin{karnaugh-map}[4][4][1][$B_f$][$B_l$][$B_m$][$B_r]
+      \end{karnaugh-map}
+    \caption{Unspread}
+    \label{fig:unfreezeKarn}
+  \end{subfigure}
+  \caption{Boundary constraints}
+  \label{fig:boundaryKarn}
 \end{figure}
 
+\subsubsection{Initialising the parse}
+The input consists of a list of slices, each with a boolean \texttt{Boundary} value which indicates if the given slice is the beginning of a new segment. 
 
-\begin{figure}[ht]
+\begin{figure}[h]
   \centering
-  \includegraphics[width=0.7\textwidth]{sssemiopenenum}
-  \caption{Enumeration of operations mid parse. Maybe for appendix? This could be much more concise.}
-  \label{fig:sssemiopenenum}
+  \includegraphics[width=0.6\textwidth]{pathFromSlices}
+  \caption{Parse Initialisation}
+  \label{fig:parseInit}
 \end{figure}
 
-\begin{figure}[ht]
+
+
+\subsubsection{Parse Steps}
+
+Figure~\ref{fig:parseStateOptions} shows the possible reductions in the general case. There are 4 options, but for each operation there are multiple inner reductions. EG for an unsplit ... 
+
+The cases for open and frozen and when there aren't 3+ open transitions has to be considered very carefully.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.85\textwidth]{impl/parseOps}
+  \caption{General parse state reductions}
+  \label{fig:parseStateOptions}
+\end{figure}
+
+\begin{figure}[h]
   \centering
   \includegraphics[width=\textwidth]{statetransitions}
   \caption{State Transition diagram}
   \label{fig:statetrans}
 \end{figure}
-\FloatBarrier
 
 In the state transition diagram (Figure \ref{fig:statetrans}), we see all the possible parse states (Is this actually useful? Maybe for appendix). This was useful for me as it helps to conceptualise how the full parse actually works. The dimensions of this digramm of the search state depends on the length of the piece, and the size of each segment. We can see that there is a process of moving to the right to unfreeze transitions, and moving towards the left during reduction operations. Perhaps some simplification of the diagram would be useful. This transition diagram does not consider segment boundaries.
 
 \FloatBarrier
-\subsubsection{Boundary handling}
-
-It is important thhat we don't reduce to an empty segment, because that would mean we've lost all information about the segment, and would not be able to make a harmonic inference. In order to prohibit this, we add additional constraints to the parse operations for each opertation based on the boolean boundary value of all involved transitions.
-\par
-We use karnaugh maps to determine the boolean expression for these constraints.
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[width=0.7\textwidth]{karnaughunfreeze}
-  \caption{Determine boolean boundary expressions for the freeze operations}
-  \label{fig:karnaugh}
-\end{figure}
-
-\par 
-Could show other maps in the appendix.
-
 \section{Baseline implementation}
 
 
@@ -1388,11 +1512,7 @@ Step 1: Design heuristic to be as accurate as possible. I.e the extreme is to co
 \par
 First the full piece heuristic parse 
 \par
-Problem of very large slices.\\ 
-Segment by segment heuristic parse - avoids the problem, but is slightly hacky. Can we incorprate our knowledge regarding the relative proportion of chord tones and ornaments. Should we allow duplicates of notes in slices? Perhaps we should favour spreads more. 
-\par
-Always consider a certain number of slices and spreads.
-\par
+The goal of the heuristic is to find the probability of a reduction. 
 
 \begin{figure}[ht]
   \centering
@@ -1469,7 +1589,16 @@ We assign 0 cost to unfreeze operations. This means we need to be careful about 
 We need to combine all of these in a fair way. Also the distinction between splits and spreads need to be considred, as they are different operations, the calculations of likelihood may cause an imbalance. All likelihoods are stored in log space.
 
 \FloatBarrier
-\subsection{Greedy Search}
+\subsection{Best-First Search}
+Given the heuristic $\mathcal{H}_0$, the first option is to use a greedy search.
+We keep unfreeze operations as an option.
+
+We find that the number of operations causes a combinatorial blowup, so the search doesn't end.
+
+Problem of very large slices.\\ 
+Segment by segment heuristic parse - avoids the problem, but is slightly hacky. Can we incorprate our knowledge regarding the relative proportion of chord tones and ornaments. Should we allow duplicates of notes in slices? Perhaps we should favour spreads more. 
+
+Always consider a certain number of slices and spreads.
 
 \subsection{Beam Search}
 Step 2: Relax the heuristic search in order to reduce runtime/ lower complexity.
@@ -1481,13 +1610,20 @@ This version of heuristic search should be able to parse full pieces (hopefully)
 Beam of size n, with 1 for a freeze, k for spread, n-k-1 
 
 \subsection{Dual Beam Search}
+It isn't clear how to determine how we should balance the costs of unspread and unsplit op
+
+\subsection{Stochastic Dual Beam Search}
+We propose sampling from the options, increasing the proportion that we ignore dependent on the number of options.
+
+\section{Choosing hyper parameters}
+
 
 \section{Testing}
-Show unit tests, and examples of the test/development cycle for the heuristic search development
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Evaluation
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Unit Tests}
+
+\subsection{Qualitative Tests}
+ Throughout the design of the heuristic $H_0$ and the implementation of different search algorithms, a few segments we used as reccuring test examples.
 
 \chapter{Evaluation}
 \textit{In this chapter, I provide qualitative and quantitative evaluations of the work completed. I then provide and interpret evidence to show that the success criteria were met.}
@@ -1499,18 +1635,13 @@ Show unit tests, and examples of the test/development cycle for the heuristic se
   \item \textit{How well my heuristic search algorithms infer chord labels?}
 \end{itemize}
 
-\section{Accuracy}
-Things to note
-\begin{itemize}
-  \item The fact that segmentation is known ahead of time provides a great deal of information \cite{gothamWhatIfWhen2021}
-  \item So we use comparisons between the random sample from each segment algorithm and the random parse algorithm to see if the use of the grammar provides an advantage over just sampling the notes directly, without looking at relations between notes.
-  \item Then we want a heuristic search algorithm that considers each option exhaustively and finds the best local option. This is too computationally expensive to be used for whole pieces. 
-  \item Given there can be millions of possible next states in the search, we need to look at different strategies to avoid searching through them all. E.g just sample states. 
-  \item Sensitivity Analysis for the heuristic search is useful for the evaluation. Explore how robust it is to handcrafted attacks/ different types of passages.
-  \item Could evaluate by segments instead of pieces. 
-\end{itemize}
+\section{Metrics}
+Ambiguity. which metrics exist? discussion.
+Accuracy and likelihood.
 
-\subsubsection{Probabilistic Model of Harmony}
+\section{Harmony Model}
+
+\subsection{Accuracy}
 When evaluating using the protovoice model: we assume that we result in only chord tones for each segment. Thus we use the chord tone probabilities to evaluate the prediction. 
 \par
 When just using a random sample, we have to assume that there is a mixture model of chord tones and ornaments. We use the learnt parameters to determine the distribution.
@@ -1523,14 +1654,36 @@ This gives us two key metrics, likelihood and accuracy.
 \par
 Could also use a more sophisticated notion of accuracy, using a chord similarity function \cite{humphreyFourTimelyInsights2015}. The {\texttt {mir\_eval}} package provides a plethora of metrics to compare chord label predictions \cite{raffelMirEvalTransparent2014}. 
 
-\section{Performance}
+\subsection{Sensitivity Analysis}
 
-\section{Heuristic Search (Extension)}
+\subsection{Qualitative Analysis}
+
+\section{Baseline Algorithms}
+Reminder of what the search is actually doing. 
+
+Things to note
+\begin{itemize}
+  \item The fact that segmentation is known ahead of time provides a great deal of information \cite{gothamWhatIfWhen2021}
+  \item So we use comparisons between the random sample from each segment algorithm and the random parse algorithm to see if the use of the grammar provides an advantage over just sampling the notes directly, without looking at relations between notes.
+  \item Then we want a heuristic search algorithm that considers each option exhaustively and finds the best local option. This is too computationally expensive to be used for whole pieces. 
+  \item Given there can be millions of possible next states in the search, we need to look at different strategies to avoid searching through them all. E.g just sample states. 
+  \item Sensitivity Analysis for the heuristic search is useful for the evaluation. Explore how robust it is to handcrafted attacks/ different types of passages.
+  \item Could evaluate by segments instead of pieces. 
+\end{itemize}
+
+\section{Extension Algorithms}
+
+\subsection{Accuracy}
+
+\subsection{Scalability}
+
+\subsection{Qualitative Analysis}
 
 \section{Success Criteria}
 
-\section{Limitations}
+I've shown that i met success criteria x by this analysiss. etc.
 
+\section{Limitations}
 
 I'm solving:
 
