@@ -570,8 +570,9 @@ The slices and transitions form a graph given slices as nodes and transitions as
       P &= a     &&&& a \in A \\
       P &= abP   &&&& a \in A, b \in B 
     \end{align}
-    \label{eq:biPath}
+    \label{eq:pathGraph}
   \end{equation}
+  \label{def:pathGraph}
 \end{definition}
 
 \begin{definition}[Outer Structure] ~\\The \textit{outer structure} is thus defined as a path graph, represented as:
@@ -658,7 +659,13 @@ Figure~\ref{fig:innerOuterStructure} gives an example derivation of the short ph
 \section{Parsing} % (fold)
 \label{sub:protovoiceParsing}
 
-The goal of parsing is to find a \textit{plausible derivation} of the given surface. For a derivation to be \textit{plausible}, the \textit{structure} it presents needs be consistent with a valid musical \textit{interpretation}. Although this is non-trivial, plausibility can be approximately represented by a probability distribution, analogously to probabilistic context free grammars(PCFGs).
+\subsubsection{Shift-reduce parsers}
+
+\subsubsection{Evaluating parses}
+
+Change all of this.
+
+When parsing based on ambiguous grammars, we wish to find a \textit{plausible derivation} of the given surface. For a derivation to be \textit{plausible}, the \textit{structure} it presents needs be consistent with a valid musical \textit{interpretation}. Although this is non-trivial, plausibility can be approximately represented by a probability distribution, analogously to probabilistic context free grammars(PCFGs).
 \par
 % \begin{definition}[Reduction]
 %   A \textit{reduction} is defined as as the inverse of a generative process, and is synonymous with a \textit{derivation}. When parsing we \textit{reduce} a piece by applying inverses of the generative operations. The structure midway through a parse of a surface is called a \textit{partial reduction} of that surface.
@@ -948,22 +955,26 @@ We present a \textbf{novel} inference system, the \textbf{ProtoVoice Harmony Mod
   \label{fig:inferenceOverview}
 \end{figure}
 
-% \begin{equation}
-%   P(S|L) = \sum\limits_{D,S'} P(S|D)~P(D|S')~P(S'|L)
-%   \label{eq:inferencePVEQ}
-% \end{equation}
-
 The PVHM is described by the following equation: 
 \begin{equation}
   \label{eq:pvhmSuccinct}
-  \begin{gathered}
-  \hat{L} = \argmax_L \Left( P(S|L, \mathcal{R}(S)) \cdot P(L) \Right)\\
-  \text{where $\mathcal{R}: \mathbf{S} \to \mathbf{S'}$ is given by:} \\
-  \mathcal{R} (S) = top \left(\argmax_D P(D|S) \right) \\
-  \end{gathered}
+  \begin{aligned}
+    \hat{L} &= \argmax_L 
+            \left( P(S|L,\hat{S'},\hat{D})\cdot P(L)\right) \\
+  \end{aligned} \\
 \end{equation}
+Where $\hat{D}$ denotes the inferred \textit{protovoice derivation} of the surface, obtained using a modified beam search algorithm that explores the state space of valid partial derivations of the $S$, guided by a heuristic $\mathcal{H_0}$.  
+$\hat{S}$ is the associated reduction of the surface, given by $top(\hat{D})$. 
 
-The core of this model is that we find the most likely reduction $\mathcal{R}(S)$ of the surface $S$ by inferring the most likely protovoice structure $\hat{D}$, using $top:\mathbf{D} \to \mathbf{S'}$. Given the reduced surface $\mathcal{R}(S)$ we finally solve $\hat{L} = \argmax_L P(L|S, \mathcal{R}(S)) \cdot P(L)$, finding the most likely sequence of chord labels $\hat{L}$ given the reduced surface $\mathcal{R}(S)$
+% \text{where $\hat{D}$ is a \textit{protovoice derivation}} \\
+% \text{and:}\\ 
+% \hat{S'} = top(\hat{D})
+
+The core of this model is that we find the most likely reduction $\mathcal{R}(S)$ of the surface $S$ by inferring the most likely protovoice structure $\hat{D}$. 
+The baseline algorithm achieves through a random search through the space of valid partial derivations. 
+The extension algorithms use an informed heuristic $H_0$ to guess $P(D|S)$ in order to guide the search, and explore the trade-offs between different search algorithms. 
+Given the inferred derivation we extract the corresponding reduced surface with $top:\mathbf{D} \to \mathbf{S'}$. 
+Given the reduced surface $\mathcal{R}(S)$ we finally solve $\hat{L} = \argmax_L P(L|S, \mathcal{R}(S)) \cdot P(L)$, finding the most likely sequence of chord labels $\hat{L}$ given the reduced surface $\mathcal{R}(S)$. 
 
 \subsubsection{Development plan}
 This system is modular by design, leading to a natural progression of complexity throughout the implementation; the baseline models provide a subset of the functionality required for the full system. For example, the harmony model is a prerequisite for the first baseline, but is also used in all subsequent models. \footnote{This could be complemented by a diagram showing the progression}
@@ -1139,9 +1150,10 @@ The goal is to find:
   \label{eq:}
 \end{equation}
 
-We choose to find $P(s|l)$ rather than $P(s|l)$ as it gives us a \textit{confidence} in our prediction, given by $P(\hat{l}|s)$.
+We choose to find $P(l|x)$ rather than $P(s|l)$ as it gives us a \textit{confidence} in our prediction, given by $P(\hat{l}|s)$.
 
-We first consider the simple case that all pitches in the slice $s$ are \textit{chord-tones} of the actual label.
+We consider case that all pitches in the slice $s$ are \textit{chord-tones} of the actual label. This is because there is a direct relationship between the chord-tones present in a segment, and the corresponding label. 
+% , whereas non-chord-tones  in other words, $s$ has already been reduced.
 
 We model the generation of a slice $s$ of size $n$ from a label $l$ as follows:
 
@@ -1199,17 +1211,6 @@ So to find the most likely label $l$ given slice $s$ we take:
  %    powers x y = x * log y - logGamma (x + 1)
 
 The full derivation has been omitted for the sake of brevity. Given that $|\mathcal{P}|$ is finite ($30$? I forgot) we can solve this directly. 
-
-\subsubsection{Predicting chordness}
-This is to guide the heuristic search.
-
-We define \textit{chordness} as the likelihood that a given slice could have been generated by the most likely label $\hat{l}$.
-
-\begin{equation}
-  \text{Chordness}(s) = P(s | \hat{l}) P(\hat{l} | s) 
-  \label{eq:chordness}
-\end{equation}
-where $\hat{l} = \argmax_l P(l | s)$ as above.
 
 % Given whether or not each pitch is a chord-tone is independent, we can find $\sum\limits_{p\in s} P(p | l) = \sum\limits_{p \in s} \bm{\phi}$
 
@@ -1302,86 +1303,88 @@ where $\hat{l} = \argmax_l P(l | s)$ as above.
 
 \subsection{Protovoice Parser}
 
-The goal of this section is to construct a parser for the protovoice model $S \to D$. We represent each step as a \texttt{state} and implement \texttt{expand(state)} such that we can use search algorithms to conduct the parse.
+The goal of this section is to construct a bottom-up parser for the protovoice model that can enumerate all valid protovoice derivations that produce a given surface: $S \to [D]$.
+The derivation can be described as a sequence of rule applications in \textit{left-most derivation order}, $D$, applied to the $top$ surface, $S'=top(D)$.  
 
-\subsubsection{Parse state}
+It is informative to consider the \textit{generation order} and \textit{parse order} of a protovoice derivation. 
+In generation order, we begin with the reduced surface $S'$ with a pointer at the left-most transition and apply each \texttt{split} or \texttt{spread} operation to the two left-most non-terminal transitions in the path graph, generating new slices and transitions. The \texttt{freeze} operation marks a transition as terminal thus shifts our pointer to the right. Operations are applied until the pointer is right-most, and all transitions are terminal, resulting in the fully elaborated surface $S$.
 
-We will represent the state as a path graph, and construct a \textit{leftmost} derivation of the surface given protovoice operations.
+Parsing is the inverse of generation: the parse begins with the elaborated surface $S$ with all transitions marked as terminal and the pointer at the right-most terminal transition. At any point of the parse, we can either \texttt{unfreeze} the transition to the left of the pointer, shifting the pointer to the left, or apply a \texttt{unsplit} or \texttt{unspread} reduction to the two transitions to the right of the pointer. Once the pointer is left-most and there is a single reduced slice for each chord segment at the top of the derivation, the resulting reduced surface is $S'$, defined $S' = top(D)$.
+
+This is a form of \textit{shift-reduce} parser, making one pass across the surface, right to left. The state of the parse is represented by \texttt{parseState} and implements \texttt{expand: parseState $\to$ [parseState]} such that we can use search algorithms to conduct the parse.
 
 \begin{figure}[h]
-  \centering
-  \begin{subfigure}[t]{\textwidth}
-    \centering\includegraphics[keepaspectratio,width=\textwidth]{impl/parseState/frozen}
-    \caption{\texttt{SSFrozen}}
-    \label{fig:ssfrozen}
-  \end{subfigure}
-  \begin{subfigure}[t]{\textwidth}
-    \centering\includegraphics[keepaspectratio,width=\textwidth]{impl/parseState/semiopen}
-    \caption{\texttt{SSSemiOpen}}
-    \label{fig:sssemiopen}
-  \end{subfigure}
-  \begin{subfigure}[t]{\textwidth}
-    \centering\includegraphics[keepaspectratio,width=\textwidth]{impl/parseState/open}
-    \caption{\texttt{SSFrozen}}
-    \label{fig:ssfrozen}
-  \end{subfigure}
-  \captionsetup{width=.9\linewidth}
-  \caption{Parse states}
-  \label{fig:parseState}
+  \centering\includegraphics[width=\textwidth]{impl/parseState/frozen.png}
+  \caption{\texttt{pSFrozen}}
+  \label{fig:pSFrozen}
 \end{figure}
 
-We begin in the frozen state, at the end of the piece.
+In the initial parse state, \texttt{pSFrozen}, the surface is represented as a \texttt{path} from the end to the beginning of the piece, with the right-most transition at its head.
+% the right most transition at it's head. The only operation from the initial state is to shift the pointer to the left by applying an \texttt{unfreeze} operation to the right-most transition. 
+% as a \textit{path graph} (Definition~\ref{def:pathGraph}) where the nodes are slices and the edges are transitions with unique start($\rtimes$) and stop($\ltimes$) symbols at the beginning and end of the piece.
+% The path graph is implemented as a \texttt{path}, a list of alternating transitions and slices, with 
 
-This is how we define the search. We start at the right, the end of the piece. We have a pointer to the current node, and all preceeding slices are open and subsequent slices are frozen. Open Slices can be reduced, but only to the point that there is one slice in a segment. We keep track of the operations performed as it (1). allows us to the draw out the derivation for the partial reduction at the end, and (2). it is used later for calculate a cost for each operation for the heuristic search.
+All transitions are initialised as frozen, indicated by the double lines in Figure~\ref{fig:pSFrozen}. The path graph begins on the right. In this initial state the only option is to unfreeze the rightmost transition, moving to the \texttt{pSSemiOpen} state. 
 
+\begin{figure}[h]
+  \centering\includegraphics[width=\textwidth]{impl/parseState/semiopen.png}
+  \caption{\texttt{pSSemiOpen}}
+  \label{fig:pSSemiOpen}
+\end{figure}
 
+The \texttt{pSSemiOpen} represents the majority of the parse. The pointer position is represented by \texttt{midSlice}. There is a \texttt{open} path of all non-terminal transitions (single line) from the pointer to the end of the piece, and a \texttt{frozen} path of all terminal transitions from the pointer to the start of the piece. The head of the frozen path is the right-most terminal transition.
+
+\begin{figure}[h]
+  \centering\includegraphics[width=\textwidth]{impl/parseState/open.png}
+  \caption{\texttt{pSOpen}}
+  \label{fig:pSOpen}
+\end{figure}
+
+The final state, \texttt{pSOpen}, has the pointer at the beginning of the piece, and has a single path \texttt{open} which contains only non-terminal transitions from the beginning to the end of the piece.
+
+Each state also stores the list of operations that, when applied to the current reduction, results in the original surface. % TODO JUSTIFICATION
 
 \begin{lstlisting}[caption={protovoiceEvaluator}, captionpos=b]
-data SearchState es es' ns o
-  = SSFrozen !(Path (Maybe es', Bool) (SliceWrapped ns)) 
+data ParseState es es' ns o
+  = psFrozen !(Path (Maybe es', Bool) (SliceWrapped ns)) 
   -- ^ Beginning of search - all frozen edges and slices
-  | SSSemiOpen 
+  | psSemiOpen 
   -- ^ Mid-search
-      { _ssFrozen :: !(Path (Maybe es', Bool) (SliceWrapped ns))
+      { _psFrozen :: !(Path (Maybe es', Bool) (SliceWrapped ns))
       -- ^ frozen transitions and slices from current point leftward
-      , _ssMidSlice :: !(SliceWrapped ns)
-      -- ^ the slice at the current posision between gsFrozen and gsOpen
-      , _ssOpen :: !(Path (Trans es) (SliceWrapped ns))
+      , _psMidSlice :: !(SliceWrapped ns)
+      -- ^ the slice at the current pointer
+      , _psOpen :: !(Path (Trans es) (SliceWrapped ns))
       -- ^ non-frozen transitions and slices from current point rightward
-      , _ssDeriv :: ![o]
+      , _psDeriv :: ![o]
       -- ^ derivation from current reduction to original surface
       }
-  | SSOpen !(Path (Trans es) (SliceWrapped ns)) ![o] 
+  | psOpen !(Path (Trans es) (SliceWrapped ns)) ![o] 
   -- ^ Single path with unfrozen transition,slices and history
 \end{lstlisting}
-\footnote{This should be changed to \texttt{ParseState}}
 
-Decision as to how to run the parse. We choose have a single point of reduction to lower the number of options at each step.
-There were three choices as to how to run the parse:
-\begin{itemize}
-  \item Free derivation: Given that the reductions can be applied to arbitrary 
-  \item Right-most derivation:  
-  \item Left-most derivation: blah blah, we choose to do this because 
-\end{itemize}
+This is not the only way to parse according to the protovoice model; the protovoice reduction rules can be applied to any pair of open transitions.
+Allowing reductions at any point along the surface could allow for different parse strategies to be employed that may have advantages.
+I choose not to pursue this due to the associated combinatorial explosion, and the benefits of being able to represent a protovoice derivation as a sequence of left-most reductions.
 
 
 \subsubsection{Parsing Operations}
-The \texttt{protoVoiceEvaluator} \cite{finkensiepModelingInferringProtovoice2021} provides an interface for the following functions. This code has been simplified in order to omit details:
+The \texttt{protoVoiceEvaluator} \cite{finkensiepModelingInferringProtovoice2021} provides the following methods: \texttt{Unfreeze}, \texttt{Unsplit}, \texttt{UnSpreadLeft}, \texttt{UnSpreadRight} and \texttt{UnSpreadMiddle}. These are used to enumerate reduction operations. This has the benefit of allowing us to only consider the outer structure of slices and transitions while parsing, without the need to delve into the details of the inner protovoice structure.
 
 \begin{figure}[h]
   \centering
   \begin{subfigure}[t]{.2\textwidth}
-    \centering\includegraphics[keepaspectratio,width=\textwidth]{impl/eval/unfreeze}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{impl/eval/unfreeze.png}
     \caption{\texttt{Unfreeze}}
     \label{fig:splitOp}
   \end{subfigure}
   \begin{subfigure}[t]{.43\textwidth}
-    \centering\includegraphics[keepaspectratio,width=0.8\textwidth]{impl/eval/unspread}
+    \centering\includegraphics[keepaspectratio,width=0.8\textwidth]{impl/eval/unspread.png}
     \caption{\texttt{Unspread}}
     \label{fig:spreadOP}
   \end{subfigure}
   \begin{subfigure}[t]{.3\textwidth}
-    \centering\includegraphics[keepaspectratio,width=\textwidth]{impl/eval/unsplit}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{impl/eval/unsplit.png}
     \caption{\texttt{Unsplit}}
     \label{fig:freezeOp}
   \end{subfigure}
@@ -1391,123 +1394,196 @@ The \texttt{protoVoiceEvaluator} \cite{finkensiepModelingInferringProtovoice2021
   \label{fig:evalOps}
 \end{figure}
 
-\begin{lstlisting}
-
-type UnspreadMiddle tr slc v = 
-  (slc, tr, slc) -> Maybe (slc, v)
-
-type UnspreadLeft tr slc = 
-  (tr, slc) -> slc -> [tr]
-
-type UnspreadRight tr slc = 
-  (slc, tr) -> slc -> [tr]
-
-type Unsplit tr slc v =
-  StartStop slc -> tr -> slc -> tr -> StartStop slc -> SplitType -> [(tr, v)]
-
-type Unfreeze tr' tr slc =
-  StartStop slc -> Maybe tr' -> StartStop slc -> [(tr, v)]
-\end{lstlisting}
-
-Transition can be frozen or unfrozen, and boundary or non boundary. Boundary is represented by vertical line, frozen is represented by two lines.
+% \begin{lstlisting}
+%
+% type UnspreadMiddle tr slc v = 
+%   (slc, tr, slc) -> Maybe (slc, v)
+%
+% type UnspreadLeft tr slc = 
+%   (tr, slc) -> slc -> [tr]
+%
+% type UnspreadRight tr slc = 
+%   (slc, tr) -> slc -> [tr]
+%
+% type Unsplit tr slc v =
+%   StartStop slc -> tr -> slc -> tr -> StartStop slc -> SplitType -> [(tr, v)]
+%
+% type Unfreeze tr' tr slc =
+%   StartStop slc -> Maybe tr' -> StartStop slc -> [(tr, v)]
+% \end{lstlisting}
+%
 
 \subsubsection{Boundary handling}
 
-The goal of the parse is to reduce the surface such that there is one slice per segment. 
+Recall that the goal of the parse is to reduce the original surface such that there is one slice per segment. 
 
 In order to achieve this we impose constraints on which reduction operations can be performed, dependent on adjacent segment boundaries. 
 
-Each transition has a boolean boundary value which indicates if the transition is across a segment boundary. We use karnaugh maps to determine the boolean expression for these constraints. 
-Let $B_f$, $B_l$, $B_m$, and $B_r$ denote the boundary values of $t_f$, $t_l$, $t_m$ and $t_r$ respectively.
-
-\begin{figure}[h]
-  \begin{center}
-    \includegraphics[width=0.75\textwidth]{impl/boundarydiagram/diag}
-  \end{center}
-  \caption{General Parse state}
-  \label{fig:parseStateBound}
-\end{figure}
 
 \begin{figure}[h]
   \centering
-  \begin{subfigure}[t]{0.73\textwidth}
-    \centering
-    \begin{karnaugh-map}[4][2][1][$B_f$][$B_l$][$B_m$]
-      \end{karnaugh-map}
-    \caption{Unfreeze}
-    \label{fig:unfreezeKarn}
-  \end{subfigure}
-  \begin{subfigure}[t]{0.65\textwidth}
-    \centering
-    \begin{karnaugh-map}[4][4][1][$B_f$][$B_l$][$B_m$][$B_r]
-      \end{karnaugh-map}
-    \caption{Unsplit}
-    \label{fig:unfreezeKarn}
-  \end{subfigure}
-  \begin{subfigure}[t]{0.3\textwidth}
-    \centering
-      \begin{karnaugh-map}[4][4][1][$B_f$][$B_l$][$B_m$][$B_r]
-      \end{karnaugh-map}
-    \caption{Unspread}
-    \label{fig:unfreezeKarn}
-  \end{subfigure}
-  \caption{Boundary constraints}
-  \label{fig:boundaryKarn}
-\end{figure}
-
-\subsubsection{Initialising the parse}
-The input consists of a list of slices, each with a boolean \texttt{Boundary} value which indicates if the given slice is the beginning of a new segment. 
-
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=0.6\textwidth]{pathFromSlices}
+  \includegraphics[width=0.6\textwidth]{impl/parseInit.png}
   \caption{Parse Initialisation}
   \label{fig:parseInit}
-\end{figure}
+\end{figure}\footnote{Not sure where to put this diagram}
 
 
-
-\subsubsection{Parse Steps}
-
-Figure~\ref{fig:parseStateOptions} shows the possible reductions in the general case. There are 4 options, but for each operation there are multiple inner reductions. EG for an unsplit ... 
-
-The cases for open and frozen and when there aren't 3+ open transitions has to be considered very carefully.
+Each transition has a boolean boundary value which indicates if the transition is across a segment boundary, denoted by the vertical line in Figure~\ref{fig:parseInit}. 
+Let $B_f$, $B_l$, $B_m$, and $B_r$ denote the boundary values of $t_f$, $t_l$, $t_m$ and $t_r$ respectively. 
+Then as an \texttt{unspread} operation ($t_l~s_l~t_m~s_r~t_r \to t_{topl} s_{top} t_{topr} $) merges two slices $s_l$ and $s_r$, removing $t_m$, we impose the constraint $\lnot B_m$ to prevent two segments from merging into one and losing the boundary. 
+Similarly, an \texttt{unsplit} operation (eg. $t_l~s_l~t_m \to t_{top}$) combines two transitions, thus we impose the constraint $\lnot (B_l \wedge B_m)$.
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.85\textwidth]{impl/parseOps}
-  \caption{General parse state reductions}
+  \includegraphics[width=0.85\textwidth]{impl/parseOps.png}
+  \caption{General parse state operations}
   \label{fig:parseStateOptions}
 \end{figure}
 
+  Figure~\ref{fig:parseStateOptions} shows how these boundary values are propagated in order to preserve segments and produce a valid parse.
+
+% \begin{figure}[h!]
+%     \centering
+%     \begin{subfigure}[b]{0.23\textwidth}
+%         \centering
+%         \scalebox{0.6}{
+%             \begin{karnaugh-map}[4][4][1][$CD$][$AB$]
+%                 \minterms{0}
+%                 % \maxterms{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
+%             \end{karnaugh-map}
+%         }
+%         \caption{\textt{UnsplitLeft}}
+%         \label{kmap1}
+%     \end{subfigure}
+%     \hfill
+%     \begin{subfigure}[b]{0.23\textwidth}
+%         \centering
+%         \scalebox{0.6}{
+%             \begin{karnaugh-map}[4][4][1][$CD$][$AB$]
+%               \minterms{}
+%             \end{karnaugh-map}
+%         }
+%         \caption{\texttt{UnsplitRight}}
+%         \label{kmap2}
+%     \end{subfigure}
+%     \hfill
+%     \begin{subfigure}[b]{0.23\textwidth}
+%         \centering
+%         \scalebox{0.6}{
+%             \begin{karnaugh-map}[4][4][1][$CD$][$AB$]
+%                \manualterms{0,0,1,1,0,0,1,1 ,0,0,1,1,0,0,1,1}
+%             \end{karnaugh-map}
+%         }
+%         \caption{\texttt{Unspread}}
+%         \label{kmap3}
+%     \end{subfigure}
+%     \hfill
+%     \begin{subfigure}[b]{0.23\textwidth}
+%         \centering
+%         \scalebox{0.6}{
+%             \begin{karnaugh-map}[4][4][1][$CD$][$AB$]
+%                \manualterms{1,1,1,1,1,1,1,1 ,0,0,0,0,0,0,0,0}
+%             \end{karnaugh-map}
+%         }
+%         \caption{\texttt{Unfreeze}}
+%         \label{kmap4}
+%     \end{subfigure}
+%     \caption{Four equally spaced karnaugh maps}
+%     \label{kmaps}
+% \end{figure}
+
+\subsubsection{Parse Steps}
+
+Figure~\ref{fig:statetrans} shows the possible outer structures for a single segment reduction consisting of three slices and four transitions. 
+This corresponds to the \texttt{pSOpen} case as there are no frozen transitions. 
+Note that while the number of possible outer stucture reductions is $3^n$ given $n$ slices, each reduction consists of a set of inner operations which also grows exponentially with the size of each slice.  
+
+The parse states define a \textbf{directed acyclic graph} where the parseStates are nodes and the parse operations are edges. 
+Traversing this graph results in either reach a valid derivation or dead state with no edges. It is possible to get stuck due to the constraint that protovoices are strictly stepwise, so there not be any possible inner operations to apply to further reduce the surface. 
+This is rare in practice, so when running the search we allow it to restart if it reaches a dead state, bounded by a constant $k$.
+
 \begin{figure}[h]
   \centering
-  \includegraphics[width=\textwidth]{statetransitions}
-  \caption{State Transition diagram}
+  \includegraphics[width=0.8\textwidth]{impl/parseTreeOpen.png}
+  \caption{Parse state transitions for an open segment with three slices.}
   \label{fig:statetrans}
 \end{figure}
 
-In the state transition diagram (Figure \ref{fig:statetrans}), we see all the possible parse states (Is this actually useful? Maybe for appendix). This was useful for me as it helps to conceptualise how the full parse actually works. The dimensions of this digramm of the search state depends on the length of the piece, and the size of each segment. We can see that there is a process of moving to the right to unfreeze transitions, and moving towards the left during reduction operations. Perhaps some simplification of the diagram would be useful. This transition diagram does not consider segment boundaries.
+% \FloatBarrier
+% \subsubsection{Parse Goal}
 
-\FloatBarrier
-\section{Baseline implementation}
+% \begin{figure}[h]
+%   \begin{center}
+%     \includegraphics[width=0.75\textwidth]{impl/boundarydiagram/diag.png}
+%   \end{center}
+%   \caption{General Parse state}
+%   \label{fig:parseStateBound}
+% \end{figure}
+% A full protovoice derivation reduces the surface to the empty transition $t_0$, but for our purposes we reduce to the point with a single slice per segment. Justify this. The limitation is that the reduced surface may not coincide with each other. Future work.
 
+\subsection{Baseline algorithms}
+The goal of protovoice parser is to find a derivation $D$ which results in a top surface $S' = top(D)$, consisting of only chord-tones. 
 
-\subsection{Baseline Reduction}
-As a crude baseline we develop two algorithms based on randomly sampling notes for each segment to infer the chord label. 
-\par
-The pure random sample algorithm simply samples random notes for each segment, and uses those to guess the chord label. This doesn't even consider the notes of the piece, so it's really bad, but provides a useful reference.
-\par 
-The per segment sample algorithm samples notes from each segment. Could just sample a random number of notes from each segment, or just use all the notes in the segment to predict the most likely chord label. This is reminiscent of using a key-profile model \cite{temperleyBayesianApproachKeyFinding2002} to find local keys.
+The simplest possible baseline is one that generates slices randomly for each segment, without considering the piece at all. This is the \textbf{RandomSample} algorithm. While this is naive, it provides a useful reference for evaluation metrics.
 
-\FloatBarrier
-\subsection{Random Search}
-Now we use our implementation of the protovoice parser, but just do a random walk in the tree of partial reductions. By comparing this against the random ample parser, we can get an idea of the utility of the model. We show that this works surprisingly well.
+As a second baseline, consider the simplest form of reduction, removing notes randomly until there is a reasonable number left. This is the \textbf{RandomReduction} algorithm.
+It is equivalent to combine all the slices in a given segment and take a random sample of $n$ notes from the combined slice. 
+The number of notes is sampled from a Poisson distribution, $n \sim \text{Poisson}(\lambda)$, where $\lambda$ is learned from data. 
 
-\FloatBarrier
+Next, we implement the \textbf{RandomWalk} algorithm using the protovoice parser. This algorithm takes a random walk through the parse states graph. The protovoice model does not make judgements based on harmony or function explicitly, but by comparing this algorithm to the other baselines, we can explore whether the constraints enforced by using a protovoice derivation has any effect on the quality of the reduction. We show that this works surprisingly well.
+
+The \texttt{ParseAlgo} type-class provides an interface for running these algorithms. The result is wrapped in a \texttt{Maybe} as it is possible for the search to get stuck, and is in the \texttt{IO} monad to allow non-determinism.
+
+\begin{lstlisting}[caption={Algorithm type-class}, captionpos=b]
+class (Show algo) => ParseAlgo algo where 
+  runParse :: algo -> AlgoInput -> IO (Maybe AlgoResult)
+\end{lstlisting}
+
 \section{Extension Implementation}
 
+\subsection{Parsing with Heuristics}
+Let us take a step back and consider what has achieved up to this point. Recall our goal is to find $\argmax_L P(L|S)$. 
+
+We are able to find a protovoice derivation of the piece, $D$ and corresponding reduced surface $S'$, which allows us to use the harmony model to infer the labels. 
+
+This is described by $\argmax_L \sum\limits_{D,S'}(P(S|D)P(D|S')P(S'|L)) P(L)$. 
+It is not possible to enumerate D in the general case, so we approximate this by finding $\hat{D}$ and $\hat{S'}$. 
+There is an abstract relation between derivations $D$ and surfaces $S$ as a given derivation can correspond to many different surfaces and vice-versa. 
+This abstract relation is described by $P(D, S) = P(D)\cdot P(S|D)$. 
+
+The probability of the derivation P(D) is defined $\prod_i P(d_i | d_0, \dots, d_{i-1})$ where $d_0$ is the first step in the generative direction. 
+The plausibility of the derivation from the generative direction is thus defined $P(D|S) = P(d_i|d_{>i}, S)$  
+
+\subsection{Extending the Harmony Model}
+
+\subsubsection{Predicting chordness}
+This is to guide the heuristic search.
+
+We define \textit{chordness} as the likelihood that a given slice could have been generated by the most likely label $\hat{l}$.
+
+\begin{equation}
+  \text{Chordness}(s) = P(s | \hat{l}) P(\hat{l} | s) 
+  \label{eq:chordness}
+\end{equation}
+where $\hat{l} = \argmax_l P(l | s)$ as above.
+
+\subsubsection{Ornaments likelihood}
+Pitches that are not chord-tones are referred to as \textit{ornaments}.
+
+
 \subsection{Heuristic Design}
+We have shown that we can use the protovoice model to reduce the surface.
+The baseline model achieves this by applying reductions randomly, so that all the notes in original surface are derived through recursive elaborations of the reduced surface, $top()$.
+
+The protovoice model does explicitly make any judgements based on the vertical or functional relations between notes. 
+The idea of the heuristic design is to incorporate domain specific knowledge relating to these relations, and use this to guide the parse. 
+
+The likelihood of each derivation step is approximated by considering only local information: the top surface and the reduction operation applied.
+
+We need to create a function $\mathcal{H}:$ \texttt{(ParseState, Op)} $\to$ \texttt{Cost}. 
+
+
+
 Step 1: Design heuristic to be as accurate as possible. I.e the extreme is to consider every possible parse, but for a single piece there can be over $10^{10^{10^{10^{10^{10}}}}}$ different parses. We consider 1 step at a time at first - this still results in needing to choose an operation out of upwards of 30,000,000 options for just a single step.     
 \par
 First the full piece heuristic parse 
