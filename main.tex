@@ -3,6 +3,8 @@
 \usepackage[pdfborder={0 0 0}]{hyperref}    % turns references into hyperlinks
 \usepackage[left=25mm, right=25mm, bottom=25mm, top=20mm]{geometry}  % adjusts page layout
 \usepackage{karnaugh-map}
+\usepackage{algorithm} 
+\usepackage{algpseudocode}
 \usepackage{tikz}
 \usepackage{graphicx}  % allows inclusion of PDF, PNG and JPG images
 \usepackage{bm}
@@ -296,13 +298,15 @@ This was an ambitious project; I met all the Success Criteria and completed the 
 \chapter{Preparation}
 % \textit{In this chapter, I present the work which was undertaken before the code was written. I first provide an exposition of the Protovoice Model which forms the foundation of this project, describing how it can be used to infer harmony. Subsequently, I discuss probabilistic programming and Bayesian inference, including a probabilistic model of harmony. Finally, I describe the software engineering techniques and principles used throughout the project. }
 
-\section{Bayesian Inference}
-\subsection{Bayesian Inference and Modelling}
+\section{Probabilisitc Inference}
+\subsection{Probabilistic Inference and Modelling}
 
 \textbf{Bayesian inference} is a statistical inference paradigm in which Bayes' theorem is used to update the probability for a hypothesis in light of available evidence. This allows us to \textit{infer} information about \textit{latent}(hidden) variables based on \textit{observed} evidence.
 
-The method of Bayesian inference reduces to representing the \textit{joint distribution} of all the random variables in a system, such that we can compute any probability of interest in that system. Let $X$ and $Z$ denote the observed and latent(unobserved) variables respectively, and let $Y$ denote the random variable we wish to infer. 
-Then we are interested in representing the \textit{joint distribution} $P(X,Y,Z)$. \textbf{Modelling} is the process of approximating a joint distribution through abstract representations and relationships.
+The method of Probabilistic inference reduces to representing the \textit{joint distribution} of all the random variables in a system, such that we can compute any probability of interest in that system.
+We typically 
+Let $X$ and $Z$ denote the observed and latent(unobserved) variables respectively, and let $Y$ denote the random variable we wish to infer. 
+Then we are interested in representing the \textit{joint distribution} $P(X,Y,Z)$, so that we can compute $\sum_Z P(Y|X,Z)$. \textbf{Modelling} is the process of approximating a joint distribution through abstract representations and relationships.
 
 We first consider how we would compute the best hypothesis for $Y$ given the evidence $X$, ignoring the latent variables $Z$.
 % In order to infer information about the value of $Y$ given the joint distribution $P(X,Y)$ and the observation $X$, we consider the \textit{conditional} probability distribution, $P(Y|X)$. 
@@ -355,7 +359,7 @@ To incorporate the latent variables $Z$, we use \textit{marginalisation} and the
   \label{eq:}
 \end{equation}
 
-Given a model of $P(Z|X)$, we avoid summing over the values of $Z$ by approximating $\hat{Z} = \argmax_Z P(Z|X) $, the most likely value of $Z$ given $X$, using MLE or MAP estimation.
+Given an abstract model $P(Z,X)$, we avoid summing over the values of $Z$ by finding $\hat{Z} = \argmax_Z P(Z|X) $, the most likely value of $Z$ given $X$, using MLE or MAP estimation.
 
 We thus update the prior $P(Z|X)$ as follows:
 \[P(Z|X) = \begin{cases} 1 &\text{if } Z=\hat{Z} \\ 0 &\text{otherwise}\end{cases}\]
@@ -497,34 +501,33 @@ There are three types of relations between notes that form the basis for the pro
 \subsection{Inner Structure} % (fold)
 \label{sub:Inner Structure}
 
-Internally, the protovoice model generates a piece of music through sequential operations on notes, inserting new notes with edges connected to existing notes.
+The protovoice model generates a piece of music through sequential operations on notes, inserting new child notes by elaborating existing notes.
 
-We represent protovoices as a graph $G$ with one vertex for each note, a vertex each for the beginning ($\rtimes$) and end ($\ltimes$) of the piece, and edges that indicate connections between notes.
+Protovoices are represented as a directed graph $G$ with one vertex for each note, a vertex each for the beginning ($\rtimes$) and end ($\ltimes$) of the piece, and edges that indicate connections between notes.
 We define a note as $p \in \mathcal{P}$ where $\mathcal{P}$ is the set of pitches, i.e the set of vertical positions on the score\footnote{See Appendix C for a detailed explaination of the pitch representation used in this project}. 
 A \textit{protovoice} is a path within this graph.
+The protovoice model is characterised by stepwise generative operations on notes. A \textit{repetition} inserts a child note of the same pitch on either side of the parent note, a \textit{neighbour} inserts a child note that is a step away from the parent, and finally \textit{passing} notes connect two protovoices stepwise.
 
-\par 
-The protovoice model is characterised by 3 primitive generative operations on notes.
+% \begin{itemize}
+%   % \setlength\itemsep{1em}
+%   \item \textbf{Repetitions:} a note of the same pitch is repeated before or after a given note
+%   \item \textbf{Neighbor notes:} a stepwise ornament to a note. 
+%   \item \textbf{Passing notes:} notes connecting two protovoices that are separated by a larger interval.
+% \end{itemize}
 
-\begin{itemize}
-  % \setlength\itemsep{1em}
-  \item \textbf{Repetitions:} a note of the same pitch is repeated before or after a given note
-  \item \textbf{Neighbor notes:} a stepwise ornament to a note. 
-  \item \textbf{Passing notes:} notes connecting two protovoices that are separated by a larger interval.
-\end{itemize}
-
-These operations relate notes to one or two \textit{parent} notes, which we can describe as rules. Operations on a single parent are represented by attaching a new \textit{child} note with an edge connected to a parent note: 
+These operations relate child notes to one or two \textit{parent} notes.
+\textit{Single-sided} operations are represented by attaching a new \textit{child} note with an edge connected to a parent note: 
 \begin{equation}
   p \implies x \to p \text{~~~~or~~~~} p \implies p \to x 
   \label{eq:singlesidedinnerop}
 \end{equation}
-Operations with two parents are represented by edge replacement. 
+\textit{Double-sided} operations are represented by edge replacement. 
 \begin{equation}
   p_1 \to p_2 ~~~\implies~~ p_1 \to c \to p_2 \label{edge replacement}
   \label{eq:doublesidedinnerop}
 \end{equation}
 
-The generation of a piece begins with the empty piece ($\rtimes \to \ltimes$) and involves the recursive application of inner operations, or rules. The full set of rules is left to the appendix, but here are a few as an example:
+The generation of a piece begins with the empty piece ($\rtimes \to \ltimes$) and is defined by the recursive application of inner operations. The full set of rules is left to the appendix, but here are a few as an example:
 \begin{equation}
   \begin{align}
     x &\implies n \to x && \text{\texttt{left-neighbor}}
@@ -1112,11 +1115,10 @@ Unit Tests (Section x)
 
 
 \subsection{End to End Pipeline}
-The next step was to implement a full end-to-end pipeline from input to chord label predictions.
-This was achieved writing \texttt{preprocessing.py}, \texttt{experiments.ipynb} and \texttt{analysis.ipynb}. This was then containerised using Docker, so that experiments could be run using a HPC. A jupyter-lab environment was set up to run the full pipeline.
+The first step was to implement a full end-to-end pipeline from piece to chord label predictions.
+This was achieved by writing \texttt{preprocess.py}, \texttt{runExperiment.py} and \texttt{analysis.ipynb}. The repository was then containerised using \textit{Docker}, so that experiments could be run and analysed using a DCML server with automated dependency resolution. A \textit{jupyter-lab} environment was set up to run the full pipeline, allowing analysis to be conducted through a browser. Experiments were executed on the server, initialised via \textit{ssh}, and \texttt{tmux} was used to maintain the server environment across connections, with automated scripts to \textit{fetch} and \textit{pull} the latest changes from GitHub.
 
-
-\subsubsection{Data set selection}
+\subsubsection{Dataset selection}
 
 The datasets used contain a selection or corpuses, bodies of work by a single composer as shown below, these were selected to exhibit a range of different styles. 
 Each dataset contains an entire set work by a composer consisting of between $15-50$ annotated scores, each with varying lengths.
@@ -1303,13 +1305,19 @@ The full derivation has been omitted for the sake of brevity. Given that $|\math
 
 \subsection{Protovoice Parser}
 
-The goal of this section is to construct a bottom-up parser for the protovoice model that can enumerate all valid protovoice derivations that produce a given surface: $S \to [D]$.
-The derivation can be described as a sequence of rule applications in \textit{left-most derivation order}, $D$, applied to the $top$ surface, $S'=top(D)$.  
+The Protovoice Parser is a bottom-up parser for the protovoice model that enumerates all the valid protovoice derivations that produce a given surface: $S \to [D]$.
+A derivation is described as a sequence of rule applications in \textit{left-most derivation order}, applied to a fully reduced surface, $S'$.
+
+Formally, a derivation $D$ is defined as a pair $(top, ops)$, where the $surface$, $S$, is derived by starting with the fully reduced $top$ and applying each operation in $ops$ in order.
 
 It is informative to consider the \textit{generation order} and \textit{parse order} of a protovoice derivation. 
-In generation order, we begin with the reduced surface $S'$ with a pointer at the left-most transition and apply each \texttt{split} or \texttt{spread} operation to the two left-most non-terminal transitions in the path graph, generating new slices and transitions. The \texttt{freeze} operation marks a transition as terminal thus shifts our pointer to the right. Operations are applied until the pointer is right-most, and all transitions are terminal, resulting in the fully elaborated surface $S$.
+In generation order, we begin with the reduced surface $S' = top(D)$ with a pointer at the left-most transition and apply each \texttt{split} or \texttt{spread} operation to the two left-most non-terminal transitions in the path graph, generating new slices and transitions.
+The \texttt{freeze} operation marks a transition as terminal thus shifts the pointer to the right.
+Operations are applied until the pointer is right-most, and all transitions are terminal, resulting in the fully elaborated surface $S$ and a derivation $D=(top, ops)$, where $ops$ is the sequence of operations applied.
 
-Parsing is the inverse of generation: the parse begins with the elaborated surface $S$ with all transitions marked as terminal and the pointer at the right-most terminal transition. At any point of the parse, we can either \texttt{unfreeze} the transition to the left of the pointer, shifting the pointer to the left, or apply a \texttt{unsplit} or \texttt{unspread} reduction to the two transitions to the right of the pointer. Once the pointer is left-most and there is a single reduced slice for each chord segment at the top of the derivation, the resulting reduced surface is $S'$, defined $S' = top(D)$.
+Parsing is the inverse of generation: the parse begins with the elaborated surface $S$ consisting of only frozen transitions with a pointer at the right-most frozen transition.
+During the parse, we can either \texttt{unfreeze} the transition at the pointer, shifting the pointer to the left, or apply a \texttt{unsplit} or \texttt{unspread} reduction to the two transitions to the right of the pointer.
+Once the pointer is left-most, all transitions are unfrozen and there is a \textit{single reduced slice} for each chord segment at the top of the derivation, the resulting derivation is $D = (top, ops)$, where the reduced surface is $S'=top$.
 
 This is a form of \textit{shift-reduce} parser, making one pass across the surface, right to left. The state of the parse is represented by \texttt{parseState} and implements \texttt{expand: parseState $\to$ [parseState]} such that we can use search algorithms to conduct the parse.
 
@@ -1319,12 +1327,9 @@ This is a form of \textit{shift-reduce} parser, making one pass across the surfa
   \label{fig:pSFrozen}
 \end{figure}
 
-In the initial parse state, \texttt{pSFrozen}, the surface is represented as a \texttt{path} from the end to the beginning of the piece, with the right-most transition at its head.
-% the right most transition at it's head. The only operation from the initial state is to shift the pointer to the left by applying an \texttt{unfreeze} operation to the right-most transition. 
-% as a \textit{path graph} (Definition~\ref{def:pathGraph}) where the nodes are slices and the edges are transitions with unique start($\rtimes$) and stop($\ltimes$) symbols at the beginning and end of the piece.
-% The path graph is implemented as a \texttt{path}, a list of alternating transitions and slices, with 
+In the initial parse state, \texttt{pSFrozen}, the surface is represented as a \texttt{path} from the end to the beginning of the piece, with the right-most transition at its head. The start($\rtimes$) and stop($\ltimes$) symbols are not explicitly stored in the \textt{path}, but are implied.
 
-All transitions are initialised as frozen, indicated by the double lines in Figure~\ref{fig:pSFrozen}. The path graph begins on the right. In this initial state the only option is to unfreeze the rightmost transition, moving to the \texttt{pSSemiOpen} state. 
+All transitions are initialised as frozen, indicated by the double lines in Figure~\ref{fig:pSFrozen}. The \texttt{path} begins on the right. In this initial state the only option is to unfreeze the rightmost transition, moving to the \texttt{pSSemiOpen} state. 
 
 \begin{figure}[h]
   \centering\includegraphics[width=\textwidth]{impl/parseState/semiopen.png}
@@ -1332,7 +1337,7 @@ All transitions are initialised as frozen, indicated by the double lines in Figu
   \label{fig:pSSemiOpen}
 \end{figure}
 
-The \texttt{pSSemiOpen} represents the majority of the parse. The pointer position is represented by \texttt{midSlice}. There is a \texttt{open} path of all non-terminal transitions (single line) from the pointer to the end of the piece, and a \texttt{frozen} path of all terminal transitions from the pointer to the start of the piece. The head of the frozen path is the right-most terminal transition.
+The \texttt{pSSemiOpen} represents the majority of the parse. The pointer is represented by \texttt{midSlice}, and points to the rightmost frozen transition. The \texttt{open} path contains all unfrozen transitions (denoted by a single line) from the right of the pointer to the end of the piece, and the \texttt{frozen} path contains all frozen transitions from the pointer to the start of the piece.
 
 \begin{figure}[h]
   \centering\includegraphics[width=\textwidth]{impl/parseState/open.png}
@@ -1340,36 +1345,50 @@ The \texttt{pSSemiOpen} represents the majority of the parse. The pointer positi
   \label{fig:pSOpen}
 \end{figure}
 
-The final state, \texttt{pSOpen}, has the pointer at the beginning of the piece, and has a single path \texttt{open} which contains only non-terminal transitions from the beginning to the end of the piece.
+In the final state, \texttt{pSOpen}, the pointer is at the beginning of the piece, and comprises a single path \texttt{open} containing only unfrozen transitions from the beginning to the end of the piece.
 
-Each state also stores the list of operations that, when applied to the current reduction, results in the original surface. % TODO JUSTIFICATION
+Each state also stores a list of operations, $ops$ that when applied to the current reduction, results in the original surface. This is empty at the beginning of the parse; for each reduction applied, the corresponding generative operation $op$ is consed to the list: $ops' := op:ops$. 
 
-\begin{lstlisting}[caption={protovoiceEvaluator}, captionpos=b]
-data ParseState es es' ns o
-  = psFrozen !(Path (Maybe es', Bool) (SliceWrapped ns)) 
-  -- ^ Beginning of search - all frozen edges and slices
-  | psSemiOpen 
-  -- ^ Mid-search
-      { _psFrozen :: !(Path (Maybe es', Bool) (SliceWrapped ns))
-      -- ^ frozen transitions and slices from current point leftward
-      , _psMidSlice :: !(SliceWrapped ns)
-      -- ^ the slice at the current pointer
-      , _psOpen :: !(Path (Trans es) (SliceWrapped ns))
-      -- ^ non-frozen transitions and slices from current point rightward
-      , _psDeriv :: ![o]
-      -- ^ derivation from current reduction to original surface
-      }
-  | psOpen !(Path (Trans es) (SliceWrapped ns)) ![o] 
-  -- ^ Single path with unfrozen transition,slices and history
-\end{lstlisting}
+% \begin{lstlisting}[caption={protovoiceEvaluator}, captionpos=b]
+% data ParseState es es' ns o
+%   = psFrozen !(Path (Maybe es', Bool) (SliceWrapped ns)) 
+%   -- ^ Beginning of search - all frozen edges and slices
+%   | psSemiOpen 
+%   -- ^ Mid-search
+%       { _psFrozen :: !(Path (Maybe es', Bool) (SliceWrapped ns))
+%       -- ^ frozen transitions and slices from current point leftward
+%       , _psMidSlice :: !(SliceWrapped ns)
+%       -- ^ the slice at the current pointer
+%       , _psOpen :: !(Path (Trans es) (SliceWrapped ns))
+%       -- ^ non-frozen transitions and slices from current point rightward
+%       , _psDeriv :: ![o]
+%       -- ^ derivation from current reduction to original surface
+%       }
+%   | psOpen !(Path (Trans es) (SliceWrapped ns)) ![o] 
+%   -- ^ Single path with unfrozen transition,slices and history
+% \end{lstlisting}
+
+
 
 This is not the only way to parse according to the protovoice model; the protovoice reduction rules can be applied to any pair of open transitions.
 Allowing reductions at any point along the surface could allow for different parse strategies to be employed that may have advantages.
 I choose not to pursue this due to the associated combinatorial explosion, and the benefits of being able to represent a protovoice derivation as a sequence of left-most reductions.
 
-
 \subsubsection{Parsing Operations}
-The \texttt{protoVoiceEvaluator} \cite{finkensiepModelingInferringProtovoice2021} provides the following methods: \texttt{Unfreeze}, \texttt{Unsplit}, \texttt{UnSpreadLeft}, \texttt{UnSpreadRight} and \texttt{UnSpreadMiddle}. These are used to enumerate reduction operations. This has the benefit of allowing us to only consider the outer structure of slices and transitions while parsing, without the need to delve into the details of the inner protovoice structure.
+The \texttt{protoVoiceEvaluator} \cite{finkensiepModelingInferringProtovoice2021} provides methods that are used to enumerate the possible operations for each reduction type \footnotemark. It also includes an implementation of a greedy parser, from which ideas were adapted and expanded upon to create the protovoice parser. 
+This allows the parser to consider only the outer structure of slices and transitions while parsing without exposing the internal notes and edges. 
+\footnotetext{Note that the notation used here for functions combines type definitions with variable names. For example, the function \texttt{evalUnsplit} has type $\texttt{evalUnsplit}::(transition, slice, transition) \to [(transition, operation)]$, but type names (e.g. $transition$) have been substituted by variable names (e.g. $t_l, t_r, t_{top}$) for expository purposes.}
+
+\begin{equation}
+  \begin{aligned}
+  &\texttt{evalUnfreeze}: &$t &\to [(t', op)]$\\
+  &\texttt{evalUnsplit}: &$(t_l, s_l, t_m) &\to [(t_{top}, op)]$\\
+  &\texttt{unSpreadLeft}: &$(s_l, t_l) \to s_{top} &\to [t_{topl}] $ \\
+  &\texttt{unSpreadRight}: &$(s_r, t_r) \to s_{top} &\to [t_{topr}] $ \\
+  &\texttt{unSpreadMiddle}: &$(s_l,t_{top},s_r) &\to \texttt{Maybe}~(s_{top}, op) $ \\
+  \end{aligned}
+  \label{eq:pvOps}
+\end{equation}
 
 \begin{figure}[h]
   \centering
@@ -1379,7 +1398,7 @@ The \texttt{protoVoiceEvaluator} \cite{finkensiepModelingInferringProtovoice2021
     \label{fig:splitOp}
   \end{subfigure}
   \begin{subfigure}[t]{.43\textwidth}
-    \centering\includegraphics[keepaspectratio,width=0.8\textwidth]{impl/eval/unspread.png}
+    \centering\includegraphics[keepaspectratio,width=0.9\textwidth]{impl/eval/unspread.png}
     \caption{\texttt{Unspread}}
     \label{fig:spreadOP}
   \end{subfigure}
@@ -1416,31 +1435,29 @@ The \texttt{protoVoiceEvaluator} \cite{finkensiepModelingInferringProtovoice2021
 \subsubsection{Boundary handling}
 
 Recall that the goal of the parse is to reduce the original surface such that there is one slice per segment. 
-
-In order to achieve this we impose constraints on which reduction operations can be performed, dependent on adjacent segment boundaries. 
-
+In order to achieve this, constraints are imposed on the reduction operations dependent on adjacent segment boundaries. 
 
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.6\textwidth]{impl/parseInit.png}
   \caption{Parse Initialisation}
   \label{fig:parseInit}
-\end{figure}\footnote{Not sure where to put this diagram}
+\end{figure}
 
-
-Each transition has a boolean boundary value which indicates if the transition is across a segment boundary, denoted by the vertical line in Figure~\ref{fig:parseInit}. 
-Let $B_f$, $B_l$, $B_m$, and $B_r$ denote the boundary values of $t_f$, $t_l$, $t_m$ and $t_r$ respectively. 
-Then as an \texttt{unspread} operation ($t_l~s_l~t_m~s_r~t_r \to t_{topl} s_{top} t_{topr} $) merges two slices $s_l$ and $s_r$, removing $t_m$, we impose the constraint $\lnot B_m$ to prevent two segments from merging into one and losing the boundary. 
-Similarly, an \texttt{unsplit} operation (eg. $t_l~s_l~t_m \to t_{top}$) combines two transitions, thus we impose the constraint $\lnot (B_l \wedge B_m)$.
+Each transition has a boolean \textit{boundary} value which indicates if the transition is across a segment boundary, denoted by the dashed vertical line in Figure~\ref{fig:parseInit}. 
+Let $B_t : t \to \{\textbf{True}, \textbf{False}\}$, such that $B_f$, $B_l$, $B_m$, and $B_r$ denote the boundary values of $t_f$, $t_l$, $t_m$ and $t_r$ respectively. 
+As an \texttt{unspread} operation ($t_l~s_l~t_m~s_r~t_r \to t_{topl} s_{top} t_{topr} $) merges two slices $s_l$ and $s_r$, removing $t_m$, the constraint $\lnot B_m$ is imposed to prevent two segments from merging. 
+Similarly, an \texttt{unsplit} operation (eg. $t_l~s_l~t_m \to t_{top}$) combines two transitions, thus we impose the constraint $\lnot (B_l \wedge B_m)$. 
+Finally, the \texttt{unfreeze} operation shifts the context to the left. If a boundary transition is unfrozen, no more reduction operations can be applied to its right, hence it a necessary condition that the segment has been fully reduced. Thus the constraint imposed on an \texttt{unfreeze} operation is $\lnot B_f \vee (B_l \wedge B_m \wedge B_r)$. Note that there are some configurations that are \textit{unreachable}, such as $B_f \wedge (B_l \wedge B_m \wedge \lnot B_r)$, thus the \texttt{unfreeze} constraint could be simplified to $\lnot B_f \vee (B_l \wedge B_m)$, but I have chosen not to as it obfuscates the semantics, and the cost of an additional logic check is negligible. \footnote{Should this be a footnote? I have chosen to include it as it an example of a decision made that demonstrates thinking.}
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.85\textwidth]{impl/parseOps.png}
-  \caption{General parse state operations}
+  \includegraphics[width=0.85\textwidth]{impl/boundarydiagram/diag.png}
+  \caption{Boundary reduction conditions and propagation}
   \label{fig:parseStateOptions}
 \end{figure}
 
-  Figure~\ref{fig:parseStateOptions} shows how these boundary values are propagated in order to preserve segments and produce a valid parse.
+  Figure~\ref{fig:parseStateOptions} provides an illustration of these constraints. The boundary must also be propagated to parent transitions following a reduction, defined by the union of each child transitions' boundary values for a given reduction.
 
 % \begin{figure}[h!]
 %     \centering
@@ -1492,7 +1509,49 @@ Similarly, an \texttt{unsplit} operation (eg. $t_l~s_l~t_m \to t_{top}$) combine
 %     \label{kmaps}
 % \end{figure}
 
+
+The \texttt{evalUnfreeze} and \texttt{evalUnsplit} functions allow the associated generative operation, \texttt{freeze} and \texttt{split} to be found trivially, but the possible \texttt{spread} operations need to derived using \texttt{unSpreadLeft}, \texttt{unSpreadRight}, and \texttt{unSpreadMiddle}.
+This is achieved using the \textit{list monad}, in which multiple branches of sequential computation appear to be executed simultaneously, returning the results of all possible computation branches in a list.
+
+\begin{algorithm}[h]
+  \caption{Enumerate unspread reductions}
+  \label{code:heuristic0}
+  % Begin pseudocode. The [1] tells algorithmic to number every line.
+  % Set to n to number every n lines. Omit it to hide line numbers.
+  \begin{algorithmic}[1]
+    \Function{CollectUnspreads}{$s_l~t_l~s_m~t_r~s_r$} 
+    \State \textbf{using} $List Monad$ \textbf{do} 
+    \State ($s_{top}, op$) \gets \texttt{maybeToList}~\$~\texttt{evalUnspreadMiddle} $(s_l, t_m, s_r)$ 
+    \State $t_{topl}$ \gets \texttt{evalUnspreadLeft}~$(s_l, t_l)~s_{top}$
+    \State $t_{topr}$ \gets \texttt{evalUnspreadRight}~$(s_r, t_r)~s_{top}$
+    \State \textbf{return} ($l_{top}, s_{top}, r_{top}$)
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+Finally, given that an \texttt{unspread} reduction involves two transitions, and an \texttt{unsplit} reduction involves only one, it is important to ensure the parse pointer is such that there are two open transitions to its right wherever possible. This avoids the case of applying alternating \texttt{unsplit} and \texttt{unfreeze} reductions, as there is only zero or one open transition within the current segment, and \texttt{unspread} reductions require two. This is not important for the sake of a parse, which enumerates all derivations, but is important later on when designing heuristic search algorithms. \footnotemark 
+
+\footnotetext{I guess I'll move this to the heuristic design section?}
+
 \subsubsection{Parse Steps}
+
+\begin{figure}[h]
+  \centering
+  \begin{subfigure}[t]{.49\textwidth}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{impl/reduction/before.png}
+    \caption{Before}
+    \label{fig:reductionBefore}
+  \end{subfigure}
+  \begin{subfigure}[t]{.49\textwidth}
+    \centering\includegraphics[keepaspectratio,width=\textwidth]{impl/reduction/after.png}
+    \caption{After}
+    \label{fig:reductionAfter}
+  \end{subfigure}
+
+  \captionsetup{width=.9\linewidth}
+  \caption{Single Reduction Step}
+  \label{fig:reductionStep}
+\end{figure}
 
 Figure~\ref{fig:statetrans} shows the possible outer structures for a single segment reduction consisting of three slices and four transitions. 
 This corresponds to the \texttt{pSOpen} case as there are no frozen transitions. 
@@ -1552,7 +1611,17 @@ There is an abstract relation between derivations $D$ and surfaces $S$ as a give
 This abstract relation is described by $P(D, S) = P(D)\cdot P(S|D)$. 
 
 The probability of the derivation P(D) is defined $\prod_i P(d_i | d_0, \dots, d_{i-1})$ where $d_0$ is the first step in the generative direction. 
-The plausibility of the derivation from the generative direction is thus defined $P(D|S) = P(d_i|d_{>i}, S)$  
+The plausibility of the derivation from the generative direction is thus defined $P(D|S) = P(d_i|d_{>i}, S)$. This cannot be calculated, but we take an approximation that is akin to markov assumption, evaluating a single operation. 
+
+We have shown that we can use the protovoice model to reduce the surface.
+The baseline model achieves this by applying reductions randomly, so that all the notes in original surface are derived through recursive elaborations of the reduced surface, $top()$.
+
+The protovoice model does explicitly make any judgements based on the vertical or functional relations between notes. 
+The idea of the heuristic design is to incorporate domain specific knowledge relating to these relations, and use this to guide the parse. 
+
+The likelihood of each derivation step is approximated by considering only local information: the top surface and the reduction operation applied.
+
+We need to create a function $\mathcal{H}:$ \texttt{(ParseState, Op)} $\to$ \texttt{Cost}. 
 
 \subsection{Extending the Harmony Model}
 
@@ -1567,21 +1636,71 @@ We define \textit{chordness} as the likelihood that a given slice could have bee
 \end{equation}
 where $\hat{l} = \argmax_l P(l | s)$ as above.
 
-\subsubsection{Ornaments likelihood}
+\subsubsection{Ornamentation likelihood}
 Pitches that are not chord-tones are referred to as \textit{ornaments}.
 
 
 \subsection{Heuristic Design}
-We have shown that we can use the protovoice model to reduce the surface.
-The baseline model achieves this by applying reductions randomly, so that all the notes in original surface are derived through recursive elaborations of the reduced surface, $top()$.
 
-The protovoice model does explicitly make any judgements based on the vertical or functional relations between notes. 
-The idea of the heuristic design is to incorporate domain specific knowledge relating to these relations, and use this to guide the parse. 
+In order to calculate the cost of a single reduction, we consider the plausibility of the corresponding operation being applied in the generative direction. 
+For example, if during the parse we are in state $S_i$ and apply a \texttt{unsplit} operation, to which takes us to $S_j$, we calculate the plausibility of the generative \texttt{split} operation in state $S_j$.
+Recall that the protovoice model comprises an inner and outer structure. The outer structure provides an abstraction of the inner structure, allowing the parsing algorithm to be designed using operations applied to slices and transitions.
 
-The likelihood of each derivation step is approximated by considering only local information: the top surface and the reduction operation applied.
+Recall that the core of the protovoice model is a set of generative operations on notes. 
 
-We need to create a function $\mathcal{H}:$ \texttt{(ParseState, Op)} $\to$ \texttt{Cost}. 
+Any operation consists of a set of regular edges, which are either neighbour
 
+\begin{algorithm}[h]
+  \caption{Heuristic function $\mathcal{H}_0$}
+    % This lets us refer to this figure by a number elsewhere in the document.
+    \label{code:heuristic0}
+
+    % Begin pseudocode. The [1] tells algorithmic to number every line.
+    % Set to n to number every n lines. Omit it to hide line numbers.
+    \begin{algorithmic}[1]
+      \Function{EvaluateOperation}{$State, Op$} 
+      \If{$Op$ is a $Split$}
+        \State \textbf{return} \Call{EvaluateSplit}{$State, Op$}
+      \ElsIf{$Op$ is a $Spread$}
+        \State \textbf{return} \Call{EvaluateSpread}{$State, Op$}
+      \ElsIf {$Op$ is a $Freeze$}
+        \State \textbf{return} \Call{Log}{1} \Comment{Likelihood of 1}
+      \EndIf
+      \EndFunction \\
+
+      \Function{EvaluateSpread}{$State, Op$} 
+      \State $s_l, s_r \gets \Call{ParentSlices}{State, Op}$
+      \State $E \gets \{\Call{RegularEdges}{Op} \cup \Call{PassingEdges}{Op}\}$
+      % \State $e_{pass} \gets \Call{PassingEdges}{Op}$
+      \State $LogLikelihoods \gets \{ \Call{EvaluateEdge}{e, s_l, s_r} : e \in E\}$
+      \State \textbf{return} 
+        $\Call{Average}{LogLikelihoods}$ 
+      \EndFunction \\
+
+      \Function{EvaluateSplit}{$State, Op$} \Comment{How much detail? keepEdges?}
+      \State $s_l, s_r \gets \Call{ParentSlices}{State, Op}$
+      \State $e_{reg} \gets \Call{RegularEdges}{Op}$
+      \State $e_{pass} \gets \Call{PassingEdges}{Op}$
+      \State $e_{single} \gets \Call{LeftEdges}{Op} \cup \Call{RightEdges}{Op}$
+      \State $e_{right} \gets \Call{RegularEdges}{Op}$
+      \State $LogLikelihoods \gets \{ \Call{EvaluateEdge}{e, s_l, s_r} : e \in \{e_{reg} \cup e_{pass}\}\}$
+      \State \textbf{return} 
+        $\Call{Average}{LogLikelihoods}$ 
+      \EndFunction \\
+
+      \Function{EvaluateEdge}{$e, s_l, s_r$} 
+      \State $n \gets $ child note introduced in $e$ 
+      \If {$e$ elaborates two parents, $p_l$ and $p_r$} 
+      \State $\vec{\phi} \gets \Call{ProbVectorDouble}{n,p_l,p_r,s_l,s_r}$ 
+      \ElsIf {$e$ elaborates single $left$ parent $p$}
+      \State $\vec{\phi} \gets \Call{ProbVectorSingle}{n,p_l,s_l}$ 
+      \ElsIf { $e$ elaborates a $right$ parent $p$}
+      \State $\vec{\phi} \gets \Call{ProbVectorSingle}{n,p_r,s_r}$ 
+      \EndIf
+      \State \textbf{return} $\Call{CategoricalLogPdf}{\vec{\phi}, n}$
+      \EndFunction \\
+    \end{algorithmic}
+  \end{algorithm}
 
 
 Step 1: Design heuristic to be as accurate as possible. I.e the extreme is to consider every possible parse, but for a single piece there can be over $10^{10^{10^{10^{10^{10}}}}}$ different parses. We consider 1 step at a time at first - this still results in needing to choose an operation out of upwards of 30,000,000 options for just a single step.     
@@ -1590,12 +1709,14 @@ First the full piece heuristic parse
 \par
 The goal of the heuristic is to find the probability of a reduction. 
 
-\begin{figure}[ht]
-  \centering
-  \includegraphics[width=0.7\textwidth]{splitsssemiopen}
-  \caption{Split operation}
-  \label{fig:splitoperation}
-\end{figure}
+
+Here the \texttt{ProbVectorSingle} function a vector for the.
+% \begin{figure}[ht]
+%   \centering
+%   \includegraphics[width=0.7\textwidth]{splitsssemiopen}
+%   \caption{Split operation}
+%   \label{fig:splitoperation}
+% \end{figure}
 
 \FloatBarrier
 \subsubsection{Scoring Unsplit Operations}
@@ -1604,7 +1725,13 @@ Consider the Split rule : \[t \to t'_{l}~s'~t'_{r}\]
 During a split, each edge in the transition and each node in an adjacent slice can be elaborated by one or more inner operations.
 These new edges can be discarded or kept to form the new edge of $t'_l$ and $t'_r$.
 \par 
-The notes in the child slice $s$ can either have edges connected to the left neighboring slice or right neighbouring slice, or both. I.e for each note in the child slice, it can be a an ornmentation of a previous note, subsequent note, both, or repetition of prev note, subsequent note etc. So we consider the chord tone profiles of the involved slices. 
+The notes in the child slice $s$ can either have edges connected to the left neighboring slice or right neighbouring slice, or both.
+In other words each note in the child slice was generated as an elaboration of the left or right parent, or both in the case of a double sided operation. 
+
+The plausibility of fa
+% For single sided operations we consider only the 
+
+previous note, subsequent note, both, or repetition of prev note, subsequent note etc. So we consider the chord tone profiles of the involved slices. 
 
 We first guess the chord type each parent slice. 
 \[\theta_l = \mathop{argmax}_{c \in C} P(s_l|c) ~~,~~ \theta_r = \mathop{argmax}_{c \in C} P(s_r|c) '\]
@@ -1662,10 +1789,47 @@ We assign 0 cost to unfreeze operations. This means we need to be careful about 
 
 \FloatBarrier
 \subsubsection{Full state evalutation}
+
+\begin{figure}[h]
+    \caption{What does this do?}
+
+    % This lets us refer to this figure by a number elsewhere in the document.
+    \label{code:mystery}
+
+    % Begin pseudocode. The [1] tells algorithmic to number every line.
+    % Set to n to number every n lines. Omit it to hide line numbers.
+    \begin{algorithmic}[1]
+      \Function{FindMysteries}{$S, k$} 
+        \If{$k \le 1$}
+          \State \textbf{return} $\{\}$ \Comment{The empty set $\emptyset$}
+        \EndIf
+        \State $n \gets |S|$ \Comment{Cardinality of $S$}
+        \State $k \gets \Call{Min}{k, n + 1}$ \Comment{Since maximum of $n$ mysteries}
+        \State $r\gets \lfloor \lfloor k/2 \rfloor (\tfrac{n+1}{k}) \rfloor$ \Comment{1-indexed rank of the pivot}
+        \State $p \gets \Call{MedianOfMediansSelect}{S, r}$ \Comment{element of rank $r$}
+        \State $S_1 \gets \{ x \in S : x < p \}$
+        \State $S_2 \gets \{ x \in S : x > p \}$
+        \State \textbf{return} $\Call{FindMysteries}{S_1, \lfloor k/2 \rfloor} \cup\{ p \} \cup \Call{FindMysteries}{S_2, \lceil k/2 \rceil}$
+      \EndFunction
+    \end{algorithmic}
+
+  \end{figure}
+
+% \begin{algorithmic}
+% \State $i \gets 10$
+% \If{$i\geq 5$} 
+%     \State $i \gets i-1$
+% \Else
+%     \If{$i\leq 3$}
+%         \State $i \gets i+2$
+%     \EndIf
+% \EndIf 
+% \end{algorithmic}
+
 We need to combine all of these in a fair way. Also the distinction between splits and spreads need to be considred, as they are different operations, the calculations of likelihood may cause an imbalance. All likelihoods are stored in log space.
 
 \FloatBarrier
-\subsection{Best-First Search}
+\subsection{Heuristic Search}
 Given the heuristic $\mathcal{H}_0$, the first option is to use a greedy search.
 We keep unfreeze operations as an option.
 
@@ -1673,6 +1837,21 @@ We find that the number of operations causes a combinatorial blowup, so the sear
 
 Problem of very large slices.\\ 
 Segment by segment heuristic parse - avoids the problem, but is slightly hacky. Can we incorprate our knowledge regarding the relative proportion of chord tones and ornaments. Should we allow duplicates of notes in slices? Perhaps we should favour spreads more. 
+
+\begin{algorithm}[h]
+  \caption{Greedy Search}
+    \label{code:stbs0}
+    \begin{algorithmic}
+    \State \textbf{initialise: } $state \gets initialState$
+    \While {$state$ is not a goal state} 
+    \State $state \gets \argmin\limits_{s \in \Call{Expand}{state}} \Call{H}{s} $
+    \State $freezes, spreads, splits \gets $ Split $nextStates$ by $operation$ type
+    \State $open \gets $ Take best $\beta$ best states from $freezes \cup spreads \cup splits$
+    \EndWhile \\
+    % \EndWhile ~
+    \Return Best state in open
+  \end{algorithmic}
+\end{algorithm}
 
 Always consider a certain number of slices and spreads.
 
@@ -1688,8 +1867,44 @@ Beam of size n, with 1 for a freeze, k for spread, n-k-1
 \subsection{Dual Beam Search}
 It isn't clear how to determine how we should balance the costs of unspread and unsplit op
 
+\begin{algorithm}[h]
+  \caption{MultiBeam Search}
+    \label{code:stbs0}
+    \begin{algorithmic}
+    \State \textbf{hyper-parameters: } $\beta \gets BeamWidth, \gamma \gets ReservoirSize$ 
+    \State \textbf{initialise: } $open \gets (initialState, 0)$
+    \While {$open$ does not contain any goal states} 
+    \State $nextStates \gets \bigcup\limits_{(s, c) \in open} \{ (s', c' + \Call{h}{s'}) : (s', c') \in \Call{Expand}{(s,c)}\} \right\}$
+    \State $freezes, spreads, splits \gets $ Split $nextStates$ by $operation$ type
+    \State $open \gets $ Take best $\beta$ best states from $freezes \cup spreads \cup splits$
+    \EndWhile \\
+    % \EndWhile ~
+    \Return Best state in open
+  \end{algorithmic}
+\end{algorithm}
+
 \subsection{Stochastic Dual Beam Search}
 We propose sampling from the options, increasing the proportion that we ignore dependent on the number of options.
+\begin{algorithm}[h]
+  \caption{Reservoir MultiBeam Search}
+    \label{code:stbs0}
+    \begin{algorithmic}
+    \State \textbf{hyper-parameters: } $\beta \gets BeamWidth, \gamma \gets ReservoirSize$ 
+    \State \textbf{initialise: } $open \gets (initialState, 0)$
+    \While {$open$ does not contain any goal states} 
+    \State $nextStates \gets \bigcup\limits_{(s, c) \in open} \{ (s', c' + \Call{h}{s'}) : (s', c') \in \Call{Expand}{(s,c)}\} \right\}$
+    \State $freezes, spreads, splits \gets $ Split $nextStates$ by $operation$ type
+    \State $unFreezes \gets \bigcup_{s \in freezes} \left( \Call{ReservoirSample}{\gamma, s} \right)$
+    \State $unSpreads \gets \bigcup_{s \in spreads} \left( \Call{ReservoirSample}{\gamma, s} \right)$
+    \State $unSplits \gets \bigcup_{s \in splits} \left( \Call{ReservoirSample}{\gamma, s} \right)$
+    \State $open \gets $ Take best $\beta$ best states from $unFreezes \cup unSpreads \cup unSplits$
+    \EndWhile \\
+    % \EndWhile ~
+    \Return Best state in open
+  \end{algorithmic}
+\end{algorithm}
+
+Here H assigns a cost for moving from state s to s'. This is defined as the negated log likelihood in $\mathcal{H}$.
 
 \section{Choosing hyper parameters}
 
