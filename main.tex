@@ -438,29 +438,32 @@ dissertation does not contain material that has already been used to any substan
     I provide answers to these questions by proposing and implementing a \textbf{novel heuristic fitness function} for
     proto-voice derivations and address the \textbf{exponential search space} using heuristics and pruning
     techniques to significantly reduce the time and space complexity from $\bm{\mathcal{O}(2^{n \cdot m})}$
-      to $\bm{\mathcal{O}(n \cdot m)}$, where $n$ is the length of in piece and $m$ is the number of notes in each segment. 
+      to $\bm{\mathcal{O}(n \cdot m)}$, where $n$ is the length of the piece and $m$ is the maximal number of notes in each
+      slice. I show that my heuristic search algorithm produces a \textbf{statistically significant improvement} in accuracy
+      over a random parse for a variety of pieces, a qualitative improvement in \textbf{interpretability}, and
+      \textbf{scales linearly} with the input dimensions.
 
-    \section{Contributions of my Project}
-
-    % The implementation of this project provides solutions to two open problems. The first is the question of how the relative plausibilities of protovoice derivations should be determined, and second is how to deal with the exponential parsing state-space.
+    % \section{Contributions of my Project}
     %
-
-    The implementation of this project achieved all of the original aims. In doing so, the key contributions include:
-    \begin{enumerate}
-      \item Developing a novel approach to Automatic Chord Estimation that integrates the proto-voice model with
-        a chord segment reduction process (Section~\ref{chap:implementation}). This not only provides an interpretable and explainable
-        framework for Automatic Chord Estimation but also has the potential to contribute to a more comprehensive
-        understanding of the underlying structure of Western tonal music. 
-      \item Proposing and implementing an informed heuristic-based fitness function to evaluate proto-voice
-        derivations, which decomposes into a estimated score for each reduction step (Section~\ref{sub:heuristicDesign}). This enables the identification of musically meaningful interpretations of the piece while discarding implausible derivations. 
-      \item Designing and developing the proto-voice harmony parser which can generate reductions of the musical surface
-        to facilitate chord label inference (Section~\ref{sec:protovoiceHarmonyParser}). 
-        This has the benefit over previous approaches of providing an explicit explanation through the proto-voice derivation, with potential to be incorporated in more complex systems to improve their interpretability.
-      \item Introducing a novel heuristic search strategy to efficiently explore the large space of possible derivations,
-        using a beam search and pruning techniques to significantly reduce the computational complexity (Section~\ref{sub:searchImpl}). 
-      \item Demonstrating the effectiveness of this approach on a diverse set of musical pieces in terms of
-        accuracy, performance and interpretability (Section~\ref{chap:evaluation}). 
-    \end{enumerate}
+    % % The implementation of this project provides solutions to two open problems. The first is the question of how the relative plausibilities of protovoice derivations should be determined, and second is how to deal with the exponential parsing state-space.
+    % %
+    %
+    % The implementation of this project achieved all of the original aims. In doing so, the key contributions include:
+    % \begin{enumerate}
+    %   \item Developing a novel approach to Automatic Chord Estimation that integrates the proto-voice model with
+    %     a chord segment reduction process (Section~\ref{chap:implementation}). This not only provides an interpretable and explainable
+    %     framework for Automatic Chord Estimation but also has the potential to contribute to a more comprehensive
+    %     understanding of the underlying structure of Western tonal music. 
+    %   \item Proposing and implementing an informed heuristic-based fitness function to evaluate proto-voice
+    %     derivations, which decomposes into a estimated score for each reduction step (Section~\ref{sub:heuristicDesign}). This enables the identification of musically meaningful interpretations of the piece while discarding implausible derivations. 
+    %   \item Designing and developing the proto-voice harmony parser which can generate reductions of the musical surface
+    %     to facilitate chord label inference (Section~\ref{sec:protovoiceHarmonyParser}). 
+    %     This has the benefit over previous approaches of providing an explicit explanation through the proto-voice derivation, with potential to be incorporated in more complex systems to improve their interpretability.
+    %   \item Introducing a novel heuristic search strategy to efficiently explore the large space of possible derivations,
+    %     using a beam search and pruning techniques to significantly reduce the computational complexity (Section~\ref{sub:searchImpl}). 
+    %   \item Demonstrating the effectiveness of this approach on a diverse set of musical pieces in terms of
+    %     accuracy, performance and interpretability (Section~\ref{chap:evaluation}). 
+    % \end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Preparation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -885,35 +888,36 @@ slices and transitions as described in Section~\ref{sub:slicesTransitions}.
   \begin{equation} t \to \underline{t} \label{eq:freezerule} \end{equation} 
 \end{itemize}
 
-\begin{figure}[ht] \centering \begin{subfigure}[t]{.5\textwidth}
-  \centering\includegraphics[keepaspectratio,width=\textwidth]{prep/cadenceouterder.png} \caption{Slices and
-  transitions} \label{fig:cadenceOuterDer} \end{subfigure} \begin{subfigure}[t]{.42\textwidth}
-  \centering\includegraphics[keepaspectratio,width=\textwidth]{prep/cadenceinnerder.png} \caption{Notes and Edges}
-  \label{fig:cadenceInnerDer} \end{subfigure} \begin{subfigure}[t]{.8\textwidth}
-\centering\includegraphics[keepaspectratio,width=\textwidth]{prep/cadencederivation.png} \caption{Abstract notation}
-\label{fig:cadenceDerivation} \end{subfigure}
-\captionsetup{width=.9\linewidth} 
-\caption{An example derivation of a short phrase.
-} \label{fig:innerOuterStructure} 
-\end{figure}
 
-Figure~\ref{fig:innerOuterStructure} gives an example derivation of a short phrase. 
-In Figure~\ref{fig:cadenceOuterDer}, nine outer operations have been applied to generate the surface.
-The generation of the piece begins with an initial split operation (1) which comprises two elaborations of the initial
-regular edge, both using the \texttt{root-note} rule, introducing child notes E and C. 
-Next, a spread operation (2) distributes the notes in the parent slice to the two child slices, with the first slice inheriting both notes, and the second child slice inheriting just the C. 
-This spread introduces a passing edge between E and C, shown as the dashed line in Figure~\ref{fig:cadenceInnerDer}. 
-The next \texttt{split} (3) elaborates the passing edge between E and
-C with the \texttt{passing-final} rule,
-introduce a child passing note, D. The regular edge between the two C's is elaborated using the
-\texttt{full-neighbour} rule, generating the B. The final \texttt{split} (4) introduces a \textit{repetition}, E, and
-a \textit{neighbour}, B, both through double-sided regular operations. Finally, the five surface transitions are marked
-as terminal (5-9), indicating the surface has been fully generated. Note that these freeze operations could've been
-applied in many different permutations, with the only constraint being that no more operations are applied after a transition is frozen.
+% \begin{figure}[ht] \centering \begin{subfigure}[t]{.5\textwidth}
+%   \centering\includegraphics[keepaspectratio,width=\textwidth]{prep/cadenceouterder.png} \caption{Slices and
+%   transitions} \label{fig:cadenceOuterDer} \end{subfigure} \begin{subfigure}[t]{.42\textwidth}
+%   \centering\includegraphics[keepaspectratio,width=\textwidth]{prep/cadenceinnerder.png} \caption{Notes and Edges}
+%   \label{fig:cadenceInnerDer} \end{subfigure} \begin{subfigure}[t]{.8\textwidth}
+% \centering\includegraphics[keepaspectratio,width=\textwidth]{prep/cadencederivation.png} \caption{Abstract notation}
+% \label{fig:cadenceDerivation} \end{subfigure}
+% \captionsetup{width=.9\linewidth} 
+% \caption{An example derivation of a short phrase.
+% } \label{fig:innerOuterStructure} 
+% \end{figure}
 
-Note that the vertically aligned notes in Figure~\ref{fig:cadenceInnerDer}
-correspond to the notes in the surface slices in Figure~\ref{fig:cadenceOuterDer}, and the final surface shown on the
-right of Figure~\ref{fig:cadenceDerivation}. 
+% Figure~\ref{fig:innerOuterStructure} gives an example derivation of a short phrase. 
+% In Figure~\ref{fig:cadenceOuterDer}, nine outer operations have been applied to generate the surface.
+% The generation of the piece begins with an initial split operation (1) which comprises two elaborations of the initial
+% regular edge, both using the \texttt{root-note} rule, introducing child notes E and C. 
+% Next, a spread operation (2) distributes the notes in the parent slice to the two child slices, with the first slice inheriting both notes, and the second child slice inheriting just the C. 
+% This spread introduces a passing edge between E and C, shown as the dashed line in Figure~\ref{fig:cadenceInnerDer}. 
+% The next \texttt{split} (3) elaborates the passing edge between E and
+% C with the \texttt{passing-final} rule,
+% introduce a child passing note, D. The regular edge between the two C's is elaborated using the
+% \texttt{full-neighbour} rule, generating the B. The final \texttt{split} (4) introduces a \textit{repetition}, E, and
+% a \textit{neighbour}, B, both through double-sided regular operations. Finally, the five surface transitions are marked
+% as terminal (5-9), indicating the surface has been fully generated. Note that these freeze operations could've been
+% applied in many different permutations, with the only constraint being that no more operations are applied after a transition is frozen.
+%
+% Note that the vertically aligned notes in Figure~\ref{fig:cadenceInnerDer}
+% correspond to the notes in the surface slices in Figure~\ref{fig:cadenceOuterDer}, and the final surface shown on the
+% right of Figure~\ref{fig:cadenceDerivation}. 
 
 % subsection Inner Structure (end)
 % subsection Outer Structure (end)
@@ -929,7 +933,7 @@ First is the number of notes in each slice, referred to as the size of the slice
 The worst case is dominated by the number of possible \texttt{unsplit} reductions at a single step, which corresponds to to the number of configurations of inner operations involved. 
 The number of possible inner operations is dominated in the worst case by the number of double-sided operations, $\mathcal{O}(|\textit{parents}|^2 \cdot |\textit{children}|) = \mathcal{O}(m^3)$. 
     As a \texttt{split} operation can consist of any configuration of these inner operations, the number of \texttt{split} operations is $\mathcal{O}(2^{m^3})
-    = \mathcal{O}(2^m)$ where $m$ is the size of the slices involved and $c$ is a constant.
+    = \mathcal{O}(2^m)$ where $m$ is the maximal number of notes in each slice involved and $c$ is a constant.
     The second input is the number of slices in the original surface, referred to as the length of the surface, $n$.
     In the worst case, the total number of complete reductions is given by $\mathcal{O}(2^{m^{n}})
     = \mathcal{O}(2^{m \cdot n})$. 
@@ -1016,7 +1020,6 @@ Finally, a new harmony parser is developed that adds constraints to ensure chord
 % \end{itemize}
 %
 % subsection Voices (end)
-\FloatBarrier 
 % \section{Search Algorithms}
 % \label{sec:searchAlgos}
 %
@@ -1159,6 +1162,7 @@ Finally, a new harmony parser is developed that adds constraints to ensure chord
 %
 %
 %       % \textbf{Probabilistic programming} is a programming paradigm that makes use of model definitions and statistical
+
 %       % inference algorithms to compute the conditional distribution of inputs that could have given rise to an observed
 %       % output. 
 %
@@ -1274,6 +1278,16 @@ development strategy chosen drew from the Agile methodology, involving two-week 
 of the plan informed by experimental data and testing. GitHub's continuous integration features were used to run a test
 suite on the repository after every commit.  
 
+% \subsubsection{Dataset selection}
+% The datasets used contain bodies of work by a single composer as shown below, these were selected to exhibit
+% a range of different styles. Each dataset contains an entire set work by a composer consisting of between $15-50$
+% annotated scores, each with varying lengths. Each dataset was split into training, validation, and test sets,
+% using a 60:20:20 split with \textit{stratified sampling} in order to maintain a balanced representation of the
+% different composers. In order to choose hyperparameters, the training and validation sets from each of the five
+% datasets were combined into a single training pool, for use in cross-validation. For the final evaluation, the
+% performance of all developed algorithms will be evaluated on the hold-out test set (20\%). This is to provide an
+% unbiased estimate of each algorithm's performance on \textbf{unseen} data.
+
 \subsection{Languages, libraries and tools}
 \label{sub:languagesLibrariesTools}
 
@@ -1316,14 +1330,12 @@ suite on the repository after every commit.
     are all permissive licenses, guaranteeing freedom to use, modify and redistribute as well as permitting proprietary
     derivative works. 
 
-    \subsection{Hardware, version control and backup} 
-    \label{sub:hardware}
-    The code was developed using Vim for Haskell and Visual Studio
-    Code for Python notebook development, on my personal laptop (16' MacBook Pro 2022, M1 Max, 32GB). Algorithms
-    were first run on my laptop, then later run on a server provided by the EPFL Digital Cognitive Musicology Lab (Dell PowerEdge R740XD Server, 2x Xeon Gold
-    625R, 768GB), using Jupyter notebooks to conduct the evaluation. I used GitHub for all my notes, development and
-    dissertation writing. Finally, this dissertation was written in Vim with VimTeX.
+    The code was developed using Vim for Haskell and Visual Studio Code for Python notebook development, on my personal laptop (16' MacBook Pro 2022, M1 Max, 32GB). 
 
+    I used GitHub for all my notes, development and dissertation writing. Finally, this dissertation was written in Vim with VimTeX.
+
+
+    \label{sub:hardware}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Implementation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1337,7 +1349,7 @@ suite on the repository after every commit.
     Next, the implementation details of the harmony module is discussed, including the inferences used in
     the heuristic function (Section~\ref{sec:harmonyModel}). 
     This is followed by an exposition of the novel proto-voice harmony parser
-    (Section~\ref{sec:protovoiceHarmonyParser}), followed by discussion of the core algorithms implemented (Section~\ref{sec:baselineAlgorithms}), 
+    (Section~\ref{sec:protovoiceHarmonyParser}), followed by discussion of the core algorithms implemented (Section~\ref{sec:coreAlgorithms}), 
     including an implementation of the template matching algorithm \cite{pardoAlgorithmsChordalAnalysis2002} as
     a standard ACE baseline. 
     Then, a description of the heuristic search algorithms developed is given (Section~\ref{sub:searchImpl}). 
@@ -1406,9 +1418,9 @@ suite on the repository after every commit.
     \vspace{1.2\DTbaselineskip}\\
     Harmony Model (Section~\ref{sec:harmonyModel})
     \vspace{4\DTbaselineskip}\\
-    Core Algorithms (Section~\ref{sec:baselineAlgorithms}) 
+    Core Algorithms (Section~\ref{sec:coreAlgorithms}) 
     \vspace{2.6\DTbaselineskip}\\
-    Core Algorithm (Section~\ref{sec:baselineAlgorithms}) 
+    Core Algorithm (Section~\ref{sec:coreAlgorithms}) 
     \vspace{1.1\DTbaselineskip}\\
     Extension Algorithms (Section~\ref{sub:searchImpl}) 
     \vspace{2.9\DTbaselineskip}\\
@@ -1444,7 +1456,6 @@ suite on the repository after every commit.
     \end{tabularx}
     \end{table}
 
-    \FloatBarrier
     \subsubsection{Repository Justification}
 
     The repository has broadly been split into five main modules, as illustrated in Figure~\ref{fig:blockDiagram}.
@@ -1541,7 +1552,6 @@ suite on the repository after every commit.
 
     % This section first motivates  the implementation of the efficient fitness function, including a number of optimisations
     % (Section~\ref{sub:heuristicImplementation}), then justifies the design of the fitness function (Section~\ref{sub:heuristicDesign}).
-    \newpage
     \section{Proto-voice Fitness Function}
     \label{sec:extensionImplementation}
 
@@ -1666,13 +1676,13 @@ suite on the repository after every commit.
     \subsubsection{Scoring Split Operations}
 
 
-  \begin{figure}[ht] \centering \begin{subfigure}[t]{.49\textwidth}
-    \centering\includegraphics[keepaspectratio,width=\textwidth]{impl/reduction/before.png} \caption{Before}
-    \label{fig:reductionBefore} \end{subfigure} \begin{subfigure}[t]{.49\textwidth}
-    \centering\includegraphics[keepaspectratio,width=\textwidth]{impl/reduction/after.png} \caption{After}
-    \label{fig:reductionAfter} \end{subfigure}
-  \captionsetup{width=.9\linewidth} \caption{Single unsplit reduction} \label{fig:reductionStep} 
-  \end{figure} 
+  % \begin{figure}[ht] \centering \begin{subfigure}[t]{.49\textwidth}
+  %   \centering\includegraphics[keepaspectratio,width=\textwidth]{impl/reduction/before.png} \caption{Before}
+  %   \label{fig:reductionBefore} \end{subfigure} \begin{subfigure}[t]{.49\textwidth}
+  %   \centering\includegraphics[keepaspectratio,width=\textwidth]{impl/reduction/after.png} \caption{After}
+  %   \label{fig:reductionAfter} \end{subfigure}
+  % \captionsetup{width=.9\linewidth} \caption{Single unsplit reduction} \label{fig:reductionStep} 
+  % \end{figure} 
 
     The plausibility of a split operation is given by the joint plausibility score of the child notes and parent notes. 
     Recall that \texttt{Split} operations elaborate parent edges by introducing new child notes that are within an interval of
@@ -1756,7 +1766,8 @@ data Split n = SplitOp
     Recall the \texttt{spread} rule : \[t_l s_r \to t'_l s_l t'_m s_r t'_r\] 
     \texttt{Spread} operations include elaborations that introduce child notes which are scored in the same
     fashion as \texttt{split} operations. The spread operation has the music theoretical function of \textit{prolonging} the parent slice, that is, the
-    notes in the child slices are both subsets of the parent slice, exemplifying the same chord label. 
+    notes in the child slices are both subsets of the parent slice, exemplifying the same chord label. As a result,
+    the regular edges introduced in a spread operation are all repetitions.
 
     % \subsubsection{Assumptions}
     % The main assumptions made in order to calculate $\phi$ are as follows. First, the operation plausibilities are conditioned on the assumption that the transition $t = (s_l, e, s_r)$ relates two slices that exemplify their guessed chord labels, $\hat{L}_{s_l}$ and $\hat{L}_{s_r}$. 
@@ -1870,21 +1881,21 @@ data Split n = SplitOp
     The root-note is stored as an \texttt{SPC} (Spelled Pitch Class), from the
     \texttt{haskell-musicology} library.
     
-    \begin{lstlisting}[caption={Chord Label Implementation}, captionpos=b] 
-data ChordLabel = ChordLabel
-  { chordType :: ChordType
-  , rootNote :: SPC }
-
--- | DCML Chord Types
-data ChordType
-  = Major
-  | Minor
-  | DominantSeventh
-  ...
-  | AugmentedSeventh
-  | NoChord
-  deriving (Eq, Enum, Bounded, Ord)
-    \end{lstlisting}
+%     \begin{lstlisting}[caption={Chord Label Implementation}, captionpos=b] 
+% data ChordLabel = ChordLabel
+%   { chordType :: ChordType
+%   , rootNote :: SPC }
+%
+% -- | DCML Chord Types
+% data ChordType
+%   = Major
+%   | Minor
+%   | DominantSeventh
+%   ...
+%   | AugmentedSeventh
+%   | NoChord
+%   deriving (Eq, Enum, Bounded, Ord)
+%     \end{lstlisting}
 
     \subsection{Inferring Harmony}
 
@@ -1900,7 +1911,7 @@ data ChordType
     \For{each chord label $l \in \mathcal{L}$}
     \State Translate the probabilistic chord profiles for $l$ to align with the root note
     \State Compute the log probability of the slice given the rotated profiles
-    \State Add the prior log probability for the chord-type of $l$
+    \State Add the log probability for the chord-type of $l$
     \State Store the log probability and label in a list
     \EndFor
     \State Find the label with the highest log probability in the list
@@ -1913,6 +1924,14 @@ data ChordType
     implementing the function \texttt{pChordtones::ChordLabel -> Vector Double} which calls \texttt{translateVector ::
     Int -> Vector Double -> Vector Double} to translate the chord-tone profile $r_{\texttt{fifths}}$ places to the left,
     aligning the chord-profile with the correct root-note, $r$, on the line of fifths. 
+
+    \subsubsection{Chord-type Probabilities}
+
+    This module exports the probability vector \texttt{pChordType} that contains the relative probabilities $p(c)$ for each of the
+    $14$ chord-types. I make use of a study of observed chord-types \cite{finkensiepChordTypesOrnamentation2023} in order to define
+    $\bm{p}_{\textt{chord-type}}$, where $p^{(c)}_{\texttt{chord-type}}$ gives the relative probability of the
+    chord-type $c$. Chord labels are modelled as i.i.d categorical variables, so $p^{(c)}_{\texttt{chord-type}}$ is
+    found by taking the MLE of the posterior distribution for chord labels found the study.
 
     \subsubsection{Maximising Label Probability}
 
@@ -2050,15 +2069,6 @@ data ChordType
   % \end{algorithmic} 
 % \end{algorithm}
 
-    \subsubsection{Chord-type Prior}
-
-    This module exports the probability vector \texttt{pChordType} that contains the relative probabilities $p(c)$ for each of the
-    $14$ chord-types. I make use of a study of observed chord-types \cite{finkensiepChordTypesOrnamentation2023} in order to define
-    $\bm{p}_{\textt{chord-type}}$, where $p^{(c)}_{\texttt{chord-type}}$ gives the relative probability of the
-    chord-type $c$. Chord labels are modelled as i.i.d categorical variables, so $p^{(c)}_{\texttt{chord-type}}$ is
-    found by dividing the number of observations of each chord-type $c$ by the total number of observed
-    chord labels in the study. 
-
 
 
 
@@ -2119,8 +2129,8 @@ data ChordType
 
       \subsection{Overview of Harmony Parser Design}
 
-      Formally, a derivation $D$ is defined as a pair $(top, \vec{d})$, where the $surface$ is derived by starting
-      with the fully reduced $top$ and applying each operation in $\vec{d}$ in \textit{left-most derivation order}. 
+      Formally, a derivation $D$ is defined as a pair $(top, ops)$, where the $surface$ is derived by starting
+      with the fully reduced $top$ and applying each operation in $ops$ in \textit{left-most derivation order}. 
 
       It is informative to consider the \textit{generation order} and \textit{parse order} of a proto-voice derivation.
       In generation order, we begin with the reduced surface $top$, consisting of only chord-tones, with a pointer at
@@ -2145,15 +2155,19 @@ data ChordType
       addition. 
 
       Finally, the \texttt{HarmonyParser} needs to conserve segment boundaries throughout the reduction it finds.
-      In order to achieve this, as the parser needs to keep track of where the boundaries are, disallow specific
+      In order to achieve this, the parser needs to keep track of where the boundaries are, disallow specific
       reductions that lead to dead states, and propagate boundary information throughout the reduction. 
 
-      The harmony parser adapts and extends the \texttt{GreedyParser.hs} from the \texttt{protovoices-haskell}
-      repository. 
-      This section first describes the \texttt{GreedyParser} before describing the adaptations made to implement the \texttt{HarmonyParser}, finding a chord segment reduction rather than a full derivation.
+      There are many potential ways to parse according to the proto-voice grammar, representing states if
+      a different manner to as described above. For example, the proto-voice reduction rules could be applied
+      to any pair of open transitions rather than those nearest to the parse pointer, which would allow the
+      exploitation of long-range dependencies. I choose not to pursue this at this point due to the associated
+      combinatorial explosion, and the benefits of being able to represent a proto-voice derivation as a sequence
+      of left-most reductions, but this could be a topic for further research.
       
       \subsection{Parse States}
-      The state of parse is described by a sum-type of three sets of states that distinguish between the position
+
+      The state of parse is represented by a sum-type of three sets of states that distinguish between the position
       of the parse pointer. The first type of state, \texttt{SSFrozen}, describes when the pointer is right-most,
       and all transitions are frozen. The second set of states is \texttt{SSSemiOpen}, which describes all the
       states where the pointer is neither left-most or right-most. In a \texttt{SSSemiOpen} state, some
@@ -2161,72 +2175,88 @@ data ChordType
       where the pointer is left-most, and all transitions have been unfrozen. This idea of how to describe states is borrowed from Finkensiep's implementation of the \texttt{GreedyParser} in the original \texttt{protovoices-haskell} repository.
 
 
+    \begin{lstlisting}[caption={Harmony Parser States}, captionpos=b] 
+data ParseState es es' ns o 
+  = psFrozen !(Path (Maybe es', Bool) (Slice ns)) 
+  -- ^ Beginning of parse - all frozen transitions
+  | psSemiOpen -- <- Mid-parse 
+    { _psFrozen :: !(Path (Maybe es', Bool) (Slice ns)) 
+    -- ^ frozen transitions and slices from current point leftward 
+    , _psMidSlice :: !(SliceWrapped ns) 
+    -- ^ the slice at the current pointer
+    , _psOpen :: !(Path (Trans es) (SliceWrapped ns)) 
+    -- ^ non-frozen transitions and slices from current point rightward 
+    , _psDeriv :: ![o] 
+    -- ^ derivation from current reduction to original surface 
+    } 
+  | psOpen !(Path (Trans es) (SliceWrapped ns)) ![o] 
+ -- ^ Final Parse States - path with unfrozen transitions, slices and derivation
+    \end{lstlisting}
 
 
-
-
-      The \texttt{GreedyParser} is adapted and exten 
-      [TODO: make this very succinct + clearer.]
-
-      The Greedy Parser is a bottom-up parser for the protovoice model that enumerates all the valid
-      proto-voice
-      derivations that produce a given score $S \to [D]$. Recall that within the context of the proto-voice model, the
-      original score is called the \textit{surface}, and the surface is \textit{reduced} by parsing, removing
-      non-chord-tones. 
-
-
-      \begin{figure}[ht] \centering\includegraphics[width=\textwidth]{impl/parseState/frozen.png}
-      \caption{\texttt{pSFrozen}} \label{fig:pSFrozen} \end{figure}
+      %
+      % \begin{figure}[ht] 
+      % \begin{subfigure}[t]{\textwidth} 
+      %   \centering
+      %   \includegraphics[width=\textwidth]{impl/parseState/frozen.png}
+      %   \caption{\texttt{SSFrozen}} 
+      %   \label{fig:pSFrozen} 
+      % \end{subfigure}
+      % \begin{subfigure}[t]{\textwidth} 
+      %   \centering
+      %   \includegraphics[width=\textwidth]{impl/parseState/semiopen.png}
+      %   \caption{\texttt{SSSemiOpen}} 
+      %   \label{fig:pSSemiOpen} 
+      % \end{subfigure}
+      % \begin{subfigure}[t]{\textwidth}
+      %   \centering
+      %   \includegraphics[width=\textwidth]{impl/parseState/open.png} 
+      %   \caption{\texttt{SSOpen}}
+      %   \label{fig:pSOpen} 
+      % \end{subfigure}
+      % \caption{Parse States}
+      % \label{fig:parseStates} 
+      % \end{figure}
 
       In the initial parse state, \texttt{pSFrozen}, the surface is represented as a \texttt{path} from the end to the
       beginning of the piece, with the right-most transition at its head. The start($\rtimes$) and stop($\ltimes$)
       symbols are not explicitly stored in the \texttt{path}, but are implied.
-
       All transitions are initialised as frozen, indicated by the double lines in Figure~\ref{fig:pSFrozen}. The
       \texttt{path} begins on the right. In this initial state the only option is to unfreeze the rightmost transition,
       moving to the \texttt{pSSemiOpen} state. 
 
-      \begin{figure}[ht] \centering\includegraphics[width=\textwidth]{impl/parseState/semiopen.png}
-      \caption{\texttt{pSSemiOpen}} \label{fig:pSSemiOpen} \end{figure}
+      \begin{figure}[ht] \centering\includegraphics[width=\textwidth]{impl/parseState/frozen.png}
+      \caption{\texttt{pSFrozen}} \label{fig:pSFrozen} \end{figure}
 
       The \texttt{pSSemiOpen} represents the majority of the parse. The pointer is represented by \texttt{midSlice}, and
       points to the rightmost frozen transition. The \texttt{open} path contains all unfrozen transitions (denoted by
       a single line) from the right of the pointer to the end of the piece, and the \texttt{frozen} path contains all
       frozen transitions from the pointer to the start of the piece.
 
-      \begin{figure}[ht] \centering\includegraphics[width=\textwidth]{impl/parseState/open.png} \caption{\texttt{pSOpen}}
-      \label{fig:pSOpen} \end{figure}
+      \begin{figure}[ht] \centering\includegraphics[width=\textwidth]{impl/parseState/semiopen.png}
+      \caption{\texttt{pSSemiOpen}} \label{fig:pSSemiOpen} \end{figure}
 
       In the final state, \texttt{pSOpen}, the pointer is at the beginning of the piece, and comprises a single path
       \texttt{open} containing only unfrozen transitions from the beginning to the end of the piece.
 
-      Each state also stores a list of operations, $ops$ that when applied to the current reduction, results in the
+      \begin{figure}[ht] \centering\includegraphics[width=\textwidth]{impl/parseState/open.png} \caption{\texttt{pSOpen}}
+      \label{fig:pSOpen} \end{figure}
+
+      Each state also stores a list of operations, \texttt{ops} that when applied to the current reduction, results in the
       original surface. This is empty at the beginning of the parse; for each reduction applied, the corresponding
-      generative operation $op$ is consed to the list: $ops' := op:ops$. 
+      generative operation \texttt{op} is consed to the list: \texttt{ops':=op:ops}. 
 
-      % \begin{lstlisting}[caption={protovoiceEvaluator}, captionpos=b] data ParseState es es' ns o = psFrozen !(Path
-      % (Maybe es', Bool) (SliceWrapped ns)) -- ^ Beginning of search - all frozen edges and slices | psSemiOpen --
-      % ^ Mid-search { _psFrozen :: !(Path (Maybe es', Bool) (SliceWrapped ns)) -- ^ frozen transitions and slices from
-      % current point leftward , _psMidSlice :: !(SliceWrapped ns) -- ^ the slice at the current pointer
-      %       , _psOpen :: !(Path (Trans es) (SliceWrapped ns)) -- ^ non-frozen transitions and slices from current
-      %       point rightward , _psDeriv :: ![o] -- ^ derivation from current reduction to original surface } | psOpen
-      %       !(Path (Trans es) (SliceWrapped ns)) ![o] -- ^ Single path with unfrozen transition,slices and history
-      %       \end{lstlisting}
+      These parse states define a \textbf{directed acyclic graph} where the parse states are nodes and the reductions are edges. 
+      Traversing this graph results in either reach a valid derivation or dead state. 
 
+      \subsection{Parsing Operations} 
+      There is a separation between parsing the outer structure and inner structure. This allows different kinds of
+      inner structure to be parsed while the outer structure stays the same. The outer structure parsing is conducted
+      in the \texttt{HarmonyParser}, while the inner structure parsing is encapsulated in the \textit{evaluators}. 
+      The \texttt{protoVoiceEvaluator} \cite{finkensiepModelingInferringProtovoice2021} provides methods that are used 
+      to enumerate the possible inner operations for each reduction type \footnotemark. 
 
-
-      This is not the only way to parse according to the proto-voice model; the proto-voice reduction rules can be applied
-      to any pair of open transitions. Allowing reductions at any point along the surface could allow for different
-      parse strategies to be employed that may have advantages. I choose not to pursue this due to the associated
-      combinatorial explosion, and the benefits of being able to represent a proto-voice derivation as a sequence of
-      left-most reductions.
-
-      \subsubsection{Parsing Operations} The \texttt{protoVoiceEvaluator}
-      \cite{finkensiepModelingInferringProtovoice2021} provides methods that are used to enumerate the possible
-      operations for each reduction type \footnotemark. It also includes an implementation of a greedy parser, from
-      which ideas were adapted and expanded upon to create the proto-voice parser. This allows the parser to consider
-      only the outer structure of slices and transitions while parsing without exposing the internal notes and edges.
-      \footnotetext{Note that the notation used here for functions combines type definitions with variable names. For
+      \footnotetext{Note that the notation used here for functions combines type declarations with variable names. For
       example, the function \texttt{evalUnsplit} has type $\texttt{evalUnsplit}::(transition, slice, transition) \to
     [(transition, operation)]$, but type names (e.g. $transition$) have been substituted by variable names (e.g. $t_l,
   t_r, t_{top}$) for expository purposes.}
@@ -2255,25 +2285,28 @@ data ChordType
 
   The \texttt{evalUnfreeze} and \texttt{evalUnsplit} functions allow the associated generative operation,
   \texttt{freeze} and \texttt{split} to be determined trivially, but the possible \texttt{spread} operations need to
-  derived using \texttt{unSpreadLeft}, \texttt{unSpreadRight}, and \texttt{unSpreadMiddle}. This is achieved using the
-  \textit{list monad}, wherein multiple branches of sequential computation appear to be executed simultaneously,
-  returning the results of all possible computation branches in a list.
+  derived using \texttt{unSpreadLeft}, \texttt{unSpreadRight}, and \texttt{unSpreadMiddle}. This is achieved by
+  considering all combinations of left parent transitions and right parent transitions if the middle operation exists. 
 
-  \begin{algorithm}[ht] 
-    \caption{Enumerate unspread reductions} 
-    \label{code:heuristic0}
-    \begin{algorithmic}[1] 
-      \Function{CollectUnspreads}{$s_l~t_l~s_m~t_r~s_r$} 
-      \State \textbf{using} List Monad
-      \textbf{do} 
-        \State $(s_{top}, op) \gets$ \texttt{maybeToList}~\$~\texttt{evalUnspreadMiddle} $(s_l, t_m, s_r)$
-        \State $t_{topl} \gets $\texttt{evalUnspreadLeft}~$(s_l, t_l)~s_{top}$ 
-        \State $t_{topr} \gets$ \texttt{evalUnspreadRight}~$(s_r, t_r)~s_{top}$ 
-        \State \textbf{return} $(l_{top}, s_{top}, r_{top}) $
-      \EndFunction
-    \end{algorithmic} 
-  \end{algorithm}
-
+  % This is achieved using the
+  % \textit{list monad}, wherein multiple branches of sequential computation appear to be executed simultaneously,
+  % returning the results of all possible computation branches in a list.
+  %
+  % \begin{algorithm}[ht] 
+  %   \caption{Enumerate unspread reductions} 
+  %   \label{code:heuristic0}
+  %   \begin{algorithmic}[1] 
+  %     \Function{CollectUnspreads}{$s_l~t_l~s_m~t_r~s_r$} 
+  %     \State \textbf{using} List Monad
+  %     \textbf{do} 
+  %       \State $(s_{top}, op) \gets$ \texttt{maybeToList}~\$~\texttt{evalUnspreadMiddle} $(s_l, t_m, s_r)$
+  %       \State $t_{topl} \gets $\texttt{evalUnspreadLeft}~$(s_l, t_l)~s_{top}$ 
+  %       \State $t_{topr} \gets$ \texttt{evalUnspreadRight}~$(s_r, t_r)~s_{top}$ 
+  %       \State \textbf{return} $(l_{top}, s_{top}, r_{top}) $
+  %     \EndFunction
+  %   \end{algorithmic} 
+  % \end{algorithm}
+  %
     % \begin{figure}[ht] 
     %   \centering 
     %   \includegraphics[width=0.7\textwidth]{impl/parseTreeOpen.png} 
@@ -2297,35 +2330,47 @@ data ChordType
   \subsection{Conserving Segment Boundaries}
   \label{sub:boundaryHandling}
 
-  Recall that the goal of the parse is to reduce the original surface such that there is one slice per segment,
-  containing only chord-tones. In order to achieve this, constraints are imposed on the reduction operations dependent
-  on adjacent segment boundaries. 
+  Recall that the goal of the parse is to reduce the original surface such that there is one slice per segment. 
+  In order to achieve this, constraints are imposed on the reduction operations dependent on adjacent segment boundaries. The boundary values are integrated in to the \texttt{HarmonyParser} by augmenting the transition data-type,
+  \texttt{Trans} with a boolean tag indicating whether or not the transition crosses a boundary.
 
-  \begin{figure}[ht] \centering \includegraphics[width=0.6\textwidth]{impl/parseInit.png} \caption{Parse Initialisation}
-  \label{fig:parseInit} \end{figure}
+    \begin{lstlisting}[caption={Transition Data-type}, captionpos=b] 
+data Trans es = Trans
+  { tContent :: !es
+  -- ^ The value inside the transition, i.e. protovoice edges
+  , t2nd :: !Bool
+  -- ^ Marks if this transition is the 2nd right parent of a spread
+  , tBoundary :: !Bool
+  -- ^ Marks whether or not this transition is at a boundary between two segments
+  }
+    \end{lstlisting}
 
-  Each transition has a boolean \textit{boundary} value which indicates if the transition is across a segment boundary,
-  denoted by the dashed vertical line in Figure~\ref{fig:parseInit}. Let $B_t : t \to \{\textbf{True},
-  \textbf{False}\}$, such that $B_f$, $B_l$, $B_m$, and $B_r$ denote the boundary values of $t_f$, $t_l$, $t_m$ and
+  % Each transition has a boolean \textit{boundary} value which indicates if the transition is across a segment boundary,
+  % denoted by the dashed vertical line in Figure~\ref{fig:parseInit}. 
+  Let $B_t : t \to \{\textbf{True}, \textbf{False}\}$, such that $B_f$, $B_l$, $B_m$, and $B_r$ denote the boundary values of $t_f$, $t_l$, $t_m$ and
   $t_r$ respectively, as shown in Figure~\ref{fig:parseStateOptions}. As an \texttt{unspread} operation ($t_l~s_l~t_m~s_r~t_r \to t_{topl} s_{top} t_{topr} $) merges
   two slices $s_l$ and $s_r$, removing $t_m$, the constraint $\lnot B_m$ is imposed to prevent two segments from
   merging. Similarly, an \texttt{unsplit} operation (eg. $t_l~s_l~t_m \to t_{top}$) combines two transitions, thus we
   impose the constraint $\lnot (B_l \wedge B_m)$. Finally, the \texttt{unfreeze} operation shifts the context to the
   left. If a boundary transition is unfrozen, no more reduction operations can be applied to its right, hence it
   a necessary condition that the segment has been fully reduced. Thus the constraint imposed on an \texttt{unfreeze}
-  operation is $\lnot B_f \vee (B_l \wedge B_m \wedge B_r)$. Note that there are some configurations that are
-  \textit{unreachable}, such as $B_f \wedge (B_l \wedge B_m \wedge \lnot B_r)$, thus the \texttt{unfreeze} constraint
-  could be simplified to $\lnot B_f \vee (B_l \wedge B_m)$, but I have chosen not to as it would obfuscate the
-  semantics, and the cost of an additional logic check is negligible. 
+  operation is $\lnot B_f \vee (B_l \wedge B_m \wedge B_r)$. Figure~\ref{fig:parseStateOptions} provides an illustration of these constraints. The boundary must also be propagated to parent transitions following a reduction, defined by the union of each child transitions' boundary values for a given reduction.
+  % Note that there are some configurations that are \textit{unreachable}, such as $B_f \wedge (B_l \wedge B_m \wedge \lnot B_r)$, thus the \texttt{unfreeze} constraint
+  % could be simplified to $\lnot B_f \vee (B_l \wedge B_m)$, but I have chosen not to as it would obfuscate the
+  % semantics, and the cost of an additional logic check is negligible. 
+  \begin{figure}[ht] 
+    \centering 
+    \includegraphics[width=0.55\textwidth]{impl/boundarydiagram/diag.png} \caption{Boundary
+  reduction conditions and propagation} 
+\label{fig:parseStateOptions} 
+\end{figure}
   % \footnote{Should this be a footnote? I have chosen to include it as it an example of a decision made that
   % demonstrates thinking.}
 
-  \begin{figure}[ht] \centering \includegraphics[width=0.85\textwidth]{impl/boundarydiagram/diag.png} \caption{Boundary
-  reduction conditions and propagation} \label{fig:parseStateOptions} \end{figure}
 
-  Figure~\ref{fig:parseStateOptions} provides an illustration of these constraints. The boundary must also be propagated
-  to parent transitions following a reduction, defined by the union of each child transitions' boundary values for
-  a given reduction.
+
+  % \begin{figure}[ht] \centering \includegraphics[width=0.6\textwidth]{impl/parseInit.png} \caption{Parse Initialisation}
+  % \label{fig:parseInit} \end{figure}
 
   % \begin{figure}[ht!] \centering \begin{subfigure}[b]{0.23\textwidth} \centering \scalebox{0.6}{
   % \begin{karnaugh-map}[4][4][1][$CD$][$AB$] \minterms{0} % \maxterms{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
@@ -2352,10 +2397,10 @@ data ChordType
 
     % \footnotetext{I guess I'll move this to the heuristic design section?}
 
-    Figure~\ref{fig:statetrans} shows the 9 possible outer configurations of slices after two reduction steps, shown for
-    a single segment reduction consisting of three slices and four transitions. One of these configurations,
-    \texttt{UnsplitLeft} $\circ$ \texttt{UnsplitRight}, is redundant as it results in the same configuration as
-    \texttt{UnsplitLeft} $\circ$ \texttt{UnsplitLeft}, so it is prohibited.
+    % Figure~\ref{fig:statetrans} shows the 9 possible outer configurations of slices after two reduction steps, shown for
+    % a single segment reduction consisting of three slices and four transitions. One of these configurations,
+    % \texttt{UnsplitLeft} $\circ$ \texttt{UnsplitRight}, is redundant as it results in the same configuration as
+    % \texttt{UnsplitLeft} $\circ$ \texttt{UnsplitLeft}, so it is prohibited.
 
     % Note that while the number of possible outer structure reductions grows exponentially, each reduction consists of
     % a set of inner operations on the notes and edges contained within each slice and transition, which also grows
@@ -2368,8 +2413,6 @@ data ChordType
     % all parses for \textit{any} piece, and there are cases when storing the each the of different \texttt{unsplit}
     % operations at a single step in memory is not possible.
 
-    The parse states define a \textbf{directed acyclic graph} where the parseStates are nodes and the parse operations
-    are edges. Traversing this graph results in either reach a valid derivation or dead state. 
 
     % \FloatBarrier \subsubsection{Parse Goal}
 
@@ -2449,76 +2492,229 @@ data ChordType
 % - Extension of monte carlo simulation with reservoir sampling.\\
 
 \section{Core Algorithms} 
-\label{sec:baselineAlgorithms}
+\label{sec:coreAlgorithms}
 
-The goal of proto-voice parser is to find a derivation $D= (top, ops)$ which results in
-a top sequence of slices $top$ consisting of only chord-tones. 
+All algorithms implemented in this project are encapsulated within the \texttt{Algorithm} module.
+The \texttt{ParseAlgo} type-class provides an interface for running these algorithms. 
+The result is wrapped in a \texttt{Maybe} to describe the case when no full reduction is found, 
+and is in the \texttt{IO} monad to allow randomness.
 
-The \texttt{ParseAlgo} type-class provides an interface for running these algorithms. The result is wrapped in
-a \texttt{Maybe} as it is possible for the search to get stuck, and is in the \texttt{IO} monad to allow
-randomness.
+The input is implemented as a sum-type, \texttt{AlgoInput}, which is either pure or impure, where the \texttt{PureEval} is a evaluator for inner proto-voice operations that returns the list of all possible inner operations
+for each type of reduction. The \texttt{ImpureEval} is an adapted evaluator that instead samples from the possible
+operations without enumerating them, allowing an exponential to linear reduction in time-complexity with respect to the
+size of each slice. 
 
-\begin{lstlisting}[caption={Algorithm type-class}, captionpos=b] 
-  class (Show algo) => ParseAlgo algo where 
-    runParse :: algo -> AlgoInput -> IO (Maybe AlgoResult) 
+The output is implemented as \texttt{AlgoResult}, a sum-type of \texttt{BlackBoxResult},
+\texttt{ReductionResult} or \texttt{PVResult}. The \texttt{BlackBoxResult} contains just the inferred chord labels with
+no explaination, and is used to represent the output of the baseline Templating algorithm. 
+The \texttt{ReductionAnalysis} contains a reduced surface represented as a list of slices. 
+The \texttt{ProtoVoiceAnalysis} comprises a pair \texttt{(top, ops)} where \texttt{top} represents the reduced surface
+as a path from the beginning of the piece to the end, and \texttt{ops} is the sequence of derivation steps in generation
+order. 
+
+% The goal of proto-voice parser is to find a derivation $D= (top, ops)$ which results in
+% a top sequence of slices $top$ consisting of only chord-tones. 
+
+
+\begin{lstlisting}[caption={Algorithm Module Overview}, captionpos=b] 
+data AlgoType
+  = Templating
+  | InformedReduction 
+  | RandomReduction
+  | RandomParse
+  ... 
+  | StochasticBeamSearch
+  deriving (Show, Read, Eq)
+
+class ParseAlgo algo where 
+  runParse :: algo -> AlgoInput -> IO (Maybe AlgoResult) 
+
+data AlgoInput 
+  = AlgoInputPure   PureEval   [InputSlice] [ChordLabel] 
+  | AlgoInputImpure ImpureEval [InputSlice] [ChordLabel]
+
+data AlgoResult 
+  = BlackBoxResult   [ChordLabel]
+  | ReductionResult  ReductionAnalysis 
+  | PVResult         ProtoVoiceAnalysis
+  deriving (Show)
 \end{lstlisting}
 
+\textbf{Template Matching: }
+As a baseline for evaluating the efficacy of the reduction process, I implemented \textit{Pardo and Birmingham's} 
+Templating algorithm \cite{pardoAlgorithmsChordalAnalysis2002},
+  a standard ACE algorithm for predicting chord labels from sequences of slices. 
+  This algorithm is parameterised by \textit{templates}, which are equivalent to binary chord-tone profiles. 
+  The templates used correspond to the chord-tone profiles used in the Harmony model and the heuristic search 
+  algorithms, allowing to a fair comparison to be made against the templating baseline. 
+  The algorithm works by choosing the chord label with the highest score for each chord segment, given by the formula $S = P - (M
+  - N)$. The Positive Evidence, $P$, is the number of notes in the segment whose pitch class matches a template element.
+  The Negative Evidence, $N$, is the number of notes in the segment whose pitch class does not match any template
+  element. The Misses, $M$, is the number of template elements which are not matched by any note in the segment. Finally
+  a sequence of rules are used to break ties when multiple labels are assigned the same score.
 
-\subsection{Baseline: Template Matching}
-[TODO: explain implementation with pseudocode]
+\textbf{Informed Reduction: }
+The Informed Reduction algorithm reduces each segment by using removing non-chord-tones according to the ground-truth 
+probabilistic chord profiles, corresponding to an idealised reduction. The purpose of this algorithm is to test the
+efficacy of the chord segment reduction process and the Harmony Model by showing how well chords can be inferred given
+a `perfect' reduction of the piece.
 
-\subsection{Baseline Reductions}
-[TODO: short motivation ]
+\textbf{Random Reduction: }
+The Random Reduction algorithm services as a baseline for reductions that make use of proto-voice derivations. This
+algorithm works by combining all notes in each segment into a single slice, and random removing notes until there are $n$ 
+notes in each segment, where $n$ is sampled from a Poisson distribution, $n \sim \text{Poisson}(\lambda)$. The parameter 
+$\lambda$ is taken from the empirical study \textit{Chord Types and Ornamentation}
+\cite{finkensiepChordTypesOrnamentation2023}.
 
-\subsubsection{Informed Reduction}
-[TODO: explain: using the actual ground truth to do the chord segment reduction. 
-This gives a theoretical bound on the expected performance of the chord segment reduction process.]
-
-\subsubsection{Random Reduction}
-As a second baseline, consider the simplest form of reduction, removing notes by randomly guessing if they are chord
-tones or non-chord-tones. This is the \textbf{RandomReduction} algorithm. It is equivalent to combine all the slices in
-a given segment and take a random sample without replacement of $n$ notes from the combined slice. The number of notes
-is sampled from a Poisson distribution, $n \sim \text{Poisson}(\lambda)$, where $\lambda$ is learned from data. 
-
-\subsection{Core: Random Parse}
-Next, the core algorithm is the \textbf{RandomWalk} algorithm using the protovoice parser. This algorithm takes a random
-walk through the parse states graph. The proto-voice model does not make judgements based on harmony or note function
+\textbf{Random Parse: }
+The first core algorithm is the \textbf{Random Parse} algorithm which reduces the surface via a proto-voice derivation by randomly 
+traversing the graph of parse states. The proto-voice model does not make judgements based on harmony or note function
 explicitly, but by comparing this algorithm to the other baselines, it can be determined whether the constraints
 enforced by using a proto-voice derivation has any effect on the quality of the reduction. 
 
+\section{Extension: Heuristic Search Algorithms}
+\label{sec:searchImpl}
 
-    % We assign 0 cost to unfreeze operations. This means we need
-    % to be careful about ensure that we don't just unfreeze the entire piece immediately. Careful construction of the
-    % search algorithm can ensure this. More later.
-  %   \paragraph{Single Sided Operations} \begin{itemize} \item Right Neighbour (Left Neighbour anagolously) \[ x \implies
-  %     x \to n~~, x,n \in P \] \[x \sim \text{Categorical}(\sigma_{ct}^{\theta_l})\] \[n \sim
-  %     \text{Categorical}(\sigma_{or}^{\theta_r})\] Find \[P(x,n~|~\theta_l)\] \item Right Repeat (Left Repeat
-  %     anagolously) \[ x \implies x \to x~~, x \in P \] \[x \sim \text{Categorical}(\sigma_{ct}^{\theta_l})\] Find
-  %   \[P(x~|~\theta_l)\] \end{itemize} \paragraph{Two Sided Operations} \begin{itemize} \item Root Note: This operation
-  %   is only done once in the original model. In our case we do not need to consider due to segment boundaries. \item
-  %   Full Repeat: \[ x \implies x \to n~~, x,n \in P \] \[x \sim \text{Categorical}(\sigma_{ct}^{\theta_l})\] \[n \sim
-  %   \text{Categorical}(\sigma_{or}^{\theta_r})\] Find \[P(x,n~|~\theta_l)\] \item Left Repeat of Right: \[ x \to
-  %   y \implies x \to y' \to y \] \[y \sim \text{Categorical}(\sigma_{ct}^{\theta_l})\] Find \[P(y~|~\theta_l)\] \item
-  %   Full Neighbour: \[ x_1 \to x_2 \implies x_1 \to n \to x_2, x \in P \]
-  %   % \[x \sim \text{Categorical}(\sigma_{ct}^{\theta_l})\]
-  % Find \[P(|~\theta_l,\theta_r)\] \end{itemize}
-  %
+All the core code described before this section was implemented in the early stages of this project. The bulk of the
+time since involved an iterative process of refining the heuristic fitness function, reading research papers and experimenting with different heuristic search algorithms. 
 
-  %
-  %
-    % Step 1: Design heuristic to be as accurate as possible. I.e the extreme is to consider every possible parse, but for
-    % a single piece there can be over $10^{10^{10^{10^{10^{10}}}}}$ different parses. We consider 1 step at a time at
-    % first - this still results in needing to choose an operation out of upwards of 30,000,000 options for just a single
-    % step.     \par First the full piece heuristic parse \par The goal of the heuristic is to find the probability of
-    % a reduction. 
+\subsection{Stochastic Beam Search}
+\label{sub:searchImpl}
+
+The final iteration of my heuristic search experimentation is the \textbf{Stochastic Beam Search} algorithm. This
+algorithm achieves a reduction of time complexity from the original proto-voice Chart Parser from $\mathcal{O}(2^{n\cdot
+m})$ to $\mathcal{O}(\beta \cdot \gamma \cdot n \cdot m)$, where $n$ is the number of surface slices, $m$ is maximal
+number of notes in each slice, and $\beta,\gamma$ are parameters. By
+making use of pruning techniques and the fitness function developed in Section~\ref{sub:heuristicImplementation}, I show a qualitative
+(Section~\ref{sub:evalInterpret}) and a statistically significant quantitative improvement in chord labelling 
+accuracy over the Random Parse for a variety of pieces (Section~\ref{sec:evalBaseline}).
 
 
-    % Here the \texttt{ProbVectorSingle} function a vector for the.
-    % \begin{figure}[ht] \centering \includegraphics[width=0.7\textwidth]{splitsssemiopen} \caption{Split operation}
-    % \label{fig:splitoperation} \end{figure}
+This algorithm was developed by necessity, \textbf{solving three key problems}. First is that the fitness function used naively with
+a greedy algorithm would result in \textbf{local optima}, with limited improvement over the random search. Interestingly, the
+greedy search resulted in an increased chance of reaching a dead state, leading to an incomplete parse. This problem was
+mitigated by using a beam search, which maintains a bounded number of best search states evaluated using the fitness function.
 
-  % \FloatBarrier \subsubsection{Scoring Unspread Operations}
-  %
+The second problem was that of \textbf{diversity} in the types of reductions performed. The fitness function approximates the
+relative plausibilities of each operation independently but their fitnesses cannot be compared against each-other
+directly. This problem was solved taking up to $\beta$ successors of each reduction type, shown in Line~6, as well as adjusting the
+relative operation weightings of the fitness function to align \texttt{spreads} and \texttt{splits} more closely. Future
+work could include developing a more sophisticated \textit{diversity metric} that as added to the fitness function 
+
+The third was the biggest roadblock I ran into in this project which was the \textbf{combinatorial blowup} that arose due to the number of possible
+\texttt{unsplit} reductions at each step. For slices of size $m$, the number of \texttt{freeze}
+operations is $\mathcal{O}(1)$, the number of \texttt{unspread} operations is $\mathcal{O}(m)$, but the number of
+\texttt{unsplit} operations is $\mathcal{O}(2^m)$, as it is defined combinatorially, choosing any configuration of
+$\mathcal{O}(m^3)$ possible elaborations, as each elaboration requires a choice of two parent notes and a child note.
+
+In order to implement this algorithm a sizeable change had to be made to the existing \texttt{protoVoiceEvaluator}. The
+existing function \texttt{evalUnsplit} takes a slice and two neighbouring transitions $(t_l,s,t_r)$and returns a list of
+all possible parent transitions, with the corresponding \texttt{split} operation, $[(t_{top}, op)]$. This is all done
+using the \textit{list monad}, which is analogous to the workings of non-deterministic finite automaton. Within the list
+monad, each action is chosen from a list "non-deterministically", so that in the end all combinations have been
+considered. In order to adapt this code I created a new monad, the \texttt{RandomChoice} monad, which works in a similar
+way to the list monad, but instead samples from the possible actions at each decision point instead. This was
+implemented in a new \texttt{Probability} module and allowed the \texttt{evalUnsplitImpure} to be written by adapting
+the existing
+\texttt{evalUnsplit} with minimal changes. This has the potential to be a useful Haskell module for probabilistic
+inference in other contexts.
+
+ \begin{algorithm}[h] 
+   \caption{Stochastic Beam Search} 
+   \label{code:stbs0}
+   \begin{algorithmic}[1]
+    \State \textbf{hyper-parameters: } $\beta \gets BeamWidth, \gamma \gets SampleSize$ 
+    \State \textbf{initialise: } $open \gets \{initialState\}$, $costs \gets \{initialState: 0 \}$
+    \Comment {$|open| = 1$}
+    \While {$open$ does not contain any goal states} 
+    \Comment {Loop runs $2n - k +1$ times}
+    % \State Initialise \textit{freezes}, \textit{spreads}, \textit{splits} as empty lists
+    \State $freezes \gets \bigcup\limits_{s \in open} \Call{Unfreezes}{s}$ 
+    \Comment {$|freezes| \leq \beta$}
+    \State $spreads \gets \bigcup\limits_{s \in open} \Call{Unspreads}{s}$ 
+    \Comment {$|spreads| \leq \beta$}
+    \State $splits \gets \bigcup\limits_{s \in open} \Call{SampleUnsplits}{s, \gamma}$ 
+    \Comment {$|splits| \leq \gamma \cdot \beta$}
+    \State Compute heuristic cost for each state in $freezes$ 
+    % \Comment {Linear in $freezes$}
+    \State Compute heuristic cost for each state in $splits$ 
+    % \Comment {Linear in $splits$}
+    \State Compute heuristic cost for each state in $spreads$ 
+    % \Comment {}
+    \State $open, costs \gets \bigcup\limits_{freezes, spreads, splits}$ Best $\beta$ states and costs.
+    \Comment {$|open| \leq 3 \beta$ }
+    \EndWhile \\
+  % \EndWhile ~
+  \Return Best state in open 
+  \end{algorithmic} 
+  \end{algorithm}
+
+\subsubsection{Complexity Analysis}
+\label{sub:complexityAnalaysis}
+
+Finally, I provide a proof of algorithmic complexity for the Stochastic Beam Search algorithm by carefully analysing the
+algorithm line-by-line, proving that this algorithm improves on the complexity of the parser in the original paper from $\mathcal{O}(2^{n\cdot m})$ where $n$ is
+the number of slices, and $m$ is the maximal number of notes in each slice, to $\mathcal{O}(\beta \cdot \gamma \cdot
+n \cdot m)$, where $\beta$ is the beam-width and $\gamma$ is the sample-size.
+Let $n$ be the number of slices in the input, and $k$ the number of chord segments, where $k \leq n$, $k,n \in
+\mathbb{N}^{+}$. Let $m \in \mathbb{N}^{+}$ be the maximal number of notes in the input slices. 
+% The graph of parse states form a directed \textit{search tree} where the root of the tree is the beginning of the parse, when $open$ contains only the initial state. 
+
+I first attest that $|open| \leq 3\cdot \beta$ throughout the execution of the algorithm. 
+During the first iteration, $|open| = 1$ as it is initialised to contain only $initailState$ on Line~2.
+The set $open$ is only updated at the end of the loop, on line 10, where $open$ is reassigned to the union of the best
+$\beta$ states from three sets of states, which is strictly less than or equal to $3\beta$.
+
+Next, I show that the number of computations within each iteration of the while loop in Line~3 is $\mathcal{O}(m \cdot
+\beta \cdot \gamma )$, then
+show that the number of loop iterations is $\mathcal{O}(n)$, thus proving that the complexity of the algorithm is
+$\mathcal{O}(\beta \cdot \gamma \cdot n\cdot m)$. 
+
+Lines 4 and 5 each compute the union of all the \textit{unfreeze} and \textit{unspread} successors of the states in
+\textit{open}, respectively. There are zero or one unfreeze successors for each state, and each successor is computed in
+constant time so $|freezes| \leq \beta$ and Line 4 requires $\mathcal{O}(\beta)$ computation steps.
+There are also zero or one unspread successors for each state, but each successor is computed by computing the maximal
+slice of the two child slices. While $|spreads| \leq 3\beta$, computing \textit{spreads} requires $\mathcal{O}(\beta \cdot m)$ computation steps. 
+Finally Line 6 computes the union of samples of all the \textit{unsplit} successors of the states in \textit{open}. Each
+sample consists of making a random choice between $\mathcal{O}(m)$ options, a constant number of times. Given that
+$\gamma$ operations are sampled for each state in \textit{open}, Line 6 involves $\mathcal{O}(\gamma \cdot \beta \cdot m)$ computation steps.
+
+Next, Lines 7,8 and 9 compute the heuristic costs for freezes, splits and spreads respectively. The computation of the
+heuristic involves up to three evaluations of the multinomial probability density function, which scales linearly in
+$m$. For unSpreads the algorithm needs to perform inference of the latent chord label for the new parent slice. This
+involves a multinomial evaluation for each of a finite vocabulary (120) of chords, which is also linear in $m$. The
+number of computation steps in lines 7 to 9 is $\mathcal{O}(\gamma \cdot \beta \cdot m)$  
+
+Line 10 involves finding the best $\beta$ states for each of the three sets of states. This was achieved by
+writing an efficient function \texttt{minElems} which finds the best $\beta$ states in one pass, resulting in
+$\mathcal{O}(\beta ^2)$ computation steps.
+
+% The branching factor is given by the number of possible parse operations at each step. This defines how many states the
+% heuristic fitness function is calculated for in each iteration of the search. For a single path through the search tree,
+% there is only one possible unfreeze operation at each step. At each step the possible unspread operation is known
+% deterministically, and is either permitted or not permitted. 
+% Finally, the number of unsplit operations is reduced from $\mathcal{O}(2^m)$ to a constant $\mathcal{O}(\gamma)$ by
+% sampling at each decision point when computing each unsplit operation (bounded by a constant number of decisions). This
+% is repeated $\gamma$ times, resulting in $\mathcal{O}(\gamma)$ potential unsplit operations considered at each step. 
+% is linear wthat the height of the search tree is $\mathcal{O}(n)$, then show that the worst case branching factor is $\mathcal{O}(\gamma)$. 
+
+% I first show that the height of the search tree is $\mathcal{O}(n)$, then show that the worst case branching factor is $\mathcal{O}(\gamma)$. 
+
+Each iteration of the loop on line 3 increments the number of derivation steps stored each state in \textit{open} by
+exactly 1. It follows that the number of iterations of the loop on line 3 in the worst case is defined by the maximal
+number of derivation steps in a full chord segment reduction, as this the definition of a goal state. 
+Consider a single path through the search tree. 
+Each step through the search tree comprises either an unfreeze, unsplit or unspread operation. At the beginning of the parse, all transitions are marked as frozen, and for the parse to complete each transition is unfrozen once and only once. As no transition is reduced before it is unfrozen, and there is one more transition than there are slices, the number of unfreeze operations is $n+1$. Secondly, both unsplit and unspread only reduce unfrozen transitions, and each decrease the number of slices in the reduced surface by $1$. As the \texttt{Harmony Parser} ensures that the parse
+results in exactly one slice per segment, the number of unsplit and unspread operations in one complete reduction is
+equal to the number of excess slices, $n-k$. Therefore the number of iterations of the while loop on line 3 is $2n-k+1 = \mathcal{O}(n)$.
+
+In then follows that as the complexity each iteration of the while loop is $\mathcal{O}(\gamma \cdot \beta \cdot m)$ and
+the number of iterations is $\mathcal{O}(n)$, the complexity of the StochasticBeamSearch algorithm is
+$\mathcal{O}(\gamma \cdot \beta \cdot n \cdot m)$, linear in both input dimensions and both parameters.
+% Now given a beam of width $\beta$, the number of operations considered at each step is given by multiplying the branch
+% factor by the beam width, giving $\mathcal{O}(\beta \cdot \gamma)$. Finally, for the entire parse it follows that the
+% algorithmic complexity is $\bm{\mathcal{O}(\beta \cdot \gamma \cdot n \cdot m)}$
+
   % Consider the Spread rule : \[t_l s_r \to t'_l s_l t'_m s_r t'_r\] We make the assumption that $s$, $s_l$, \& $s_r$ are
   % all realisations of the same chord. This lines up with the music theorretical basis for this operation in the
   % model(justify). \par Thus we find the most likely chord (optional extension: marginalise over all chords) \[\theta
@@ -2559,115 +2755,17 @@ enforced by using a proto-voice derivation has any effect on the quality of the 
   %   as they are different operations, the calculations of likelihood may cause an imbalance. All likelihoods are stored
   %   in log space.
   %
-    \FloatBarrier
-
-    \section{Heuristic Search} 
-    \label{sub:searchImpl}
-    [TODO: entire section, justify and explain implemntation, use fitness funciton but without] 
-
-    \subsection {Stochastic Beam Search}
-
-    \subsubsection{Motivation}
-    \subsubsection{Implementation}
-    \subsubsection{Complexity Analysis}
-
-    \begin{algorithm}[ht] \caption{Greedy Search} \label{code:greedy} \begin{algorithmic} \State \textbf{initialise:
-      } $state \gets initialState$ \While {$state$ is not a goal state} \State $state \gets \argmin\limits_{s \in
-      \Call{Expand}{state}} \Call{H}{s} $ \State $freezes, spreads, splits \gets $ Split $nextStates$ by $operation$
-      type \State $open \gets $ Take best $\beta$ best states from $freezes \cup spreads \cup splits$ \EndWhile \\
-      % \EndWhile ~
-    \Return Best state in open \end{algorithmic} \end{algorithm}
-
-    Always consider a certain number of slices and spreads.
-    \subsubsection{Complexity Analysis}
-
-    \subsection {Beam Search}
-    Step 2: Relax the heuristic search in order to reduce runtime/ lower complexity. \par In
-    the case that there are 85,000,000 options, perhaps we should sample the options rather than evaluating all of them.
-    \par This version of heuristic search should be able to parse full pieces (hopefully), so can be used to compare
-    with the baselines on an entire corpus. \par Beam of size n, with 1 for a freeze, k for spread, n-k-1 
-
-    \subsubsection{Dual Beam Search} 
-    It isn't clear how to determine how we should balance the costs of unspread and unsplit op
-
-    \begin{algorithm}[ht] 
-      \caption{MultiBeam Search} 
-      \label{code:mbs} 
-      \begin{algorithmic} 
-        \State \textbf{hyper-parameters: } $\beta \gets BeamWidth, \gamma \gets ReservoirSize$ 
-        \State \textbf{initialise: } $open \gets (initialState, 0)$ \While {$open$ does not contain any goal states} 
-        \State $nextStates \gets \bigcup\limits_{(s, c) \in open }\left\{ (s', c' + \Call{h}{s'}) : (s', c') \in \Call{Expand}{(s,c)} \right\}$ 
-        \State $freezes, spreads, splits \gets $ Split $nextStates$ by $operation$ type 
-        \State $open \gets $ Take best $\beta$ best states from $freezes \cup spreads \cup splits$ \EndWhile \\
-        \Return Best state in open 
-      \end{algorithmic} 
-    \end{algorithm}
-
-   \subsection{Stochastic Dual Beam Search} 
-   [TODO: Justify and correct pseudocode/ cut the bullshit. Genentic algorithm]
-
-     We propose sampling from the options, increasing the proportion that we ignore dependent on the number of options.
-     \begin{algorithm}[ht] \caption{Reservoir MultiBeam Search} \label{code:stbs0}
-
-  \begin{algorithmic} 
-    \State \textbf{hyper-parameters: } $\beta \gets BeamWidth, \gamma \gets ReservoirSize$ 
-    \State \textbf{initialise: } $open \gets (initialState, 0)$ \While {$open$ does not contain any goal states} 
-    \State $nextStates \gets \bigcup\limits_{(s, c) \in open} \left\{ (s', c' + \Call{h}{s'}) : (s', c') \in \Call{Expand}{(s,c)}\} \right\}$ 
-  \State $freezes, spreads, splits \gets $ Split $nextStates$ by $operation$ type 
-  \State $unFreezes \gets \bigcup_{s \in freezes} \left( \Call{ReservoirSample}{\gamma, s} \right)$ 
-  \State $unSpreads \gets \bigcup_{s \in spreads} \left( \Call{ReservoirSample}{\gamma, s} \right)$ 
-  \State $unSplits \gets \bigcup_{s \in splits} \left( \Call{ReservoirSample}{\gamma, s} \right)$ 
-  \State $open \gets $ Take best $\beta$ best states from $unFreezes \cup unSpreads \cup unSplits$ \EndWhile \\
-  % \EndWhile ~
-  \Return Best state in open 
-  \end{algorithmic} 
-  \end{algorithm}
-
-Here H assigns a cost for moving from state s to s'. This is defined as the negated log likelihood in $\mathcal{H}$.
-% \section{Choosing hyper parameters}
-% \label{sec:parameters}
-%
-
-  \subsubsection{Complexity Analysis}
-  [Show how complexity has been reduced wrt. the two input dimensions, compared to best-first]
-
-  \begin{figure}[ht]
-    \begin{center}
-      \includegraphics[width=\textwidth]{figs/eval/extParamsAccuracyRuntime.png}
-    \end{center}
-    \caption{}
-    \label{fig:extParamsAccRun}
-  \end{figure}
 
   \section{Testing}
-  [TODO:]
   \label{sec:testing}
-
-  \subsection{End to End Pipeline} The first step was to implement a full end-to-end pipeline from piece to chord label
-  predictions. This was achieved by writing \texttt{preprocess.py}, \texttt{runExperiment.py} and
-  \texttt{analysis.ipynb}. The repository was then containerised using \textit{Docker}, so that experiments could be
-  run and analysed using a remote server with automated dependency resolution. Experiments were executed on
-  a server, initialised via \textit{ssh}, and \textit{tmux} was used to maintain the server environment across
-  connections, with automated scripts to pull the latest changes from GitHub. A \textit{jupyter-lab} environment was
-  set up on the server, and scripts written to fetch the results of the latest experiments and produce plots and
-  tables, allowing analysis to be conducted through a browser. \subsubsection{Dataset selection}
-
-  The datasets used contain bodies of work by a single composer as shown below, these were selected to exhibit
-  a range of different styles. Each dataset contains an entire set work by a composer consisting of between $15-50$
-  annotated scores, each with varying lengths. Each dataset was split into training, validation, and test sets,
-  using a 60:20:20 split with \textit{stratified sampling} in order to maintain a balanced representation of the
-  different composers. In order to choose hyperparameters, the training and validation sets from each of the five
-  datasets were combined into a single training pool, for use in cross-validation. For the final evaluation, the
-  performance of all developed algorithms will be evaluated on the hold-out test set (20\%). This is to provide an
-  unbiased estimate of each algorithm's performance on \textbf{unseen} data.
-
-
-  \subsection{Unit Tests}
   \label{sub:unittests}
 
-  \subsection{Qualitative Tests} Throughout the design of the heuristic $H_0$ and the implementation of different search
-  algorithms, a few segments we used as reccuring test examples - interpretability - how well the output lines up with
-  a theoretical analysis.
+  Continuous integration was used throughout this project. Tests were written using the \texttt{HSpec} testing
+  framework for each module. This proved useful as it ensures that changes in the code base didn't have any unexpected
+  consequences. The \texttt{Harmony.spec} test file was particularly useful as it contains a large number of potential
+  slices and expected chord label outputs, which facilitated an effective iterative test-driven development cycle;
+  more complicated examples were added to the test specification as the harmony model became more
+  sophisticated.
 
 \chapter{Evaluation} 
 \label{chap:evaluation}
@@ -2686,8 +2784,8 @@ performance, scalability and interpretability of the developed algorithms.
     Section & Deliverable & Axes of Evaluation  \\
     \toprule 
     Section~\ref{sec:evalHarmony} & Harmony Module & Accuracy \\
-    Section~\ref{sec:evalBaseline} & Random Parse, Harmony Parser & Accuracy, Scalability \\
-    Section~\ref{sec:evalExtension}& Heuristic Search, Fitness function & Interpretability, Accuracy, Scalability \\
+    % Section~\ref{sec:evalBaseline} & Random Parse, Harmony Parser & Accuracy, Scalability \\
+    Section~\ref{sec:evalBaseline}& Heuristic Search, Fitness function & Interpretability, Accuracy, Scalability \\
     \end{tabularx} 
   }
   \end{table}
@@ -2695,19 +2793,27 @@ performance, scalability and interpretability of the developed algorithms.
 % First is an evaluation of the harmony module and the novel chord segment reduction process, finding a theoretical upper
 % bound of the prediction performance (Section~\ref{sec:evalHarmony}). 
 
-In order to show that the Success Criteria have been met, this chapter asks and answers the following questions: 
-\begin{itemize} 
-  \item Does the Harmony Module effectively infer chord labels from multi-sets of corresponding chord-tones? (Section~\ref{sec:evalHarmony})
-  \item Can the proto-voice model be used to perform a chord segment reduction? (Section~\ref{sec:evalBaseline})
-  \item Does the fitness function developed provide a meaningful proxy for the true accuracy of a proto-voice reduction?
-    (Section~\ref{sec:evalExtension})
-  \item Does the developed heuristic search algorithm achieve linear time complexity with respect to the input
-    dimensions? (Section~\ref{sec:evalExtension})
-\end{itemize}
+% In order to show that the Success Criteria have been met, this chapter asks and answers the following questions: 
+% \begin{itemize} 
+%   \item Does the Harmony Module effectively infer chord labels from multi-sets of corresponding chord-tones? (Section~\ref{sec:evalHarmony})
+%   \item Can the proto-voice model be used to perform a chord segment reduction? (Section~\ref{sec:evalBaseline})
+%   \item Does the fitness function developed provide a meaningful proxy for the true accuracy of a proto-voice reduction?
+%     (Section~\ref{sec:evalExtension})
+%   \item Does the developed heuristic search algorithm achieve linear time complexity with respect to the input
+%     dimensions? (Section~\ref{sec:evalExtension})
+% \end{itemize}
+%
+\section{Evaluation Methodology}
 
-\subsubsection{Evaluation Metrics}
+\textbf{Datasets:} The data-sets are from the DCML \texttt{romantic piano corpus} repository
+\cite{hentschelAnnotatedCorpusTonal2022}, which contains a selection of 19th Century tonal piano music annotated
+according to the DCML harmony annotation standard.
+The evaluation is conducted using a test set of six pieces from three composers: Edvard Gierg, Frédéric Chopin and Robert Schumann. 
+A different, larger set of pieces from the same composers were used as the training set when developing, used in order
+to find the optimum beam-width and \texttt{unsplit} sample-size
+parameters, manual qualitative inspection and close-error analysis. 
 
-Two numeric metrics are used to evaluate label classification performance. Recall that a chord label is described as
+\textbf{Evaluation Metrics}: Two numeric metrics are used to evaluate label classification performance. Recall that a chord label is described as
 a tuple of root-note and chord-type. \textbf{Label accuracy} is the proportion of completely correct chord label
 predictions, and \textbf{root accuracy} is the proportion of correct root-note predictions, regardless of the
 chord-type. Other metrics used include chord-label and root-note \textbf{recall} for each chord-type, used to evaluate
@@ -2715,10 +2821,21 @@ how well different chord-types are classified, and \textbf{running time}, which 
 search algorithms. Finally, \textbf{qualitative} judgements are made to evaluate the interpretability of the proto-voice fitness
 function.
 
+\textbf{Evaluation Pipeline}: 
+Early in the implementation a full end-to-end pipeline from piece to chord label
+predictions was developed. This consists of the scripts in the $\texttt{scripts/}$ folder, \texttt{preprocess.py}, \texttt{runExperiment.py} and \texttt{analysis.ipynb}. 
+The repository was then containerised using \textit{Docker}, so that experiments could be
+run and analysed using a remote server. 
+Experiments were executed on the server, initialised via \textit{ssh}, and \textit{tmux} was used to maintain the server
+environment across connections, with automated scripts to pull the latest changes from GitHub. A \textit{jupyter-lab}
+environment was set up on the server, and scripts were written to fetch the results of the latest experiments and produce plots and tables. 
+Algorithms were first run on my laptop, then later run on a server provided by the EPFL Digital Cognitive Musicology Lab
+(Dell PowerEdge R740XD Server, 2x Xeon Gold 625R, 768GB).
+
   \section{Harmony Model}
   \label{sec:evalHarmony}
   \textbf{Question 1: }Does the Harmony Model effectively infer chord labels from multi-sets of corresponding chord-tones?
-  \subsubsection{Experiment setup}
+
   The harmony model is shown to effectively infer chord labels by evaluating the upper bound on prediction
   accuracy (given an oracle heuristic), and comparing this \textit{Pardo and Birmingham's} Templating algorithm \cite{pardoAlgorithmsChordalAnalysis2002},
   a standard ACE algorithm for predicting chord labels from sequences of slices.  
@@ -2726,84 +2843,62 @@ function.
   This is achieved by running the Harmony Model on the reduction produced by the \textbf{Informed Reduction} algorithm.
   This algorithm reduces each segment by using removing non-chord-tones according to the ground-truth probabilistic
   chord profiles, corresponding to an idealised reduction. 
+
   \subsubsection{Discussion of Results}
-\begin{table}[ht!] 
+
+\begin{table}[ht] 
 \caption{Harmony Model vs Templating Baseline} 
 \label{tab:informedReductions} 
 \centering
-\begin{tabular}{llrr}
+\begin{tabular}{llcc}
 \toprule
-  Data-set       &          Algorithm  & \multicolumn{2}{l}{Accuracy} \\
-         &            &     Mean &  Std \\
+Composer       &          Algorithm  & Label Accuracy & Root Accuracy \\
 \toprule
-%   Beethoven & Informed Reduction &  \textbf{0.86} & 0.05 \\
-%          & Templating &     0.68 & 0.06 \\
-% \midrule
-  Chopin & Informed Reduction &     \textbf{0.89} & 0.12 \\
-         & Templating &     0.65 & 0.11 \\
+Chopin & Informed Reduction &     \textbf{0.89} & \textbf{0.96} \\
+         & Templating &     0.65 & 0.70 \\
 \midrule
-  Grieg & Informed Reduction &     \textbf{0.72} & 0.10 \\
-         & Templating &     0.54 & 0.14 \\
+Grieg & Informed Reduction &     \textbf{0.82} & \textbf{0.92} \\
+         & Templating &     0.52 & 0.62 \\
 \midrule
-  Schumann & Informed Reduction &     \textbf{0.85} & 0.00 \\
-         & Templating &     0.70 & 0.01 \\
+Schumann & Informed Reduction &     \textbf{0.85} & \textbf{0.91} \\
+         & Templating &     0.71 & 0.75 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Table~\ref{tab:informedReductions}: show This table shows the results of the \textit{Informed Reduction} algorithm
-described above. This shows that my algorithm is good. Running a t-squared test on the two algorithms showed that the informed reduction
-algorithm performs better than the standard baseline templating algorithm. This indicates that the chord segment
-reduction method can be used effectively to infer chord labels given the non-chord-tones can be removed, justifiying the
-underlying theory behind this project. [TODO]
+Table~\ref{tab:informedReductions} shows that the harmony model paired with an informed reduction algorithm leads to
+excellent results, out-performing the baseline Templating algorithm for three sets of pieces. As the accuracy varies
+significant accross different pieces and composers, a paired-t test was run for the two algorithms, resulting in
+a paired-t value of X, showing that the Informed Reduction algorithm has a higher accuracy with X\% confidence. 
+The excellent prediction performance using the Informed Reduction algorithm demonstrates that the chord segment reduction method can be used effectively to infer chord labels given that the non-chord-tones can be removed, affirming the underlying theory behind this project.
 
   \begin{figure}[H]
     \begin{center}
-      \includegraphics[width=0.85\textwidth]{figs/eval/Harmony/perfectRootNote.pdf}
+      \includegraphics[width=0.85\textwidth]{figs/eval/Harmony/rootNoteHeatMap.pdf}
     \end{center}
     \caption{Root note confusion matrix for the Informed Reduction. The proportion of correct root note predictions are shown in the central
     column.}
-    \label{fig:perfectConfusion}
+    \label{fig:confusionRoot}
   \end{figure}
 
   \begin{figure}[H]
     \begin{center}
-      \includegraphics[width=0.6\textwidth]{figs/eval/Harmony/perfectChordType.pdf}
+      \includegraphics[width=0.6\textwidth]{figs/eval/Harmony/chordLabelHeatMap.pdf}
     \end{center}
     \caption{Chord-type confusion matrix for the Informed Reduction.} 
-    \label{fig:perfectConfusion}
+    \label{fig:confusionLabel}
   \end{figure}
 
-
-% \end{tabular}
-%   \begin{table}[ht!] 
-%   \caption{Harmony Model vs Templating Baseline} 
-%   \label{tab:informedReductions} \centering
-%   \begin{tabularx}{0.8\textwidth}{llrr} 
-%     Data-set & Algorithm & Accuracy & \\
-%              &  & Mean & Std \\
-%     \toprule 
-%     Beethoven & Informed Reduction & $0.86$ & \\ 
-%               & Templating & $$ & \\ 
-%     \midrule
-%     Chopin    & Informed Reduction & $-33.2 \pm 15.9$ \\
-%               & Templating & $-33.2 \pm 15.9$ \\
-%     \midrule
-%     Grieg     & Informed Reduction & $-35.7 \pm 14.4$ \\
-%               & Templating  & $-35.7 \pm 14.4$ \\
-%     \midrule
-%     Schumann  & Informed Reduction &  $-24.0 \pm $ \\
-%               & Templating &  $-24.0 \pm $ \\
-%   \end{tabularx} 
-%   \end{table}
-
-
-  Figure~\ref{fig:predvsTruePerfect}: IR represents incorrect root. NC represents no chord. Actually a problem with root
-  note prediction. We are using a bag of spelled pitches, ignoring the octave information.
-
-  Note that chord label populations are highly imbalanced, in the data-set used, $84\%$ of the true chord-labels are one of \texttt{M},
-  \texttt{Mm7} or \texttt{m}. The harmony model has excellent prediction accuracy for the most common labels, but
-  less accuracy for the less common labels, but given that the . 
+  Figure~\ref{fig:confusionRoot} and Figure~\ref{fig:confusionLabel} show the root-note and full label prediction
+  recall for specific chord-types. In Figure~\ref{fig:confusionRoot} we see that the root note prediction is excellent
+  for the most common chord-types, with some systematic errors for the less common types. 
+  % One notable example is the
+  % predictions for \texttt{mm7} chord-types, which is split approximately 50/50 between a correct root note and
+  % a prediction error interval of $4$ fifths. This corresponds to predicting the \textit{relative major} of the chord.
+  % This makes sense as the major chord built from the relative major of an minor 7th chord comprises a subset of
+  % pitches of the minor 7th chord, and the missing pitch for the major chord (the sixth, 4 fifths to the right) is the third most common ornament for a major chord (See Figure~\ref{fig:probChordProfile}). 
+  % % Note that chord label populations are highly imbalanced, in the data-set used, $84\%$ of the true chord-labels are one of \texttt{M},
+  % \texttt{Mm7} or \texttt{m}. 
 
   \subsubsection{Limitations}
 
@@ -2854,9 +2949,10 @@ underlying theory behind this project. [TODO]
   a proto-voice reduction?
 
   \textbf{Question 3:} Does the developed heuristic search algorithm achieve an improvement in accuracy compared to the random parse?
-  \subsubsection{Experiment Setup}
+
   To answer both questions, I show that the \textbf{Stochastic Beam Search} guided by the heuristic fitness function
-  results in a statistically significant improvement in accuracy over the \textbf{Random Parse} for a varied selection of pieces.
+  results in a statistically significant improvement in accuracy over both the \textbf{Random Parse} and
+  \textbf{Random Reduction} for a varied selection of pieces.
 
   % It is possible for searches to get stuck. I ran the \textbf{RandomWalk} algorithm on the combined dataset consisting
   % of 174 pieces, allowing 3 reruns per parse with a 300s timeout for each parse, and found that 118 pieces failed to be parsed, 57 pieces were able to be
@@ -2878,90 +2974,138 @@ underlying theory behind this project. [TODO]
 \toprule
  Data-set &  Algorithm                            &         Accuracy &      Root-note Recall \\
 \midrule
- Chopin &  Stochastic Beam Search &  $\bm{0.66 \pm 0.03}$ &  $\bm{0.75 \pm 0.03}$ \\
+ Chopin &  Stochastic Beam Search &  $\bm{0.67 \pm 0.02}$ &  $\bm{0.74 \pm 0.04}$ \\
          & Random Parse &  $0.54 \pm 0.04$ &  $0.67 \pm 0.04$ \\
- Grieg & Stochastic Beam Search &  $\bm{0.50 \pm 0.03}$ &  $\bm{0.72 \pm 0.03}$ \\
-         &   Random Parse &  $0.43 \pm 0.03$ &  $0.73 \pm 0.03$ \\
-Schumann & Stochastic Beam Search &  $0.64 \pm 0.01$ &  $0.66 \pm 0.01$ \\
-         & Random Parse &  $0.64 \pm 0.02$ &  $0.66 \pm 0.02$ \\
+         & Random Reduction &  $0.55 \pm 0.03$ &  $0.68 \pm 0.04$ \\
+ Grieg & Stochastic Beam Search &  $\bm{0.48 \pm 0.02}$ &  $\bm{0.62 \pm 0.03}$ \\
+         &   Random Parse &  $0.45 \pm 0.02$ &  $0.57 \pm 0.04$ \\
+         &   Random Reduction &  $0.43 \pm 0.04$ &  $0.58 \pm 0.03$ \\
+Schumann & Stochastic Beam Search &  $0.57 \pm 0.01$ &  $0.63 \pm 0.01$ \\
+         & Random Parse &  $0.60 \pm 0.01$ &  $0.68 \pm 0.01$ \\
+         & Random Reduction &  $0.55 \pm 0.05$ &  $0.66 \pm 0.05$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 Table~\ref{tab:heursticRed} shows the average full chord-label and root-note prediction accuracies for three
 datasets, with 95\% confidence intervals. For Chopin and Grieg the heuristic search algorithm leads to a statistically
-significant improvement, however the accuracies are not improved for the Schumann dataset. Regardless, this provides
+significant improvement, however a statistically significant improvement is not achieved with the Schumann dataset. Regardless, this provides
 evidence that the combination of the fitness function and the Stochastic Beam Search algorithm leads to more accurate
-chord label predictions. 
-
+chord label predictions, and there's space for improvement with further refinement of the fitness function and search
+algorithm.
 
   \subsection{Interpretability}
   \label{sub:evalInterpret}
+  While the prediction accuracy results show that the fitness function guides the search towards reductions that lead to more
+  accurate predictions, it is important that it does so in an interpretable manner, rather than making use of statistical regularities that do not coincide with human intuition or music theory practice.
   \paragraph{Question:} {Does the fitness function developed provide a meaningful proxy for the music theoretic
   soundness of a proto-voice derivation?}
-  % Show the derivation of the same segment, one from the random parse, one from the heuristic search\\
-  % Heuristic search vs Random Search Quantititaively \\
-  \subsubsection{Experiment Setup}
-  The prediction accuracy 
 
+  I take an example segment reduction from the StochasticBeamSearch search example and compare it with one from the
+  random parse, qualitatively evaluating if the heuristic search finds a derivation that corresponds to a more
+  musically meaningful interpretation of the segment of music.
 
   \subsubsection{Discussion of Results}
+  \begin{figure}[ht]
+    \begin{center}
+      \includegraphics[width=\textwidth]{figs/eval/Extension/derivation.pdf}
+    \end{center}
+    \caption{Example derivation (I eill need to recreate this manually)}
+    \label{fig:extDeriv}
+  \end{figure}
+
+  Figure~\ref{fig:extDeriv} shows. ..... While it did this thing well.. it isn't perfect though..fitness
+  function can be refined further.
 
   \subsection{Scalability}
-  \paragraph{Question:} {Does the developed heuristic search algorithm achieve linear time complexity with respect to the input dimensions?}
   \label{sub:evalExtScale}
-  \subsubsection{Experiment Setup}
+  The Stochastic Beam Search was proven in Section~\ref{sub:complexityAnalaysis} to improve on the complexity of the
+  original chart parser from $\mathcal{O}(2^{n \cdot m})$ to $\mathcal{O}(\beta \cdot \gamma \cdot n \cdot m)$, where
+  $\beta$ and $\gamma$ are search parameters, $n$ is the number of slices in the input, and $m$ is the maximal number
+  of notes per slice. This section provides clear empirical evidence for this result, and explores the trade-off between
+  the accuracy and the search parameters.
 
+  \textbf{Question 5:} Does the Stochastic Beam Search algorithm achieve linear time complexity with respect to the input dimensions?
 
+  To answer question 5, three configurations of the Stochastic Beam Search were run five times on each of a large set of
+  pieces. The relation between $n$ and $m$ and the run-time is measured and plotted, with a linear regression line
+  plotted on each plot. 
+  % The reasonable confidence intervals provide evidence that there is a linear relationship between
+  % each of $n$ and $m$, and the run-time of the algorithm.
+
+  \textbf{Question 6:} Does the Stochastic Beam Search scale well with respect to its parameters?
+
+  \textbf{Question 7:} How is the trade-off between accuracy and run-time for the Stochastic Beam
+  Search characterised?
+
+  To answer questions 6 and 7, the Stochastic Beam Search was run on a single piece, \texttt{Chopin B167}, with a grid of
+  parameter configurations, with each configuration repeated 8 times. The beam width is varied incrementally between 2 and 19, and the
+  \texttt{unsplit} sample-size is varied between 5 and 145 with increments of 5.
+  Heat maps are used to plot each configuration, one showing the average accuracy achieved, and one showing the average run-time. 
   \subsubsection{Discussion of Results}
 
-  \subsubsection{Experiment Setup}
+  \begin{figure}[ht]
+    \begin{center}
+      \includegraphics[width=\textwidth]{figs/eval/Extension/scaling.pdf}
+    \end{center}
+    \caption{Run time with respect to the input dimensions, $n$ and $m$}
+    \label{fig:extScaling}
+  \end{figure}
+\textbf{Figure~\ref{fig:extScaling}}: Linear regression lines have been plotted with a 95\% confidence range. The plots
+show a clear linear relationship between both the number of slices in each piece and the maximal number of notes in each
+slice in each piece, and the run-time of the algorithm.
 
-  \begin{figure*}[ht]
+  \begin{figure}[ht]
+    \begin{center}
+      \includegraphics[width=\textwidth]{figs/eval/Extension/extParamsAccuracyRuntime.pdf}
+    \end{center}
+    \caption{Heat maps showing the effect of the search parameters $\beta$ and $\gamma$ on accuracy and run-time for
+    \texttt{Chopin B167}. The average accuracy for the Random Parse on this piece was $0.55$.}
+    \label{fig:extParamsAccRun}
+  \end{figure}
 
-    \includegraphics[width=\textwidth]{figs/eval/baselineResults.png}
-    \caption{}
-    \label{fig:baseRes}
-  \end{figure*}
-  
-  \paragraph{Question:} {Does the developed Harmony Parser successfully perform chord segment reduction?}
-  \paragraph{Answer:} {All developed search algorithms make use of the Harmony Parser in order to perform the chord
-  segment reductions. Running the Random-Parse on the combined Data-set containing 800 pieces results in a successful
-  parse for 62\% of the pieces. Those that do}
+\textbf{Figure~\ref{fig:extParamsAccRun}}: Both the run-time and accuracy have been plotted for a range of parameter
+configurations. The heat-map on the right shows a clear linear relationship between run-time and either parameter,
+although there is more chaotic run-time and prediction behaviour with very small values of $\gamma$. This makes sense as
+lower values of $\gamma$ result in a small number of potential \texttt{unsplit} reductions being sampled, resulting in more random
+behaviour. Interestingly, the highest accuracy was achieve with a sample size of $5$ and beam-width of $18$. One 
+interpretation of these results is that increasing the beam-width encourages a more \textit{robust} search behaviour, and a more
+robust search can recover situations when the greedy search algorithm explores states that turn out to be suboptimal.
+The parameter $\gamma$ affects how greedy the search algorithm is with respect to \texttt{unsplit} reductions, with
+$\gamma=1$ resulting in just one random \texttt{unsplit} being considered while a configuration with $\gamma=100$ will
+pick the best $\beta$ \texttt{unsplit} reductions at each step. 
+
+There is also an interaction between $\beta$ and
+$\gamma$ that determines the relative proportion of \texttt{unsplit}, \texttt{unspread} and \texttt{unfreeze} operations
+at each step. As the search algorithm always considers $\beta$ parse operations of \textit{each type}, when $\gamma
+< \beta$ there will be a tendency to have more spread and freeze operations in the combined beam. As a result, the
+search is encouraged to explore fewer \texttt{unsplit} operations. This provides an explanation for the reduced
+prediction accuracy from in Figure~\ref{fig:extParamsAccRun} in the region given by $\gamma < 1.6 \beta$.
 
 
 \section{Success Criteria}
 \label{sec:successCriteriaEval}
 
-\section{Overview of Limitations}
-
+[TODO: explain how the evaluation has shown that the success criteria have been met.]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       % Conclusions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
       \chapter{Conclusions} 
-      This project aimed to [] and it has been demonstrated that this was achieved with great success. 
+      This project aimed to  and it has been demonstrated that this was achieved with great success. 
       This chapter provides a reflection on the achievements of the project, the lessons learned, and possible avenues of future work.
 
-      \section{Achievements}
-
       - Reiterate how each of the questions asked on the outset have been answered. \\
-
-      \section{Lessons learned}
-
       - Use of visualisations for development very complex algorithm and output. \\
       - Logging at different verbosity levels proved very helpful. \\
-
-      \section{Future Work}
-
       - Different Domains \\
       - Further heuristic algorithms/ genetic algorithms \\
+      - Diversity
       - Context \\
       - Non left-most parse \\
-      - 
-
-
+      - Longer range dependencies \\
+      - Multi-stage process all in an explainable way? - get trendy and combine with large language model lol
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       % the bibliography
